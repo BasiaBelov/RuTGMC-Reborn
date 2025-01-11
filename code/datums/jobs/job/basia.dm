@@ -25,7 +25,6 @@
 	engineer = SKILL_ENGINEER_INHUMAN
 	construction = SKILL_CONSTRUCTION_INHUMAN
 	firearms = SKILL_FIREARMS_TRAINED
-	swordplay = SKILL_SWORDPLAY_TRAINED
 
 /datum/job/terragov/command/basia
 	title = BASIA
