@@ -11,22 +11,20 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 	RADIO_CHANNEL_DELTA = RADIO_TOKEN_DELTA
 ))
 
-
 /obj/item/radio/headset
 	name = "radio headset"
 	desc = "An updated, modular intercom that fits over the head. Takes encryption keys."
 	icon_state = "headset"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/clothing/ears_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/clothing/ears_right.dmi',
 	)
-	item_state = "headset"
+	worn_icon_state = "headset"
 	subspace_transmission = TRUE
 	canhear_range = 0 // can't hear headsets from very far away
 
-	flags_equip_slot = ITEM_SLOT_EARS
+	equip_slot_flags = ITEM_SLOT_EARS
 	var/obj/item/encryptionkey/keyslot2 = null
-
 
 /obj/item/radio/headset/Initialize(mapload)
 	if(keyslot)
@@ -51,51 +49,45 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 		QDEL_NULL(keyslot2)
 	return ..()
 
-
 /obj/item/radio/headset/attackby(obj/item/I, mob/user, params)
 	. = ..()
-
-	if(isscrewdriver(I))
-		if(keyslot || keyslot2)
-			for(var/ch_name in channels)
-				SSradio.remove_object(src, GLOB.radiochannels[ch_name])
-				secure_radio_connections[ch_name] = null
-
-			var/turf/T = get_turf(user)
-			if(T)
-				if(keyslot)
-					keyslot.forceMove(T)
-					keyslot = null
-				if(keyslot2)
-					keyslot2.forceMove(T)
-					keyslot2 = null
-
-			recalculateChannels()
-			balloon_alert_to_viewers("pops out keys")
-
-		else
-			balloon_alert(user, "No keys to remove")
-
-	else if(istype(I, /obj/item/encryptionkey))
-		if(keyslot && keyslot2)
-			balloon_alert(user, "Can't, headset is full")
+	if(.)
+		return
+	if(!istype(I, /obj/item/encryptionkey))
+		return
+	if(keyslot && keyslot2)
+		balloon_alert(user, "Can't, headset is full")
+		return
+	if(!keyslot)
+		if(!user.transferItemToLoc(I, src))
 			return
+		keyslot = I
+	else
+		if(!user.transferItemToLoc(I, src))
+			return
+		keyslot2 = I
+		I.forceMove(src)
+		keyslot2 = I
+	recalculateChannels()
 
-		if(!keyslot)
-			if(!user.transferItemToLoc(I, src))
-				return
-			keyslot = I
-
-		else
-			if(!user.transferItemToLoc(I, src))
-				return
-			keyslot2 = I
-
-			I.forceMove(src)
-			keyslot2 = I
-
-		recalculateChannels()
-
+/obj/item/radio/headset/screwdriver_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(!keyslot && !keyslot2)
+		balloon_alert(user, "No keys to remove")
+		return
+	for(var/ch_name in channels)
+		SSradio.remove_object(src, GLOB.radiochannels[ch_name])
+		secure_radio_connections[ch_name] = null
+	var/turf/T = get_turf(user)
+	if(T)
+		if(keyslot)
+			keyslot.forceMove(T)
+			keyslot = null
+		if(keyslot2)
+			keyslot2.forceMove(T)
+			keyslot2 = null
+	recalculateChannels()
+	balloon_alert_to_viewers("pops out keys")
 
 /obj/item/radio/headset/examine(mob/user)
 	. = ..()
@@ -168,17 +160,16 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 	name = "marine radio headset"
 	desc = "A standard military radio headset."
 	icon_state = "cargo_headset"
-	item_state = "headset"
+	worn_icon_state = "headset"
 	frequency = FREQ_COMMON
-	flags_atom = CONDUCT | PREVENT_CONTENTS_EXPLOSION
+	atom_flags = CONDUCT | PREVENT_CONTENTS_EXPLOSION
 	freerange = TRUE
+	faction = FACTION_TERRAGOV
 	var/obj/machinery/camera/camera
 	var/datum/atom_hud/squadhud = null
 	var/mob/living/carbon/human/wearer = null
 	var/headset_hud_on = FALSE
 	var/sl_direction = FALSE
-	///The faction this headset belongs to. Used for hudtype, minimap and safety protocol
-	var/faction = FACTION_TERRAGOV
 	///The type of minimap this headset gives access to
 	var/datum/action/minimap/minimap_type = /datum/action/minimap/marine
 
@@ -228,7 +219,6 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 	if(wearer)
 		if(headset_hud_on && wearer.wear_ear == src)
 			squadhud.remove_hud_from(wearer)
-			wearer.SL_directional = null
 			if(wearer.assigned_squad)
 				SSdirection.stop_tracking(wearer.assigned_squad.tracking_id, wearer)
 		wearer = null
@@ -284,8 +274,8 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 			else if(ishuman(wearer))
 				SSminimaps.add_marker(wearer, marker_flags, image('icons/UI_icons/map_blips.dmi', null, "undefibbable", BELOW_FLOAT_LAYER))
 			return
-		if(!wearer.client)
-			var/mob/dead/observer/ghost = wearer.get_ghost()
+		if(!wearer.mind)
+			var/mob/dead/observer/ghost = wearer.get_ghost(TRUE)
 			if(!ghost?.can_reenter_corpse)
 				if(issynth(wearer))
 					SSminimaps.add_marker(wearer, marker_flags, image('icons/UI_icons/map_blips.dmi', null, "undefibbable_synt", BELOW_FLOAT_LAYER))
@@ -314,6 +304,11 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 		var/image/overlay = image('icons/UI_icons/map_blips.dmi', null, wearer.job.minimap_icon)
 		overlay.color = wearer.assigned_squad.color
 		underlay.overlays += overlay
+
+		if(wearer.assigned_squad?.squad_leader == wearer)
+			var/image/leader_trim = image('icons/UI_icons/map_blips.dmi', null, "leader_trim")
+			underlay.overlays += leader_trim
+
 		SSminimaps.add_marker(wearer, marker_flags, underlay)
 		return
 	SSminimaps.add_marker(wearer, marker_flags, image('icons/UI_icons/map_blips.dmi', null, wearer.job.minimap_icon))
@@ -364,7 +359,7 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 
 /obj/item/radio/headset/mainship/verb/configure_squadhud()
 	set name = "Configure Headset HUD"
-	set category = "Object.Clothing"
+	set category = "IC.Clothing"
 	set src in usr
 
 	if(!can_interact(usr))
@@ -391,9 +386,9 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 		return
 
 	var/dat = {"
-	<b><A href='?src=[text_ref(src)];headset_hud_on=1'>Squad HUD: [headset_hud_on ? "On" : "Off"]</A></b><BR>
+	<b><A href='byond://?src=[text_ref(src)];headset_hud_on=1'>Squad HUD: [headset_hud_on ? "On" : "Off"]</A></b><BR>
 	<BR>
-	<b><A href='?src=[text_ref(src)];sl_direction=1'>Squad Leader Directional Indicator: [sl_direction ? "On" : "Off"]</A></b><BR>
+	<b><A href='byond://?src=[text_ref(src)];sl_direction=1'>Squad Leader Directional Indicator: [sl_direction ? "On" : "Off"]</A></b><BR>
 	<BR>"}
 
 	var/datum/browser/popup = new(user, "radio")
@@ -497,6 +492,12 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 	name = "spatial agent headset"
 	icon_state = "headset_marine_generic"
 	keyslot = /obj/item/encryptionkey/mcom/ai
+	item_flags = DELONDROP
+
+/obj/item/radio/headset/mainship/service
+	name = "service radio headset"
+	icon_state = "headset_marine_xray"
+	keyslot = /obj/item/encryptionkey/general
 
 /obj/item/radio/headset/mainship/marine
 	keyslot = /obj/item/encryptionkey/general
@@ -694,3 +695,18 @@ GLOBAL_LIST_INIT(channel_tokens, list(
 /obj/item/radio/headset/distress/echo
 	name = "\improper Echo Task Force headset"
 	keyslot = /obj/item/encryptionkey/echo
+
+/obj/item/radio/headset/distress/retired
+	name = "retirement home headset"
+	keyslot = /obj/item/encryptionkey/retired
+	frequency = FREQ_RETIRED
+
+/obj/item/radio/headset/distress/vsd
+	name = "security detail headset"
+	keyslot = /obj/item/encryptionkey/vsd
+	frequency = FREQ_VSD
+
+/obj/item/radio/headset/distress/erp
+	name = "prankster headset"
+	keyslot = /obj/item/encryptionkey/erp
+	frequency = FREQ_ERP

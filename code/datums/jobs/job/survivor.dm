@@ -60,248 +60,78 @@ If you find any other survivors in the area, cooperate with them to increase you
 Depending on the job you've undertook, you may have additional skills to help others when needed.
 Good luck, but do not expect to survive."})
 
-
-//Assistant
-/datum/job/survivor/assistant
-	title = "Assistant Survivor"
-	outfit = /datum/outfit/job/survivor/assistant
-
-
-/datum/outfit/job/survivor/assistant
-	name = "Assistant Survivor"
-	jobtype = /datum/job/survivor/assistant
-
-	w_uniform = /obj/item/clothing/under/color/grey
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/norm
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	ears = /obj/item/radio/headset/survivor
-
-
-//Scientist
 /datum/job/survivor/scientist
 	title = "Scientist Survivor"
 	skills_type = /datum/skills/civilian/survivor/scientist
 	outfit = /datum/outfit/job/survivor/scientist
 
-
-/datum/outfit/job/survivor/scientist
-	name = "Scientist Survivor"
-	jobtype = /datum/job/survivor/scientist
-
-	w_uniform = /obj/item/clothing/under/rank/scientist
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/tox
-	ears = /obj/item/radio/headset/survivor
-
-
-//Doctor
 /datum/job/survivor/doctor
 	title = "Doctor's Assistant Survivor"
 	skills_type = /datum/skills/civilian/survivor/doctor
 	outfit = /datum/outfit/job/survivor/doctor
 
-
-/datum/outfit/job/survivor/doctor
-	name = "Doctor's Assistant Survivor"
-	jobtype = /datum/job/survivor/doctor
-
-	w_uniform = /obj/item/clothing/under/rank/medical
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/med
-	ears = /obj/item/radio/headset/survivor
-
-
-//Liaison
 /datum/job/survivor/liaison
 	title = "Liaison Survivor"
 	outfit = /datum/outfit/job/survivor/liaison
 
-
-/datum/outfit/job/survivor/liaison
-	name = "Liaison Survivor"
-	jobtype = /datum/job/survivor/liaison
-
-	w_uniform = /obj/item/clothing/under/liaison_suit
-	wear_suit = /obj/item/clothing/suit/armor/bulletproof
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/norm
-	ears = /obj/item/radio/headset/survivor
-
-
-//Security Guard
 /datum/job/survivor/security
 	title = "Security Guard Survivor"
 	skills_type = /datum/skills/civilian/survivor/marshal
 	outfit = /datum/outfit/job/survivor/security
 
-
-/datum/outfit/job/survivor/security
-	name = "Security Guard Survivor"
-	jobtype = /datum/job/survivor/security
-
-	w_uniform = /obj/item/clothing/under/rank/security/corp
-	wear_suit = /obj/item/clothing/suit/armor/bulletproof
-	shoes = /obj/item/clothing/shoes/marine
-	back = /obj/item/storage/backpack/satchel/sec
-	ears = /obj/item/radio/headset/survivor
-
-
-//Civilian
 /datum/job/survivor/civilian
 	title = "Civilian Survivor"
 	outfit = /datum/outfit/job/survivor/civilian
 
-
-/datum/outfit/job/survivor/civilian
-	name = "Civilian Survivor"
-	jobtype = /datum/job/survivor/civilian
-
-	w_uniform = /obj/item/clothing/under/pj/red
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/norm
-	ears = /obj/item/radio/headset/survivor
-
-
-//Chef
 /datum/job/survivor/chef
 	title = "Chef Survivor"
 	skills_type = /datum/skills/civilian/survivor/chef
 	outfit = /datum/outfit/job/survivor/chef
 
-
-/datum/outfit/job/survivor/chef
-	name = "Chef Survivor"
-	jobtype = /datum/job/survivor/chef
-
-	w_uniform = /obj/item/clothing/under/rank/chef
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/norm
-	ears = /obj/item/radio/headset/survivor
-
-
-//Botanist
 /datum/job/survivor/botanist
 	title = "Botanist Survivor"
 	outfit = /datum/outfit/job/survivor/botanist
 
-
-/datum/outfit/job/survivor/botanist
-	name = "Botanist Survivor"
-	jobtype = /datum/job/survivor/botanist
-
-	w_uniform = /obj/item/clothing/under/rank/hydroponics
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/hydroponics
-	ears = /obj/item/radio/headset/survivor
-
-
-//Atmospherics Technician
 /datum/job/survivor/atmos
 	title = "Atmospherics Technician Survivor"
 	skills_type = /datum/skills/civilian/survivor/atmos
 	outfit = /datum/outfit/job/survivor/atmos
 
-
-/datum/outfit/job/survivor/atmos
-	name = "Atmospherics Technician Survivor"
-	jobtype = /datum/job/survivor/atmos
-
-	w_uniform = /obj/item/clothing/under/rank/atmospheric_technician
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/eng
-	ears = /obj/item/radio/headset/survivor
-
-
-//Chaplain
 /datum/job/survivor/chaplain
 	title = "Chaplain Survivor"
 	outfit = /datum/outfit/job/survivor/chaplain
 
-
-/datum/outfit/job/survivor/chaplain
-	name = "Chaplain Survivor"
-	jobtype = /datum/job/survivor/chaplain
-
-	w_uniform = /obj/item/clothing/under/rank/chaplain
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/norm
-	ears = /obj/item/radio/headset/survivor
-
-
-//Miner
 /datum/job/survivor/miner
 	title = "Miner Survivor"
 	skills_type = /datum/skills/civilian/survivor/miner
 	outfit = /datum/outfit/job/survivor/miner
 
-
-/datum/outfit/job/survivor/miner
-	name = "Miner Survivor"
-	jobtype = /datum/job/survivor/miner
-
-	w_uniform = /obj/item/clothing/under/rank/miner
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel/norm
-	ears = /obj/item/radio/headset/survivor
-
-
-//Salesman
 /datum/job/survivor/salesman
 	title = "Salesman Survivor"
 	outfit = /datum/outfit/job/survivor/salesman
 
-
-/datum/outfit/job/survivor/salesman
-	name = "Salesman Survivor"
-	jobtype = /datum/job/survivor/salesman
-
-	w_uniform = /obj/item/clothing/under/liaison_suit
-	wear_suit = /obj/item/clothing/suit/armor/vest
-	shoes = /obj/item/clothing/shoes/black
-	back = /obj/item/storage/backpack/satchel
-	ears = /obj/item/radio/headset/survivor
-
-
-//Colonial Marshal
 /datum/job/survivor/marshal
 	title = "Colonial Marshal Survivor"
 	skills_type = /datum/skills/civilian/survivor/marshal
 	outfit = /datum/outfit/job/survivor/marshal
 
+/datum/job/survivor/bartender
+	title = "Bartender Survivor"
+	outfit = /datum/outfit/job/survivor/bartender
 
-/datum/outfit/job/survivor/marshal
-	name = "Colonial Marshal Survivor"
-	jobtype = /datum/job/survivor/marshal
+/datum/job/survivor/chemist
+	title = "Pharmacy Technician Survivor"
+	skills_type = /datum/skills/civilian/survivor/scientist
+	outfit = /datum/outfit/job/survivor/chemist
 
-	w_uniform = /obj/item/clothing/under/CM_uniform
-	wear_suit = /obj/item/clothing/suit/storage/CMB
-	shoes = /obj/item/clothing/shoes/jackboots
-	back = /obj/item/storage/backpack/satchel/sec
-	ears = /obj/item/radio/headset/survivor
+/datum/job/survivor/roboticist
+	title = "Roboticist Survivor"
+	skills_type = /datum/skills/civilian/survivor/atmos
+	outfit = /datum/outfit/job/survivor/roboticist
 
-
-// Rambo Survivor
+// Rambo Survivor - pretty overpowered, pls spawn with caution
 /datum/job/survivor/rambo
-	title = "Survivor"
+	title = "Rambo Survivor"
 	skills_type = /datum/skills/civilian/survivor/master
 	outfit = /datum/outfit/job/survivor/rambo
 	job_flags = JOB_FLAG_ROUNDSTARTJOINABLE|JOB_FLAG_OVERRIDELATEJOINSPAWN|JOB_FLAG_LATEJOINABLE
-
-/datum/outfit/job/survivor/rambo
-	name = "Survivor"
-	jobtype = /datum/job/survivor/rambo
-	w_uniform = /obj/item/clothing/under/color/grey
-	wear_suit = /obj/item/clothing/suit/armor/rugged
-	shoes = /obj/item/clothing/shoes/ruggedboot
-	back = /obj/item/storage/backpack/satchel/rugged
-	gloves = /obj/item/clothing/gloves/ruggedgloves
-	ears = /obj/item/radio/headset/survivor

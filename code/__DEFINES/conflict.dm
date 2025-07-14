@@ -37,7 +37,7 @@
 #define INTENT_NUMBER_HARM 3
 
 //Ammo defines for gun/projectile related things.
-//flags_ammo_behavior
+//ammo_behavior_flags
 
 ///Ammo will impact a targeted open turf instead of continuing past it
 #define AMMO_TARGET_TURF (1<<0)
@@ -77,7 +77,7 @@
 #define AMMO_SENTRY (1<<17)
 
 //Gun defines for gun related thing. More in the projectile folder.
-//flags_gun_features
+//gun_features_flags
 #define GUN_CAN_POINTBLANK (1<<0)
 #define GUN_UNUSUAL_DESIGN (1<<1)
 #define GUN_AMMO_COUNTER (1<<2)
@@ -128,11 +128,14 @@
 #define AUTOFIRE_CONTINUE (1<<0)
 #define AUTOFIRE_SUCCESS (1<<1)
 
-//Ammo magazine defines, for flags_magazine
+//Ammo magazine defines, for magazine_flags
 #define MAGAZINE_REFILLABLE (1<<0)
 #define MAGAZINE_HANDFUL (1<<1)
 #define MAGAZINE_WORN (1<<2)
 #define MAGAZINE_REFUND_IN_CHAMBER (1<<3)
+#define MAGAZINE_NOT_FABRICABLE (1<<4)
+///ammo count shown on mag sprite
+#define MAGAZINE_SHOW_AMMO (1<<5)
 
 //Slowdown from various armors.
 #define SHOES_SLOWDOWN -1.0			// How much shoes slow you down by default. Negative values speed you up
@@ -183,13 +186,24 @@
 #define SMOKE_XENO_HEMODILE (1<<12)
 #define SMOKE_XENO_TRANSVITOX (1<<13)
 #define SMOKE_CHEM (1<<14)
-#define SMOKE_EXTINGUISH (1<<15) //Extinguishes fires and mobs that are on fire
-#define SMOKE_NEURO_LIGHT (1<<16) //Effectively a sub-flag of Neuro; precludes higher impact effects
-#define SMOKE_HUGGER_PACIFY (1<<17) //Smoke that pacifies huggers in its area; mainly used for vision blocking smoke
-#define SMOKE_XENO_SANGUINAL (1<<18) //Toxic crimson smoke created by the Defiler's Defile ability.
-#define SMOKE_XENO_OZELOMELYN (1<<19) //Smoke that purges chemicals and does minor capped toxin damage for Defiler.
-#define SMOKE_SATRAPINE (1<<20) //nerve agent that purges painkillers and causes increasing pain
-#define SMOKE_XENO_TOXIC (1<<21) //deals damage to anyone inside it and inflicts the intoxicated debuff, dealing damage over time
+/// Extinguishes fires and mobs that are on fire
+#define SMOKE_EXTINGUISH (1<<15)
+/// Effectively a sub-flag of Neuro; precludes higher impact effects
+#define SMOKE_NEURO_LIGHT (1<<16)
+/// Smoke that pacifies huggers in its area; mainly used for vision blocking smoke
+#define SMOKE_HUGGER_PACIFY (1<<17)
+/// Toxic crimson smoke created by the Defiler's Defile ability.
+#define SMOKE_XENO_SANGUINAL (1<<18)
+/// Smoke that purges chemicals and does minor capped toxin damage for Defiler.
+#define SMOKE_XENO_OZELOMELYN (1<<19)
+/// Nerve agent that purges painkillers and causes increasing pain
+#define SMOKE_SATRAPINE (1<<20)
+/// Deals damage to anyone inside it and inflicts the intoxicated debuff, dealing damage over time
+#define SMOKE_XENO_TOXIC (1<<21)
+/// This smoke removes any smoke has this in its effects_cycle, that removes certain types of smokes.
+#define SMOKE_PURGER (1<<22)
+/// Smoke that acts like SMOKE_BLISTERING for non-xenos and applies pyrogen's melting fire status effect when entering.
+#define SMOKE_XENO_PYROGEN (1<<23)
 
 //Incapacitated
 #define INCAPACITATED_IGNORE_RESTRAINED (1<<0)
@@ -249,5 +263,27 @@
 //Explosion damage multipliers for different objects
 #define RESIN_EXPLOSIVE_MULTIPLIER 0.85
 
+// What kind of function to use for Explosions falling off.
+#define EXPLOSION_FALLOFF_SHAPE_LINEAR 1
+#define EXPLOSION_FALLOFF_SHAPE_EXPONENTIAL 2
+#define EXPLOSION_FALLOFF_SHAPE_EXPONENTIAL_HALF 3
+
+#define EXPLOSION_MAX_POWER 5000
+
 //Damage modificator
 #define PRED_MELEE_DAMAGE_MOD 0.5
+
+//Cave comms defines
+/// No impact on comms
+#define CAVE_NO_INTERFERENCE 0
+/// Scrambles outgoing messages, no impact on incoming.
+#define CAVE_MINOR_INTERFERENCE 1
+/// Prevents incoming and outgoing messages.
+#define CAVE_FULL_INTERFERENCE 2
+
+/// Time needed to initially configure an antenna module after equipping
+#define ANTENNA_SYNCING_TIME 30 SECONDS
+
+#define CADE_TYPE_BOMB "concussive armor"
+#define CADE_TYPE_MELEE "ballistic armor"
+#define CADE_TYPE_ACID "caustic armor"

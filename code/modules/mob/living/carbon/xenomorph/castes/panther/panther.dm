@@ -13,9 +13,8 @@
 	tier = XENO_TIER_TWO
 	upgrade = XENO_UPGRADE_NORMAL
 	pixel_x = -16
-	old_x = -16
 	bubble_icon = "alien"
-	gib_chance = 0
+	gib_chance = 44.81
 	inherent_verbs = list(
 		/mob/living/carbon/xenomorph/proc/vent_crawl,
 	)
@@ -56,11 +55,6 @@
 	if(!reagents.total_volume)
 		icon_state = "pantherheart_e"
 
-/mob/living/carbon/xenomorph/panther/on_death()
-	. = ..()
-	if(prob(44.81))
-		new /obj/item/reagent_containers/food/drinks/pantherheart(loc)
-		gib()
-
-/mob/living/carbon/xenomorph/panther/set_frenzy_aura(new_aura)
-	return
+/mob/living/carbon/xenomorph/panther/gib()
+	new /obj/item/reagent_containers/food/drinks/pantherheart(loc)
+	return ..()

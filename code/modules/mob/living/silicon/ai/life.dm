@@ -1,4 +1,4 @@
-/mob/living/silicon/ai/Life()
+/mob/living/silicon/ai/Life(seconds_per_tick, times_fired)
 
 	if(notransform) //If we're dead or set to notransform don't bother processing life
 		return
@@ -7,7 +7,7 @@
 		SSmobs.stop_processing(src)
 		return
 
-	updatehealth()
+	update_health()
 
 	interactee?.check_eye(src)
 
@@ -25,11 +25,11 @@
 			set_stat(CONSCIOUS)
 
 
-/mob/living/silicon/ai/updatehealth()
+/mob/living/silicon/ai/update_health()
 	if(status_flags & GODMODE)
 		return
 
-	health = 100 - getOxyLoss() - getToxLoss() - getFireLoss() - getBruteLoss()
+	health = 100 - get_oxy_loss() - get_tox_loss() - get_fire_loss() - get_brute_loss()
 
 	update_stat()
 

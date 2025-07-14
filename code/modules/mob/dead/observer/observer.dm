@@ -27,7 +27,6 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 	var/datum/orbit_menu/orbit_menu
 	var/mob/observetarget = null	//The target mob that the ghost is observing. Used as a reference in logout()
 
-
 	//We store copies of the ghost display preferences locally so they can be referred to even if no client is connected.
 	//If there's a bug with changing your ghost settings, it's probably related to this.
 	var/ghost_others = GHOST_OTHERS_DEFAULT_OPTION
@@ -38,6 +37,10 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 	var/lastsetting = null	//Stores the last setting that ghost_others was set to, for a little more efficiency when we update ghost images. Null means no update is necessary
 
 	var/inquisitive_ghost = FALSE
+	/// Stores variable set in toggle_health_scan.
+	var/health_scan = FALSE
+	/// Creates health_analyzer to scan with on toggle_health_scan toggle.
+	var/obj/item/healthanalyzer/integrated/health_analyzer
 	///A weakref to the original corpse of the observer
 	var/datum/weakref/can_reenter_corpse
 	var/started_as_observer //This variable is set to 1 when you enter the game as an observer.
@@ -97,7 +100,8 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 		name = random_unique_name(gender)
 	real_name = name
 
-	animate(src, pixel_y = 2, time = 10, loop = -1)
+	animate(src, pixel_y = 2, time = 10, loop = -1, flags = ANIMATION_RELATIVE)
+	animate(pixel_y = -2, time = 10, loop = -1, flags = ANIMATION_RELATIVE)
 
 	grant_all_languages()
 
@@ -116,6 +120,8 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 	QDEL_NULL(orbit_menu)
 	GLOB.observer_list -= src //"wait isnt this done in logout?" Yes it is but because this is clients thats unreliable so we do it again here
 	SSmobs.dead_players_by_zlevel[z] -= src
+
+	QDEL_NULL(health_analyzer)
 
 	return ..()
 
@@ -202,7 +208,9 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 
 		switch(tgui_alert(ghost, "What would you like to do?", "Burrowed larva source available", list("Join as Larva", "Cancel"), 0))
 			if("Join as Larva")
-				SSticker.mode.attempt_to_join_as_larva(ghost.client)
+				var/mob/living/carbon/human/original_corpse = ghost.can_reenter_corpse.resolve()
+				if(SSticker.mode.attempt_to_join_as_larva(ghost.client) && ishuman(original_corpse))
+					original_corpse?.set_undefibbable()
 		return
 
 	else if(href_list["preference"])
@@ -368,7 +376,7 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 		to_chat(src, span_warning("Another consciousness is in your body...It is resisting you."))
 		return FALSE
 
-	client.view_size.set_default(get_screen_size(client.prefs.widescreenpref))//Let's reset so people can't become allseeing gods
+	client.view_size?.set_default(get_screen_size(client.prefs.widescreenpref))//Let's reset so people can't become allseeing gods
 	mind.transfer_to(old_mob, TRUE)
 	return TRUE
 
@@ -391,13 +399,6 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 			client.prefs.ghost_hud ^= GHOST_HUD_MED
 			client.prefs.save_preferences()
 			to_chat(src, span_boldnotice("[hud_choice] [ghost_medhud ? "Enabled" : "Disabled"]"))
-		if("Security HUD")
-			ghost_sechud = !ghost_sechud
-			H = GLOB.huds[DATA_HUD_SECURITY_ADVANCED]
-			ghost_sechud ? H.add_hud_to(src) : H.remove_hud_from(src)
-			client.prefs.ghost_hud ^= GHOST_HUD_SEC
-			client.prefs.save_preferences()
-			to_chat(src, span_boldnotice("[hud_choice] [ghost_sechud ? "Enabled": "Disabled"]"))
 		if("Squad HUD")
 			ghost_squadhud = !ghost_squadhud
 			H = GLOB.huds[DATA_HUD_SQUAD_TERRAGOV]
@@ -420,17 +421,16 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 			client.prefs.save_preferences()
 			to_chat(src, span_boldnotice("[hud_choice] [ghost_orderhud ? "Enabled" : "Disabled"]"))
 
-
-
-/mob/dead/observer/verb/teleport(area/A in GLOB.sorted_areas)
+/mob/dead/observer/verb/teleport()
 	set category = "Ghost"
 	set name = "Teleport"
 	set desc = "Teleport to an area."
 
-	if(!A)
+	var/area/newloc = tgui_input_list(usr, "Choose an area to teleport to.", "Teleport", GLOB.sorted_areas)
+	if(!newloc)
 		return
 
-	abstract_move(pick(get_area_turfs(A)))
+	abstract_move(pick(get_area_turfs(newloc)))
 
 /mob/dead/observer/verb/follow_ghost()
 	set category = "Ghost"
@@ -679,7 +679,8 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 /mob/dead/observer/stop_orbit(datum/component/orbiter/orbits)
 	. = ..()
 	pixel_y = 0
-	animate(src, pixel_y = 2, time = 10, loop = -1)
+	animate(src, pixel_y = 2, time = 10, loop = -1, flags = ANIMATION_RELATIVE)
+	animate(pixel_y = -2, time = 10, loop = -1, flags = ANIMATION_RELATIVE)
 
 /mob/dead/observer/verb/toggle_zoom()
 	set category = "Ghost"
@@ -839,11 +840,10 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 
 	if(!isnull(can_reenter_corpse) && tgui_alert(usr, "Are you sure? You won't be able to get revived.", "Confirmation", list("Yes", "No")) == "Yes")
 		var/mob/living/carbon/human/human_current = can_reenter_corpse.resolve()
-		if(istype(human_current))
+		if(ishuman(human_current))
 			human_current.set_undefibbable(TRUE)
-
 		can_reenter_corpse = null
-		to_chat(usr, span_notice("You can no longer be revived."))
+		to_chat(usr, span_boldwarning("You can no longer be revived."))
 		return
 
 	to_chat(usr, span_warning("You already can't be revived."))
@@ -861,6 +861,21 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 	else
 		to_chat(src, span_notice("You will no longer examine things you click on."))
 
+/// Toggle for whether you health-scan living beings on click as observer.
+/mob/dead/observer/verb/toggle_health_scan()
+	set category = "Ghost"
+	set name = "Toggle Health Scan"
+	set desc = "Toggles whether you health-scan living beings on click"
+
+	if(health_scan)
+		to_chat(src, span_notice("Health scan disabled."))
+		health_scan = FALSE
+		QDEL_NULL(health_analyzer)
+	else
+		to_chat(src, span_notice("Health scan enabled."))
+		health_scan = TRUE
+		health_analyzer = new()
+
 /mob/dead/observer/verb/join_valhalla()
 	set name = "Join Valhalla"
 	set category = "Ghost"
@@ -877,10 +892,14 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 		to_chat(usr, span_boldnotice("You must be dead to use this!"))
 		return
 
-	var/choice = tgui_input_list(usr, "You are about to embark to the ghastly walls of Valhalla. Xenomorph or Marine?", "Join Valhalla", list("Xenomorph", "Marine"))
+	var/choice = tgui_input_list(usr, "You are about to embark to the ghastly walls of Valhalla. This will make you unrevivable. Xenomorph or Marine?", "Join Valhalla", list("Xenomorph", "Marine"))
 
 	if(!choice)
 		return
+
+	var/mob/living/carbon/human/original_corpse = can_reenter_corpse?.resolve()
+	if(ishuman(original_corpse))
+		original_corpse?.set_undefibbable(TRUE)
 
 	if(choice == "Xenomorph")
 		var/mob/living/carbon/xenomorph/xeno_choice = tgui_input_list(usr, "You are about to embark to the ghastly walls of Valhalla. What xenomorph would you like to have?", "Join Valhalla", GLOB.all_xeno_types)
@@ -958,6 +977,6 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 		return
 
 	if(src == target_ghost)
-		client.holder.spatial_agent()
+		SSadmin_verbs.dynamic_invoke_verb(src, /datum/admin_verb/spatial_agent)
 	else
 		target_ghost.change_mob_type(/mob/living/carbon/human, delete_old_mob = TRUE)

@@ -24,19 +24,19 @@
 	move_force = MOVE_FORCE_VERY_STRONG
 	move_resist = MOVE_FORCE_OVERPOWERING
 	resistance_flags = UNACIDABLE|XENO_DAMAGEABLE|PLASMACUTTER_IMMUNE
-	flags_atom = BUMP_ATTACKABLE|PREVENT_CONTENTS_EXPLOSION|CRITICAL_ATOM
+	atom_flags = BUMP_ATTACKABLE|PREVENT_CONTENTS_EXPLOSION|CRITICAL_ATOM
 	appearance_flags = TILE_BOUND|PIXEL_SCALE|KEEP_TOGETHER
 	max_integrity = 300
 	soft_armor = list(MELEE = 20, BULLET = 10, LASER = 0, ENERGY = 0, BOMB = 10, BIO = 0, FIRE = 100, ACID = 100)
 	force = 5
 	move_delay = 1 SECONDS
-	COOLDOWN_DECLARE(mecha_bump_smash)
 	light_system = MOVABLE_LIGHT
 	light_on = FALSE
 	light_range = 8
 	generic_canpass = FALSE
 	hud_possible = list(MACHINE_HEALTH_HUD, MACHINE_AMMO_HUD, ORDER_HUD)
 	mouse_pointer = 'icons/mecha/mecha_mouse.dmi'
+	facing_modifiers = list(VEHICLE_FRONT_ARMOUR = 0.5, VEHICLE_SIDE_ARMOUR = 1, VEHICLE_BACK_ARMOUR = 1.5)
 	///What direction will the mech face when entered/powered on? Defaults to South.
 	var/dir_in = SOUTH
 	///How much energy the mech will consume each time it moves. This variable is a backup for when leg actuators affect the energy drain.
@@ -47,36 +47,23 @@
 	var/melee_energy_drain = 15
 	///The minimum amount of energy charge consumed by leg overload
 	var/overload_step_energy_drain_min = 50
-	///Modifiers for directional damage reduction
-	var/list/facing_modifiers = list(MECHA_FRONT_ARMOUR = 0.5, MECHA_SIDE_ARMOUR = 1, MECHA_BACK_ARMOUR = 1.5)
 	///if we cant use our equipment(such as due to EMP)
 	var/equipment_disabled = FALSE
 	/// Keeps track of the mech's cell
 	var/obj/item/cell/cell
-	/// Keeps track of the mech's scanning module
-	var/obj/item/stock_parts/scanning_module/scanmod
-	/// Keeps track of the mech's capacitor
-	var/obj/item/stock_parts/capacitor/capacitor
 	///Whether the mechs maintenance protocols are on or off
 	var/construction_state = MECHA_LOCKED
 	///Contains flags for the mecha
-	var/mecha_flags = ADDING_ACCESS_POSSIBLE | CANSTRAFE | IS_ENCLOSED | HAS_HEADLIGHTS
-	///Stores the DNA enzymes of a carbon so tht only they can access the mech
-	var/dna_lock
+	var/mecha_flags
 	///Spark effects are handled by this datum
 	var/datum/effect_system/spark_spread/spark_system = new
 	///How powerful our lights are
 	var/lights_power = 6
 	///Just stop the mech from doing anything
 	var/completely_disabled = FALSE
-	///Whether this mech is allowed to move diagonally
-	var/allow_diagonal_movement = FALSE
-	///Whether or not the mech destroys walls by running into it.
-	var/bumpsmash = FALSE
 
 	///Special version of the radio, which is unsellable
 	var/obj/item/radio/mech/radio
-	var/list/trackers = list()
 
 	///Bitflags for internal damage
 	var/internal_damage = NONE
@@ -94,10 +81,8 @@
 	///required access to change internal components
 	var/list/internals_req_access = list()
 
-	///Typepath for the wreckage it spawns when destroyed
-	var/wreckage
 	///single flag for the type of this mech, determines what kind of equipment can be attached to it
-	var/mech_type
+	//var/mech_type
 
 	///assoc list: key-typepathlist before init, key-equipmentlist after
 	var/list/equip_by_category = list(
@@ -116,8 +101,6 @@
 	///flat equipment for iteration
 	var/list/flat_equipment
 
-	///Whether our steps are silent due to no gravity
-	var/step_silent = FALSE
 	///Sound played when the mech moves
 	var/stepsound = 'sound/mecha/mechstep.ogg'
 	///Sound played when the mech walks
@@ -132,8 +115,6 @@
 	var/destruction_sleep_duration = 2 SECONDS
 	///Whether outside viewers can see the pilot inside
 	var/enclosed = TRUE
-	///In case theres a different iconstate for AI/MMI pilot(currently only used for ripley)
-	var/silicon_icon_state = null
 	///Currently ejecting, and unable to do things
 	var/is_currently_ejecting = FALSE
 	///Safety for weapons. Won't fire if enabled, and toggled by middle click.
@@ -142,8 +123,6 @@
 	var/datum/effect_system/smoke_spread/bad/smoke_system = new
 
 	////Action vars
-	///Bool for energy shield on/off
-	var/defense_mode = FALSE
 
 	///Bool for leg overload on/off
 	var/leg_overload_mode = FALSE
@@ -160,13 +139,6 @@
 	///Cooldown between using smoke
 	var/smoke_cooldown = 10 SECONDS
 
-	///check for phasing, if it is set to text (to describe how it is phasing: "flying", "phasing") it will let the mech walk through walls.
-	var/phasing = ""
-	///Power we use every time we phaze through something
-	var/phasing_energy_drain = 200
-	///icon_state for flick() when phazing
-	var/phase_state = ""
-
 	///Wether we are strafing
 	var/strafe = FALSE
 
@@ -179,6 +151,14 @@
 	var/ui_y = 600
 	/// ref to screen object that displays in the middle of the UI
 	var/atom/movable/screen/mech_view/ui_view
+	/// boolean: Can someone use the mech without skill? Used for shitspawn
+	var/skill_locked = TRUE
+	/// boolean: are lights on?
+	var/lights_on = FALSE
+	/// boolean: is mech suffering from emp?
+	var/mech_emped = FALSE
+	///holds the EMP timer
+	var/emp_timer
 
 /obj/item/radio/mech //this has to go somewhere
 	subspace_transmission = TRUE
@@ -199,8 +179,6 @@
 
 	GLOB.nightfall_toggleable_lights += src
 	add_cell()
-	add_scanmod()
-	add_capacitor()
 	START_PROCESSING(SSobj, src)
 	log_message("[src.name] created.", LOG_MECHA)
 	GLOB.mechas_list += src //global mech list
@@ -241,50 +219,40 @@
 	LAZYCLEARLIST(flat_equipment)
 
 	QDEL_NULL(cell)
-	QDEL_NULL(scanmod)
-	QDEL_NULL(capacitor)
 	QDEL_NULL(spark_system)
 	QDEL_NULL(smoke_system)
 	QDEL_NULL(ui_view)
 
-	GLOB.mechas_list -= src //global mech list
-	for(var/datum/atom_hud/squad/mech_status_hud in GLOB.huds) //Add to the squad HUD
+	emp_timer = null
+
+	GLOB.mechas_list -= src
+	for(var/datum/atom_hud/squad/mech_status_hud in GLOB.huds)
 		mech_status_hud.remove_from_hud(src)
 	return ..()
 
-/obj/vehicle/sealed/mecha/obj_destruction(damage_amount, damage_type, damage_flag)
+/obj/vehicle/sealed/mecha/obj_destruction(damage_amount, damage_type, damage_flag, mob/living/blame_mob)
+	if(istype(blame_mob) && blame_mob.ckey)
+		var/datum/personal_statistics/personal_statistics = GLOB.personal_statistics_list[blame_mob.ckey]
+		if(faction == blame_mob.faction)
+			personal_statistics.mechs_destroyed -- //bruh
+		else
+			personal_statistics.mechs_destroyed ++
+
 	spark_system?.start()
 
-	var/mob/living/silicon/ai/unlucky_ais
 	for(var/mob/living/occupant AS in occupants)
-		if(isAI(occupant))
-			unlucky_ais = occupant
-			occupant.gib() //No wreck, no AI to recover
-			continue
 		mob_exit(occupant, FALSE, TRUE)
 		occupant.SetSleeping(destruction_sleep_duration)
-
-	if(wreckage)
-		var/obj/structure/mecha_wreckage/WR = new wreckage(loc, unlucky_ais)
-		for(var/obj/item/mecha_parts/mecha_equipment/E in flat_equipment)
-			if(E.detachable && prob(30))
-				WR.crowbar_salvage += E
-				E.detach(WR) //detaches from src into WR
-				E.activated = TRUE
-			else
-				E.detach(loc)
-				qdel(E)
-		if(cell)
-			WR.crowbar_salvage += cell
-			cell.forceMove(WR)
-			cell.use(rand(0, cell.charge), TRUE)
-			cell = null
 	return ..()
-
 
 /obj/vehicle/sealed/mecha/update_icon_state()
 	icon_state = get_mecha_occupancy_state()
 	return ..()
+
+/obj/vehicle/sealed/mecha/update_overlays()
+	. = ..()
+	if(mech_emped)
+		. += image('icons/effects/effects.dmi', src, "shieldsparkles")
 
 /obj/vehicle/sealed/mecha/Moved(atom/old_loc, movement_dir, forced, list/old_locs)
 	. = ..()
@@ -353,40 +321,22 @@
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_toggle_lights, VEHICLE_CONTROL_SETTINGS)
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/mech_view_stats, VEHICLE_CONTROL_SETTINGS)
 	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/strafe, VEHICLE_CONTROL_DRIVE)
+	initialize_controller_action_type(/datum/action/vehicle/sealed/mecha/reload, VEHICLE_CONTROL_EQUIPMENT)
 
 /obj/vehicle/sealed/mecha/proc/get_mecha_occupancy_state()
-	if((mecha_flags & SILICON_PILOT) && silicon_icon_state)
-		return silicon_icon_state
 	if(LAZYLEN(occupants))
 		return base_icon_state
 	return "[base_icon_state]-open"
 
-/obj/vehicle/sealed/mecha/CanPassThrough(atom/blocker, movement_dir, blocker_opinion)
-	if(!phasing || get_charge() <= phasing_energy_drain || throwing)
-		return ..()
-	if(phase_state)
-		flick(phase_state, src)
-	return TRUE
-
+///Restores the mech after EMP
 /obj/vehicle/sealed/mecha/proc/restore_equipment()
+	emp_timer = null
 	equipment_disabled = FALSE
+	update_appearance(UPDATE_OVERLAYS)
 	for(var/mob/mob_occupant AS in occupants)
 		SEND_SOUND(mob_occupant, sound('sound/items/timer.ogg', volume=50))
 		to_chat(mob_occupant, span_notice("Equipment control unit has been rebooted successfully."))
 	set_mouse_pointer()
-
-///Updates the values given by scanning module and capacitor tier, called when a part is removed or inserted.
-/obj/vehicle/sealed/mecha/proc/update_part_values()
-	if(scanmod)
-		normal_step_energy_drain = 20 - (5 * scanmod.rating) //10 is normal, so on lowest part its worse, on second its ok and on higher its real good up to 0 on best
-		step_energy_drain = normal_step_energy_drain
-	else
-		normal_step_energy_drain = 500
-		step_energy_drain = normal_step_energy_drain
-	if(capacitor)
-		soft_armor = soft_armor.modifyRating(energy = (capacitor.rating * 5)) //Each level of capacitor protects the mech against emp by 5%
-	else //because we can still be hit without a cap, even if we can't move
-		soft_armor = soft_armor.setRating(energy = 0)
 
 /obj/vehicle/sealed/mecha/examine(mob/user)
 	. = ..()
@@ -408,11 +358,8 @@
 			. += "[icon2html(ME, user)] \A [ME]."
 	if(enclosed)
 		return
-	if(mecha_flags & SILICON_PILOT)
-		. += "[src] appears to be piloting itself..."
-	else
-		for(var/occupante in occupants)
-			. += "You can see [occupante] inside."
+	for(var/occupante in occupants)
+		. += "You can see [occupante] inside."
 
 //processing internal damage, alert updates, lights power use.
 /obj/vehicle/sealed/mecha/process(delta_time)
@@ -469,7 +416,7 @@
 				break  // all good
 			checking = checking.loc
 
-	if(mecha_flags & LIGHTS_ON)
+	if(!lights_on)
 		use_power(2*delta_time)
 
 //Diagnostic HUD updates
@@ -497,10 +444,7 @@
 		. = COMSIG_MOB_CLICK_CANCELED
 	if(!isturf(target) && !isturf(target.loc)) // Prevents inventory from being drilled
 		return
-	if(completely_disabled || is_currently_ejecting || (mecha_flags & CANNOT_INTERACT))
-		return
-	if(phasing)
-		balloon_alert(user, "not while [phasing]!")
+	if(completely_disabled || is_currently_ejecting)
 		return
 	if(HAS_TRAIT(src, TRAIT_INCAPACITATED))
 		return
@@ -512,12 +456,12 @@
 	if(src == target)
 		return
 	var/dir_to_target = get_dir(src,target)
-	if(!(mecha_flags & OMNIDIRECTIONAL_ATTACKS) && dir_to_target && !(dir_to_target & dir))//wrong direction
+	if(dir_to_target && !(dir_to_target & dir))//wrong direction
 		return
 	if(internal_damage & MECHA_INT_CONTROL_LOST)
 		target = pick(view(3,target))
 	var/mob/living/livinguser = user
-	if(!(livinguser in return_controllers_with_flag(VEHICLE_CONTROL_EQUIPMENT)))
+	if(!is_equipment_controller(user))
 		balloon_alert(user, "wrong seat for equipment!")
 		return
 	var/obj/item/mecha_parts/mecha_equipment/selected
@@ -576,11 +520,6 @@
 /////////////////////////
 ////// Access stuff /////
 /////////////////////////
-
-/obj/vehicle/sealed/mecha/proc/operation_allowed(mob/M)
-	req_access = operation_req_access
-	req_one_access = list()
-	return allowed(M)
 
 /obj/vehicle/sealed/mecha/proc/internals_access_allowed(mob/M)
 	req_one_access = internals_req_access

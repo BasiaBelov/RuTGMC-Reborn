@@ -26,7 +26,7 @@
 	fire_delay = 5 SECONDS
 	fire_sound = 'sound/weapons/pred_plasmacaster_fire.ogg'
 	message_to_user = "will now fire low power stun bolts"
-	radial_icon_state = "plasma_weak"
+	radial_icon_state = "predator_plasma_weak"
 	muzzle_flash_color = COLOR_MAGENTA
 
 /datum/yautja_energy_weapon_modes/stun_heavy_bolts
@@ -35,7 +35,7 @@
 	fire_delay = 7 SECONDS
 	fire_sound = 'sound/weapons/pred_lasercannon.ogg'
 	message_to_user = "will now fire high power stun bolts"
-	radial_icon_state = "plasma_strong"
+	radial_icon_state = "predator_plasma_strong"
 	muzzle_flash_color = COLOR_MAGENTA
 
 /datum/yautja_energy_weapon_modes/stun_spheres
@@ -44,7 +44,7 @@
 	fire_delay = 100
 	fire_sound = 'sound/weapons/pulse.ogg'
 	message_to_user = "will now fire plasma immobilizers"
-	radial_icon_state = "laser_sniper_overcharge"
+	radial_icon_state = "predator_stun_spheres"
 	muzzle_flash_color = COLOR_MAGENTA
 
 /datum/yautja_energy_weapon_modes/lethal_bolts
@@ -59,7 +59,7 @@
 /obj/item/weapon/gun/energy/yautja
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = null
-	item_icons = list(
+	worn_icon_list = list(
 		slot_back_str = 'icons/mob/hunter/pred_gear.dmi',
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi',
@@ -71,7 +71,7 @@
 	muzzle_flash_color = COLOR_MAGENTA
 	default_ammo_type = null
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_NO_PITCH_SHIFT_NEAR_EMPTY|GUN_ENERGY|GUN_AMMO_COUNT_BY_PERCENTAGE|GUN_UNUSUAL_DESIGN
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_NO_PITCH_SHIFT_NEAR_EMPTY|GUN_ENERGY|GUN_AMMO_COUNT_BY_PERCENTAGE|GUN_UNUSUAL_DESIGN
 
 	var/list/datum/yautja_energy_weapon_modes/mode_list = list()
 
@@ -123,16 +123,16 @@
 	desc = "A compact Yautja device in the shape of a crescent. It can rapidly fire damaging spikes and automatically recharges."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "spikelauncher"
-	item_state = "spikelauncher"
+	worn_icon_state = "spikelauncher"
 	resistance_flags = UNACIDABLE
 	fire_sound = 'sound/effects/woodhit.ogg' // TODO: Decent THWOK noise.
 	ammo_datum_type = /datum/ammo/energy/yautja/alloy_spike
-	flags_equip_slot = ITEM_SLOT_BELT|ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BELT|ITEM_SLOT_BACK
 	w_class = WEIGHT_CLASS_BULKY //Fits in yautja bags.
 	rounds = 12
 	max_rounds = 12
 	var/last_regen
-	flags_item = ITEM_PREDATOR|TWOHANDED
+	item_flags = ITEM_PREDATOR|TWOHANDED
 
 	fire_delay = 5
 	accuracy_mult = 1.25
@@ -186,19 +186,19 @@
 	name = "plasma rifle"
 	desc = "A long-barreled heavy plasma weapon. Intended for combat, not hunting. Has an integrated battery that allows for a functionally unlimited amount of shots to be discharged. Equipped with an internal gyroscopic stabilizer allowing its operator to fire the weapon one-handed if desired"
 	icon_state = "plasmarifle"
-	item_state = "plasmarifle"
+	worn_icon_state = "plasmarifle"
 	resistance_flags = UNACIDABLE
 	fire_sound = 'sound/weapons/pred_plasma_shot.ogg'
 	ammo_datum_type = /datum/ammo/energy/yautja/rifle/bolt
 	zoomdevicename = "scope"
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	w_class = WEIGHT_CLASS_GIGANTIC
 	rounds = 100
 	max_rounds = 100
 	charge_cost = 5
 	var/last_regen = 0
-	flags_item = ITEM_PREDATOR|TWOHANDED
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_NO_PITCH_SHIFT_NEAR_EMPTY|GUN_ENERGY|GUN_AMMO_COUNT_BY_PERCENTAGE|GUN_UNUSUAL_DESIGN|GUN_WIELDED_FIRING_ONLY
+	item_flags = ITEM_PREDATOR|TWOHANDED
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_NO_PITCH_SHIFT_NEAR_EMPTY|GUN_ENERGY|GUN_AMMO_COUNT_BY_PERCENTAGE|GUN_UNUSUAL_DESIGN|GUN_WIELDED_FIRING_ONLY
 
 	fire_delay = 10
 	accuracy_mult = 1.5
@@ -256,17 +256,17 @@
 	name = "plasma pistol"
 	desc = "A plasma pistol capable of rapid fire. It has an integrated battery. Can be used to set fires, either to braziers or on people."
 	icon_state = "plasmapistol"
-	item_state = "plasmapistol"
+	worn_icon_state = "plasmapistol"
 
 	resistance_flags = UNACIDABLE
 	fire_sound = 'sound/weapons/pulse3.ogg'
-	flags_equip_slot = ITEM_SLOT_BELT
+	equip_slot_flags = ITEM_SLOT_BELT
 	ammo_datum_type = /datum/ammo/energy/yautja/pistol
 	w_class = WEIGHT_CLASS_BULKY
 	rounds = 40
 	max_rounds = 40
 	charge_cost = 1
-	flags_item = ITEM_PREDATOR|TWOHANDED
+	item_flags = ITEM_PREDATOR|TWOHANDED
 
 	fire_delay = 4
 	accuracy_mult = 1.5
@@ -325,8 +325,8 @@
 	desc = "A powerful, shoulder-mounted energy weapon."
 	icon_state = "plasma_ebony"
 	var/initial_icon_state = "plasma"
-	var/base_item_state = "plasma_wear"
-	item_state_slots = list(
+	var/base_worn_icon_state = "plasma_wear"
+	worn_worn_icon_state_slots = list(
 		slot_back_str = "plasma_wear_off",
 		slot_s_store_str = "plasma_wear_off"
 	)
@@ -336,8 +336,8 @@
 	w_class = WEIGHT_CLASS_GIGANTIC
 	force = 0
 	fire_delay = 3
-	flags_atom = CONDUCT
-	flags_item = NOBLUDGEON //Can't bludgeon with this.
+	atom_flags = CONDUCT
+	item_flags = NOBLUDGEON //Can't bludgeon with this.
 
 	fire_delay = 5
 	accuracy_mult = 1
@@ -370,9 +370,9 @@
 
 /obj/item/weapon/gun/energy/yautja/plasma_caster/Initialize(mapload, spawn_empty, caster_material = "ebony")
 	icon_state = "[initial_icon_state]_[caster_material]"
-	item_state = "[initial_icon_state]_[caster_material]"
-	item_state_slots[slot_back_str] = "[base_item_state]_off_[caster_material]"
-	item_state_slots[slot_s_store_str] = "[base_item_state]_off_[caster_material]"
+	worn_icon_state = "[initial_icon_state]_[caster_material]"
+	worn_worn_icon_state_slots[slot_back_str] = "[base_worn_icon_state]_off_[caster_material]"
+	worn_worn_icon_state_slots[slot_s_store_str] = "[base_worn_icon_state]_off_[caster_material]"
 	. = ..()
 	source = loc
 	if(!istype(source))

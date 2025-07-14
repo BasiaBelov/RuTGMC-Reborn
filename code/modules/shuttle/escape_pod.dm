@@ -20,12 +20,12 @@
 
 /obj/docking_port/mobile/escape_pod/register()
 	. = ..()
-	SSshuttle.escape_pods += src
+	SSshuttle.escape_pod_list += src
 
 /obj/docking_port/mobile/escape_pod/Destroy(force)
 	if(force)
-		SSshuttle.escape_pods -= src
-	. = ..()
+		SSshuttle.escape_pod_list -= src
+	return ..()
 
 /obj/docking_port/mobile/escape_pod/proc/count_escaped_humans()
 	for(var/turf/T AS in return_turfs())
@@ -67,7 +67,7 @@
 		return
 	playsound(return_center_turf(),'sound/effects/escape_pod_launch.ogg', 25, 1)
 	count_escaped_humans()
-	SSshuttle.moveShuttleToTransit(id, TRUE)
+	SSshuttle.moveShuttleToTransit(shuttle_id, TRUE)
 
 /obj/docking_port/stationary/escape_pod
 	name = "escape pod"
@@ -80,7 +80,7 @@
 
 /obj/docking_port/stationary/escape_pod/escape_shuttle
 	name = "escape shuttle"
-	id = "escape hangar"
+	shuttle_id = "escape hangar"
 	dir = EAST
 	dwidth = 3
 	width = 7
@@ -101,8 +101,23 @@
 	name = "escape pod controller"
 	icon = 'icons/obj/airlock_machines.dmi'
 	icon_state = "airlock_control_standby"
+	screen_overlay = null
 	power_channel = ENVIRON
 	density = FALSE
+
+/obj/machinery/computer/shuttle/escape_pod/examine(mob/user)
+	. = ..()
+	var/obj/docking_port/mobile/escape_pod/M = SSshuttle.getShuttle(shuttleId)
+	if(!M || M.launch_status == EARLY_LAUNCHED || M.launch_status == EARLY_LAUNCHED)
+		return
+	if(SSevacuation.evac_status != EVACUATION_STATUS_INITIATING)
+		return
+	var/text = "Time until refueling completion:"
+	var/eta = (SSevacuation.evac_time + EVACUATION_MANUAL_DEPARTURE - world.time) * 0.1
+	if(eta <= 0)
+		text = "Time until automatic launch:"
+		eta = (SSevacuation.evac_time + EVACUATION_AUTOMATIC_DEPARTURE - world.time) * 0.1
+	. += span_notice("[text] [(eta / 60) % 60]:[add_leading(num2text(eta % 60), 2, "0")]")
 
 /obj/machinery/computer/shuttle/escape_pod/escape_shuttle
 	name = "escape shuttle controller"
@@ -134,8 +149,11 @@
 		if(!M.can_launch)
 			to_chat(usr, span_warning("Evacuation is not enabled!"))
 			return
+		if(SSevacuation.evac_time + EVACUATION_MANUAL_DEPARTURE - world.time > 0)
+			to_chat(usr, span_warning("The escape pod is not fully refueled yet!"))
+			return
 
-		to_chat(usr, span_highdanger("You slam your fist down on the launch button!"))
+		to_chat(usr, span_userdanger("You slam your fist down on the launch button!"))
 		M.launch(TRUE)
 
 //=========================================================================================
@@ -147,7 +165,7 @@
 	var/being_forced = 0 //Simple variable to prevent sound spam.
 	var/linked_to_shuttle = FALSE
 
-/obj/machinery/cryopod/evacuation/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock, idnum, override=FALSE)
+/obj/machinery/cryopod/evacuation/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	if(linked_to_shuttle)
 		return
 	. = ..()
@@ -186,7 +204,7 @@
 	close()
 	lock(TRUE)
 
-/obj/machinery/door/airlock/evacuation/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock, idnum, override=FALSE)
+/obj/machinery/door/airlock/evacuation/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	if(linked_to_shuttle)
 		return
 	. = ..()

@@ -1,5 +1,5 @@
 /obj/item/weapon/energy
-	flags_atom = NOBLOODY
+	atom_flags = NOBLOODY
 
 /obj/item/weapon/energy/axe
 	name = "energy axe"
@@ -10,8 +10,8 @@
 	throw_speed = 1
 	throw_range = 5
 	w_class = WEIGHT_CLASS_NORMAL
-	flags_atom = CONDUCT|NOBLOODY
-	attack_verb = list("attacked", "chopped", "cleaved", "torn", "cut")
+	atom_flags = CONDUCT|NOBLOODY
+	attack_verb = list("attacks", "chops", "cleaves", "tears", "cuts")
 	sharp = IS_SHARP_ITEM_BIG
 	edge = 1
 
@@ -41,11 +41,11 @@
 	throw_speed = 1
 	throw_range = 5
 	w_class = WEIGHT_CLASS_SMALL
-	flags_atom = NOBLOODY
-	attack_verb = list("attacked", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
+	atom_flags = NOBLOODY
+	attack_verb = list("attacks", "slashes", "stabs", "slices", "tears", "rips", "dices", "cuts")
 	sharp = IS_SHARP_ITEM_BIG
 	edge = 1
-	flags_equip_slot = ITEM_SLOT_BELT
+	equip_slot_flags = ITEM_SLOT_BELT
 	///Sword color, if applicable
 	var/sword_color
 	///Force of the weapon when activated
@@ -55,7 +55,7 @@
 	. = ..()
 	if(!sword_color)
 		sword_color = pick("red","blue","green","purple")
-	AddComponent(/datum/component/shield, SHIELD_TOGGLE|SHIELD_PURE_BLOCKING, shield_cover = list(MELEE = 35, BULLET = 20, LASER = 20, ENERGY = 20, BOMB = 0, BIO = 0, FIRE = 0, ACID = 0))
+	AddComponent(/datum/component/shield, SHIELD_TOGGLE|SHIELD_PURE_BLOCKING, list(MELEE = 35, BULLET = 20, LASER = 20, ENERGY = 20, BOMB = 0, BIO = 0, FIRE = 0, ACID = 0))
 	AddComponent(/datum/component/stun_mitigation, shield_cover = list(MELEE = 40, BULLET = 40, LASER = 40, ENERGY = 40, BOMB = 40, BIO = 40, FIRE = 40, ACID = 40))
 	AddElement(/datum/element/strappable)
 

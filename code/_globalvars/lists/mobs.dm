@@ -67,8 +67,12 @@ GLOBAL_LIST_INIT(all_xeno_types, list(
 	/mob/living/carbon/xenomorph/drone/primordial,
 	/mob/living/carbon/xenomorph/sentinel,
 	/mob/living/carbon/xenomorph/sentinel/primordial,
+	/mob/living/carbon/xenomorph/sentinel/retrograde,
+	/mob/living/carbon/xenomorph/sentinel/retrograde/primordial,
 	/mob/living/carbon/xenomorph/defender,
 	/mob/living/carbon/xenomorph/defender/primordial,
+	/mob/living/carbon/xenomorph/defender/steel_crest,
+	/mob/living/carbon/xenomorph/defender/steel_crest/primordial,
 	/mob/living/carbon/xenomorph/gorger,
 	/mob/living/carbon/xenomorph/gorger/primordial,
 	/mob/living/carbon/xenomorph/hunter,
@@ -117,6 +121,7 @@ GLOBAL_LIST_INIT(all_xeno_types, list(
 	/mob/living/carbon/xenomorph/scorpion,
 	/mob/living/carbon/xenomorph/facehugger,
 	/mob/living/carbon/xenomorph/spiderling,
+	/mob/living/carbon/xenomorph/baneling,
 ))
 
 GLOBAL_LIST_EMPTY_TYPED(hellhound_list, /mob/living/carbon/xenomorph/hellhound)

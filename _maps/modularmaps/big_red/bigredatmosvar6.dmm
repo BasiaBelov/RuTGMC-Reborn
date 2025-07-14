@@ -75,7 +75,7 @@
 /turf/open/floor/plating/ground/mars/random/cave,
 /area/bigredv2/outside/s)
 "go" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 8
 	},
 /turf/open/floor/marking/asteroidwarning,
@@ -203,7 +203,7 @@
 	},
 /area/bigredv2/outside/se)
 "ow" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 1
 	},
 /turf/open/floor/marking/asteroidwarning{
@@ -247,7 +247,7 @@
 /turf/open/floor/asteroidfloor,
 /area/bigredv2/outside/s)
 "qk" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 8
 	},
 /turf/open/floor/asteroidfloor,
@@ -283,7 +283,7 @@
 /turf/open/floor/plating/ground/mars/random/cave,
 /area/bigredv2/outside/s)
 "sm" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 8
 	},
 /obj/machinery/atmospherics/pipe/simple/green/hidden{
@@ -384,7 +384,7 @@
 /turf/open/floor/plating/ground/mars/random/sand,
 /area/bigredv2/outside/se)
 "yk" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 1
 	},
 /turf/open/floor/asteroidfloor,
@@ -400,7 +400,7 @@
 /area/bigredv2/outside/se)
 "zz" = (
 /turf/open/liquid/water/river,
-/area/bigredv2/caves/rock)
+/area/space)
 "zI" = (
 /obj/structure/cable,
 /obj/effect/decal/cleanable/dirt,
@@ -528,7 +528,7 @@
 /turf/open/floor/plating/ground/mars/random/cave,
 /area/bigredv2/outside/se)
 "Jf" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 8
 	},
 /turf/open/floor/marking/asteroidwarning,
@@ -668,7 +668,7 @@
 	},
 /area/bigredv2/outside/se)
 "Ue" = (
-/obj/structure/barricade/wooden{
+/obj/structure/barricade/wood{
 	dir = 1
 	},
 /obj/machinery/atmospherics/components/unary/vent_pump{

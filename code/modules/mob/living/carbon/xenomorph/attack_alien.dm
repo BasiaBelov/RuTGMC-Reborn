@@ -155,6 +155,7 @@
 	if(issamexenohive(X))
 		X.visible_message(span_warning("\The [X] nibbles [src]."),
 		span_warning("We nibble [src]."), null, 5)
+		X.do_attack_animation(src)
 		return FALSE
 	return ..()
 
@@ -167,7 +168,7 @@
 	if(stat == DEAD)
 		if(istype(wear_ear, /obj/item/radio/headset/mainship))
 			var/obj/item/radio/headset/mainship/cam_headset = wear_ear
-			if(cam_headset.camera.status)
+			if(cam_headset?.camera?.status)
 				cam_headset.camera.toggle_cam(null, FALSE)
 				playsound(loc, SFX_ALIEN_CLAW_METAL, 25, 1)
 				X.do_attack_animation(src, ATTACK_EFFECT_CLAW)
@@ -183,7 +184,7 @@
 			to_chat(X, span_warning("[src] is dead, why would we want to touch it?"))
 		return FALSE
 
-	if(isyautja(src) && check_pred_shields(X.xeno_caste.melee_damage * X.xeno_melee_damage_modifier + dam_bonus, backside_attack = dir == get_dir(get_turf(X), get_turf(src)), xenomorph = TRUE))
+	if(check_predator_shields(X, X.xeno_caste.melee_damage * X.xeno_melee_damage_modifier + dam_bonus, dir))
 		return FALSE
 
 	SEND_SIGNAL(X, COMSIG_XENOMORPH_ATTACK_HUMAN, src)

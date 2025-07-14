@@ -25,8 +25,8 @@
 //This is the one actually used by AI in ai.dm
 /mob/camera/aiEye/hud
 	icon_state = "nothing"
-	var/icon_state_on = "ai_camera"
 	hud_possible = list(SQUAD_HUD_TERRAGOV)
+	var/icon_state_on = "ai_camera"
 
 /mob/camera/aiEye/hud/Initialize(mapload)
 	. = ..()
@@ -190,16 +190,13 @@
 	if(relay_speech && speaker && ai && !radio_freq && speaker != ai && near_camera(speaker))
 		ai.relay_speech(message, speaker, message_language, raw_message, radio_freq, spans, message_mode)
 
-/mob/camera/aiEye/proc/register_facedir_signals(mob/user)
-	RegisterSignal(user, COMSIG_KB_MOB_FACENORTH_DOWN, VERB_REF(northface))
-	RegisterSignal(user, COMSIG_KB_MOB_FACEEAST_DOWN, VERB_REF(eastface))
-	RegisterSignal(user, COMSIG_KB_MOB_FACESOUTH_DOWN, VERB_REF(southface))
-	RegisterSignal(user, COMSIG_KB_MOB_FACEWEST_DOWN, VERB_REF(westface))
-
-/mob/camera/aiEye/proc/unregister_facedir_signals(mob/user)
-	UnregisterSignal(user, list(COMSIG_KB_MOB_FACENORTH_DOWN, COMSIG_KB_MOB_FACEEAST_DOWN, COMSIG_KB_MOB_FACESOUTH_DOWN, COMSIG_KB_MOB_FACEWEST_DOWN))
-
-/mob/camera/aiEye/playsound_local(turf/turf_source, soundin, vol, vary, frequency, falloff, is_global, channel, sound/sound_to_use, distance_multiplier, mob/sound_reciever)
-	if(istype(parent_cameranet) && !parent_cameranet.checkTurfVis(get_turf(src)))
+/mob/camera/aiEye/playsound_local(turf/turf_source, soundin, vol, vary, frequency, falloff, is_global, channel, sound/sound_to_use, distance_multiplier)
+	if((istype(parent_cameranet) && !parent_cameranet.checkTurfVis(get_turf(src))) || !ai)
 		return
-	return ..(turf_source, soundin, vol, vary, frequency, falloff, is_global, channel, sound_to_use, distance_multiplier, ai)
+	/*
+	What is happening here is we are looking to find the position of the sound source relative to the camera eye
+	and using it to get a turf in the same relative position to the AI core in order to properly simulate the
+	direction and volume of where the sound is coming from.
+	*/
+	var/turf/playturf = locate(ai.x + (turf_source.x - x), ai.y + (turf_source.y - y), ai.z)
+	ai?.playsound_local(playturf, soundin, vol, vary, frequency, falloff, is_global, channel, sound_to_use, distance_multiplier)

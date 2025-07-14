@@ -1,4 +1,3 @@
-#define HYDRO_SPEED_MULTIPLIER 1
 /obj/prop/hydroponics
 	name = "hydroponics tray"
 	icon = 'icons/obj/machines/hydroponics.dmi'
@@ -16,6 +15,8 @@
 	. = ..()
 	var/static/list/connections = list(
 		COMSIG_OBJ_TRY_ALLOW_THROUGH = PROC_REF(can_climb_over),
+		COMSIG_FIND_FOOTSTEP_SOUND = TYPE_PROC_REF(/atom/movable, footstep_override),
+		COMSIG_TURF_CHECK_COVERED = TYPE_PROC_REF(/atom/movable, turf_cover_check),
 	)
 	AddElement(/datum/element/connect_loc, connections)
 
@@ -28,5 +29,3 @@
 /obj/prop/hydroponics/slashable
 	resistance_flags = XENO_DAMAGEABLE
 	max_integrity = 80
-
-#undef HYDRO_SPEED_MULTIPLIER

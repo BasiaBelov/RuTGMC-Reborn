@@ -11,7 +11,6 @@
 	maxHealth = 200
 	plasma_stored = 50
 	pixel_x = -16
-	old_x = -16
 	tier = XENO_TIER_ONE
 	upgrade = XENO_UPGRADE_NORMAL
 	pull_speed = -2
@@ -74,7 +73,7 @@
 /mob/living/carbon/xenomorph/defender/steel_crest/projectile_hit(obj/projectile/proj, cardinal_move, uncrossing)
 	if(SEND_SIGNAL(src, COMSIG_XENO_PROJECTILE_HIT, proj, cardinal_move, uncrossing) & COMPONENT_PROJECTILE_DODGE)
 		return FALSE
-	if(proj.ammo.flags_ammo_behavior & AMMO_SKIPS_ALIENS)
+	if(proj.ammo.ammo_behavior_flags & AMMO_SKIPS_ALIENS)
 		return FALSE
 	if((cardinal_move & REVERSE_DIR(dir)))
 		proj.damage -= proj.damage * (0.2 * get_sunder())

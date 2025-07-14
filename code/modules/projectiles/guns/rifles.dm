@@ -1,17 +1,20 @@
-//-------------------------------------------------------
-
 /obj/item/weapon/gun/rifle
+	icon = 'icons/obj/items/gun/rifle.dmi'
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/rifle_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/rifle_righthand_1.dmi',
+	)
 	reload_sound = 'sound/weapons/guns/interact/rifle_reload.ogg'
 	cocked_sound = 'sound/weapons/guns/interact/cocked.ogg'
 	silenced_sound = 'sound/weapons/guns/rifles/AR-12/AR12_SIL.ogg'
 	wield_sound =    'sound/weapons/guns/rifles/Deploy_Wave_RIFLES.ogg'
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	w_class = WEIGHT_CLASS_BULKY
 	force = 15
-	flags_gun_features = GUN_CAN_POINTBLANK||GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK||GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	load_method = MAGAZINE //codex
 	aim_slowdown = 0.35
-	wield_delay = 0.6 SECONDS
+	wield_delay = 0.8 SECONDS
 	gun_skill_category = SKILL_RIFLES
 
 	burst_amount = 3
@@ -21,8 +24,7 @@
 	scatter_unwielded = 13
 	recoil_unwielded = 4
 	damage_falloff_mult = 0.5
-	upper_akimbo_accuracy = 5
-	lower_akimbo_accuracy = 3
+	akimbo_scatter_mod = 8
 
 //-------------------------------------------------------
 //AR-18 Carbine
@@ -31,7 +33,7 @@
 	name = "\improper AR-18 Kauser carbine"
 	desc = "The Keckler and Hoch AR-18 carbine is one of the standard rifles used by the TerraGov Marine Corps. It's commonly used by people who prefer greater mobility in combat, like scouts and other light infantry. Uses 10x24mm caseless ammunition."
 	icon_state = "t18"
-	item_state = "t18"
+	worn_icon_state = "t18"
 	fire_sound = 'sound/weapons/guns/fire/tgmc/kinetic/gun_ar18.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound =   'sound/weapons/guns/rifles/AR-18/AR18_clipout.ogg'
@@ -42,15 +44,9 @@
 	max_shells = 36 //codex
 	force = 20
 	default_ammo_type = /obj/item/ammo_magazine/rifle/ar18
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
-		)
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/ar18,
 		/obj/item/ammo_magazine/rifle/ar18/ap,
-		/obj/item/ammo_magazine/rifle/ar18/hp,
-		/obj/item/ammo_magazine/rifle/ar18/incendiary,
 	)
 	attachable_allowed = list(
 		/obj/item/attachable/stock/ar18stock,
@@ -86,7 +82,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(/obj/item/attachable/stock/ar18stock)
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 16,"rail_x" = 5, "rail_y" = 19, "under_x" = 18, "under_y" = 14, "stock_x" = 0, "stock_y" = 13)
@@ -128,7 +124,7 @@
 	name = "\improper AR-12 K&H assault rifle"
 	desc = "The Keckler and Hoch AR-12 assault rifle used to be the TerraGov Marine Corps standard issue rifle before the AR-18 carbine replaced it. It is, however, still used widely despite that. The gun itself is very good at being used in most situations however it suffers in engagements at close quarters and is relatively hard to shoulder than some others. It uses 10x24mm caseless ammunition."
 	icon_state = "t12"
-	item_state = "t12"
+	worn_icon_state = "t12"
 	fire_sound = SFX_GUN_AR12
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound =   'sound/weapons/guns/rifles/AR-12/AR12_clipout.ogg'
@@ -138,14 +134,8 @@
 	max_shells = 50 //codex
 	force = 20
 	default_ammo_type = /obj/item/ammo_magazine/rifle/ar12
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
-	)
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/ar12,
-		/obj/item/ammo_magazine/rifle/ar12/ap,
-		/obj/item/ammo_magazine/rifle/ar12/hp,
 		/obj/item/ammo_magazine/rifle/ar12/incendiary,
 	)
 	attachable_allowed = list(
@@ -182,7 +172,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 17,"rail_x" = 0, "rail_y" = 23, "under_x" = 17, "under_y" = 13, "stock_x" = 0, "stock_y" = 13)
 	aim_fire_delay = 0.1 SECONDS
@@ -195,7 +185,7 @@
 	extra_delay = 0.05 SECONDS
 	accuracy_mult = 1.1
 	scatter = -2
-	wield_delay = 0.7 SECONDS
+	wield_delay = 0.9 SECONDS
 	burst_amount = 3
 	aim_slowdown = 0.4
 	damage_falloff_mult = 0.5
@@ -221,12 +211,12 @@
 /obj/item/weapon/gun/rifle/dmr37
 	name = "\improper DMR-37 SCA designated marksman rifle"
 	desc = "The San Cristo Arms DMR-37 is the TerraGov Marine Corps designated marksman rifle. It is rather well-known for it's very consistent target placement at longer than usual range, it however lacks a burst fire mode or an automatic mode. It is mostly used by people who prefer to do more careful shooting than most. Uses 10x27mm caseless caliber."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/marksman64.dmi'
 	icon_state = "t37"
-	item_state = "t37"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "t37"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_64.dmi',
 	)
 	inhand_x_dimension = 64
 	inhand_y_dimension = 32
@@ -242,7 +232,7 @@
 	wield_sound =    'sound/weapons/guns/dmr/Deploy_Wave_DMR.ogg'
 	caliber = CALIBER_10X27_CASELESS //codex
 	aim_slowdown = 0.75
-	wield_delay = 0.8 SECONDS
+	wield_delay = 1 SECONDS
 	force = 20
 	max_shells = 20 //codex
 	default_ammo_type = /obj/item/ammo_magazine/rifle/dmr37
@@ -277,7 +267,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	starting_attachment_types = list(/obj/item/attachable/scope/mini/dmr)
 	attachable_offset = list("muzzle_x" = 50, "muzzle_y" = 20,"rail_x" = 21, "rail_y" = 22, "under_x" = 31, "under_y" = 15, "stock_x" = 14, "stock_y" = 10)
@@ -339,11 +329,11 @@
 	name = "\improper BR-64 SCA battle rifle"
 	desc = "The San Cristo Arms BR-64 is the TerraGov Marine Corps main battle rifle. It is known for its consistent ability to perform well at most ranges, and medium range stopping power with bursts. It is mostly used by people who prefer a bigger round than the average. Uses 10x26.5smm caseless caliber."
 	icon_state = "t64"
-	item_state = "t64"
-	icon = 'icons/Marine/gun64.dmi'
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "t64"
+	icon = 'icons/obj/items/gun/marksman64.dmi'
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_64.dmi',
 	)
 	inhand_x_dimension = 64
 	inhand_y_dimension = 32
@@ -359,13 +349,12 @@
 	wield_sound =    'sound/weapons/guns/dmr/Deploy_Wave_DMR.ogg'
 	caliber = CALIBER_10X265_CASELESS //codex
 	aim_slowdown = 0.55
-	wield_delay = 0.7 SECONDS
+	wield_delay = 0.9 SECONDS
 	force = 20
 	max_shells = 36 //codex
 	default_ammo_type = /obj/item/ammo_magazine/rifle/br64
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/br64,
-		/obj/item/ammo_magazine/rifle/br64/ap,
 	)
 	attachable_allowed = list(
 		/obj/item/attachable/stock/br64stock,
@@ -397,7 +386,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam, //RUTGMC EDIT
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(/obj/item/attachable/stock/br64stock, /obj/item/weapon/gun/grenade_launcher/underslung/br64, /obj/item/attachable/scope/mini)
 	attachable_offset = list("muzzle_x" = 44, "muzzle_y" = 19,"rail_x" = 18, "rail_y" = 23, "under_x" = 33, "under_y" = 13, "stock_x" = 11, "stock_y" = 14)
@@ -421,9 +410,9 @@
 /obj/item/weapon/gun/rifle/m412
 	name = "\improper PR-412 pulse rifle"
 	desc = "The PR-412 rifle is a Pulse Industries rifle, billed as a pulse rifle due to its use of electronic firing for faster velocity. A rather common sight in most systems. Uses 10x24mm caseless ammunition."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "m412"
-	item_state = "m412"
+	worn_icon_state = "m412"
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	fire_sound = 'sound/weapons/guns/fire/M412.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
@@ -468,7 +457,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam, //RUTGMC EDIT
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(/obj/item/weapon/gun/grenade_launcher/underslung)
 	attachable_offset = list("muzzle_x" = 44, "muzzle_y" = 19,"rail_x" = 15, "rail_y" = 21, "under_x" = 25, "under_y" = 16, "stock_x" = 18, "stock_y" = 15)
@@ -477,7 +466,7 @@
 	burst_delay = 0.15 SECONDS
 	accuracy_mult = 1.1
 	scatter = -1
-	wield_delay = 0.7 SECONDS
+	wield_delay = 0.9 SECONDS
 	burst_amount = 3
 	aim_slowdown = 0.4
 	damage_mult = 1.05 //Has smaller magazines
@@ -491,7 +480,7 @@
 	name = "\improper PR-412E battle rifle"
 	desc = "An \"Elite\" modification of the PR-412 pulse rifle series, given to special operation units. It has been given a stock and a longer barrel with an integrated barrel charger, with a red skull stenciled on the body for some reason."
 	icon_state = "m412e"
-	item_state = "m412e"
+	worn_icon_state = "m412e"
 	default_ammo_type = /obj/item/ammo_magazine/rifle/ap
 	attachable_allowed = list(
 		/obj/item/attachable/suppressor,
@@ -539,15 +528,19 @@
 /obj/item/weapon/gun/rifle/m41a
 	name = "\improper PR-11 pulse rifle"
 	desc = "A strange failed electronically fired rifle, a rather unknown weapon of its time. It caused a surge in the use of electronic firing in the modern era though. Uses 10x24mm caseless ammunition. Has a irremoveable grenade launcher."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
 	icon_state = "m41a"
-	item_state = "m41a"
+	worn_icon_state = "m41a"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_1.dmi',
+	)
 	fire_sound = SFX_GUN_PULSE
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/m41a_unload.ogg'
 	reload_sound = 'sound/weapons/guns/interact/m41a_reload.ogg'
 	aim_slowdown = 0.5
-	wield_delay = 1.35 SECONDS
+	wield_delay = 1.55 SECONDS
 	max_shells = 95 //codex
 	default_ammo_type = /obj/item/ammo_magazine/rifle/m41a
 	allowed_ammo_types = list(/obj/item/ammo_magazine/rifle/m41a)
@@ -570,7 +563,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(/obj/item/attachable/stock/m41a, /obj/item/weapon/gun/grenade_launcher/underslung/invisible)
 	attachable_offset = list("muzzle_x" = 41, "muzzle_y" = 19,"rail_x" = 12, "rail_y" = 24, "under_x" = 24, "under_y" = 13, "stock_x" = 22, "stock_y" = 16)
@@ -580,16 +573,21 @@
 	scatter = 0
 	fire_delay = 0.2 SECONDS
 
-
+/obj/item/weapon/gun/rifle/m41a/magharness
+	starting_attachment_types = list(
+		/obj/item/attachable/stock/m41a,
+		/obj/item/attachable/magnetic_harness,
+		/obj/item/weapon/gun/grenade_launcher/underslung/invisible,
+	)
 
 //-------------------------------------------------------
 
 /obj/item/weapon/gun/rifle/mpi_km
 	name = "\improper MPi-KM assault rifle"
 	desc = "A cheap and robust rifle, sometimes better known as an 'AK'. Chambers 7.62x39mm. Despite lacking attachment points beyond its underbarrel, remains a popular product on the black market with its cheap cost and higher than usual caliber rounds."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "ak47"
-	item_state = "ak47"
+	worn_icon_state = "ak47"
 	caliber = CALIBER_762X39 //codex
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	max_shells = 40 //codex
@@ -626,7 +624,7 @@
 		/obj/item/weapon/gun/grenade_launcher/underslung/mpi, //alt sprite, unremovable
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 35, "muzzle_y" = 18,"rail_x" = 6, "rail_y" = 20, "under_x" = 19, "under_y" = 14, "stock_x" = 5, "stock_y" = 12)
 	starting_attachment_types = list(/obj/item/attachable/stock/mpi_km)
@@ -635,7 +633,7 @@
 	burst_amount = 1
 	fire_delay = 0.25 SECONDS
 	scatter = 0
-	wield_delay = 0.7 SECONDS
+	wield_delay = 0.9 SECONDS
 
 	placed_overlay_iconstate = "ak47"
 
@@ -658,7 +656,7 @@
 	name = "\improper MPi-KM assault rifle"
 	desc = "A cheap and robust rifle manufactured by the SOM, famed for its reliability and stopping power. Sometimes better known as an 'AK', it chambers 7.62x39mm."
 	icon_state = "ak47_black"
-	item_state = "ak47_black"
+	worn_icon_state = "ak47_black"
 	default_ammo_type = /obj/item/ammo_magazine/rifle/mpi_km/black
 	attachable_allowed = list(
 		/obj/item/attachable/bayonet,
@@ -702,14 +700,18 @@
 /obj/item/weapon/gun/rifle/lmg_d
 	name = "\improper lMG-D light machinegun"
 	desc = "A cheap and robust machinegun, sometimes better known as an 'RPD'. Chambers 7.62x39mm. Despite lacking attachment points beyond its underbarrel, remains a popular product on the black market with its cheap cost, high capacity and higher than usual caliber rounds."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
 	icon_state = "rpd"
-	item_state = "rpd"
+	worn_icon_state = "rpd"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_1.dmi',
+	)
 	fire_animation = "rpd_fire"
 	caliber = CALIBER_762X39 //codex
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	max_shells = 100  //codex
-	wield_delay = 1.2 SECONDS
+	wield_delay = 1.4 SECONDS
 	aim_slowdown = 0.95
 	fire_sound = 'sound/weapons/guns/fire/ak47.ogg'
 	unload_sound = 'sound/weapons/guns/interact/ak47_unload.ogg'
@@ -739,7 +741,7 @@
 		/obj/item/attachable/flashlight/under,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 
 	attachable_offset = list("muzzle_x" = 35, "muzzle_y" = 18,"rail_x" = 6, "rail_y" = 20, "under_x" = 19, "under_y" = 14, "stock_x" = 6, "stock_y" = 14)
@@ -763,9 +765,13 @@
 /obj/item/weapon/gun/rifle/dpm
 	name = "\improper Degtyaryov 'RP' machine gun"
 	desc = "A cheap and robust machine gun seen commonly in the fringes of the bubble. Fires high caliber rounds to accommodate for its sluggish rate of fire, it is generally found being called 'The Record Player' due to the resemblance. Fires 7.62x39mm AP rounds."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
 	icon_state = "dp27"
-	item_state = "dp27"
+	worn_icon_state = "dp27"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_1.dmi',
+	)
 	max_shells = 47 //codex
 	caliber = CALIBER_762X39 //codex
 	fire_sound = SFX_SVD_FIRE
@@ -781,7 +787,7 @@
 		/obj/item/attachable/stock/dpm,
 	)
 
-	flags_gun_features = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER
+	gun_features_flags = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 32, "muzzle_y" = 17,"rail_x" = 22, "rail_y" = 17, "under_x" = 32, "under_y" = 14, "stock_x" = 13, "stock_y" = 9)
 	starting_attachment_types = list(/obj/item/attachable/stock/dpm)
@@ -795,7 +801,7 @@
 	accuracy_mult = 1
 	scatter = 2
 	recoil = -1
-	wield_delay = 0.9 SECONDS
+	wield_delay = 0.7 SECONDS
 	aim_slowdown = 0.85
 	movement_acc_penalty_mult = 4
 
@@ -805,9 +811,9 @@
 /obj/item/weapon/gun/rifle/m16
 	name = "\improper FN M16A4 assault rifle"
 	desc = "A light, versatile assault rifle with a 30 round magazine, chambered to fire the 5.56x45mm NATO cartridge. The 4th generation in the M16 platform, this FN variant has added automatic fire selection and retains relevance among mercenaries and militias thanks to its high customizability. It is incredibly good at rapid burst fire, but must be paced correctly."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "m16a4"
-	item_state = "m16a4"
+	worn_icon_state = "m16a4"
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	caliber = CALIBER_556X45 //codex
 	max_shells = 30 //codex
@@ -847,7 +853,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE)
 	attachable_offset = list("muzzle_x" = 47, "muzzle_y" = 19,"rail_x" = 18, "rail_y" = 24, "under_x" = 29, "under_y" = 15, "stock_x" = 19, "stock_y" = 13)
 	aim_fire_delay = 0.2 SECONDS
@@ -858,7 +864,7 @@
 	extra_delay = -0.05 SECONDS
 	burst_delay = 0.15 SECONDS
 	accuracy_mult = 1.1
-	wield_delay = 0.5 SECONDS
+	wield_delay = 0.7 SECONDS
 	damage_mult = 1.2
 
 /obj/item/weapon/gun/rifle/m16/freelancer
@@ -876,9 +882,9 @@
 /obj/item/weapon/gun/rifle/famas
 	name = "\improper FAMAS assault rifle"
 	desc = "A light, versatile fast firing assault rifle with a 24 round magazine and short range scope, chambered to fire the 5.56x45mm NATO cartridge within a short amount of time."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "famas"
-	item_state = "famas"
+	worn_icon_state = "famas"
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	caliber = CALIBER_556X45 //codex
 	max_shells = 24 //codex
@@ -911,14 +917,14 @@
 		/obj/item/weapon/gun/rifle/pepperball/pepperball_mini,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	attachable_offset = list("muzzle_x" = 38, "muzzle_y" = 17,"rail_x" = 22, "rail_y" = 24, "under_x" = 28, "under_y" = 12, "stock_x" = 19, "stock_y" = 13)
 
 	fire_delay = 0.15 SECONDS
 	burst_delay = 0.15 SECONDS
 	accuracy_mult = 1.15
-	wield_delay = 0.5 SECONDS
+	wield_delay = 0.7 SECONDS
 	damage_mult = 1.2
 	scatter = 1
 	movement_acc_penalty_mult = 4
@@ -935,10 +941,11 @@
 	desc = "The Kauser MG-42 is the TGMC's current standard non-IFF-capable LMG. It's known for its ability to lay down heavy fire support very well. It is generally used when someone wants to hold a position or provide fire support. It uses 10x24mm ammunition."
 
 	icon_state = "t42"
-	item_state = "t42"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "t42"
+	icon = 'icons/obj/items/gun/machinegun.dmi'
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_64.dmi',
 	)
 	inhand_x_dimension = 64
 	inhand_y_dimension = 32
@@ -947,7 +954,7 @@
 	max_shells = 120 //codex
 	force = 30
 	aim_slowdown = 0.8
-	wield_delay = 1 SECONDS
+	wield_delay = 1.2 SECONDS
 	fire_sound = 'sound/weapons/guns/fire/tgmc/kinetic/gun_mg42.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	cocked_sound = 'sound/weapons/guns/machineguns/MG-42/MG42_boltpull.ogg'
@@ -987,7 +994,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_AUTOBURST)
 	gun_skill_category = SKILL_HEAVY_WEAPONS
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 17,"rail_x" = 4, "rail_y" = 20, "under_x" = 16, "under_y" = 14, "stock_x" = 0, "stock_y" = 13)
@@ -1017,13 +1024,13 @@
 /obj/item/weapon/gun/rifle/mg60
 	name = "\improper MG-60 Raummetall general purpose machine gun"
 	desc = "The Raummetall MG-60 general purpose machinegun is the TGMC's current standard GPMG. Though usually seen mounted on vehicles, it is sometimes used by infantry to hold chokepoints or suppress enemies, or in rare cases for marching fire. It uses 10x26mm boxes."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
 	icon_state = "t60"
-	item_state = "t60"
-	fire_animation = "loaded_fire"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "t60"
+	fire_animation = "t60_fire"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_64.dmi',
 	)
 	inhand_x_dimension = 64
 	inhand_y_dimension = 32
@@ -1032,7 +1039,7 @@
 	max_shells = 200 //codex
 	force = 35
 	aim_slowdown = 1.2
-	wield_delay = 1.5 SECONDS
+	wield_delay = 1.7 SECONDS
 	fire_sound = 'sound/weapons/guns/fire/tgmc/kinetic/gun_mg60.ogg'
 	fire_rattle = 'sound/weapons/guns/fire/tgmc/kinetic/gun_mg60_low.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
@@ -1062,7 +1069,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	starting_attachment_types = list(/obj/item/attachable/stock/t60stock)
 	gun_skill_category = SKILL_HEAVY_WEAPONS
@@ -1093,13 +1100,18 @@
 /obj/item/weapon/gun/rifle/m412l1_hpr
 	name = "\improper PR-412L1 heavy pulse rifle"
 	desc = "A large weapon capable of laying down supressing fire, based on the PR-412 pulse rifle platform. Effective in burst fire. Uses 10x24mm caseless ammunition."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
 	icon_state = "m412l1"
-	item_state = "m412l1"
+	worn_icon_state = "m412l1"
+	fire_animation = "m412l1_fire"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_1.dmi',
+	)
 	caliber = CALIBER_10X24_CASELESS //codex
 	max_shells = 200 //codex
 	aim_slowdown = 0.8
-	wield_delay = 2 SECONDS
+	wield_delay = 2.2 SECONDS
 	fire_sound = 'sound/weapons/guns/fire/hmg.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/m41a_unload.ogg'
@@ -1129,7 +1141,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	gun_skill_category = SKILL_HEAVY_WEAPONS
 	attachable_offset = list("muzzle_x" = 42, "muzzle_y" = 19,"rail_x" = 17, "rail_y" = 21, "under_x" = 31, "under_y" = 15, "stock_x" = 18, "stock_y" = 15)
@@ -1160,9 +1172,9 @@
 /obj/item/weapon/gun/rifle/type71
 	name = "\improper Type 71 'GROZA' pulse rifle"
 	desc = "The primary rifle of the USL pirates, the Type 71 is a reliable rifle chambered in 7.62x39mm, firing in three round bursts to conserve ammunition. A newer model for surpression roles to comply with overmatch doctrines is in progress and only issued to a limited number of privates in the USL."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "type71"
-	item_state = "type71"
+	worn_icon_state = "type71"
 	unique_reskin = list(
 		"Wood" = "type71_wood",
 	)
@@ -1176,11 +1188,9 @@
 	default_ammo_type = /obj/item/ammo_magazine/rifle/type71
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/type71,
-		/obj/item/ammo_magazine/rifle/type71/ap,
-		/obj/item/ammo_magazine/rifle/type71/hp,
 	)
 	aim_slowdown = 0.6
-	wield_delay = 0.7 SECONDS
+	wield_delay = 0.9 SECONDS
 	attachable_allowed = list(
 		/obj/item/attachable/reddot,
 		/obj/item/attachable/b7_scope,
@@ -1214,7 +1224,7 @@
 		/obj/item/attachable/scope/unremovable,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	attachable_offset = list("muzzle_x" = 41, "muzzle_y" = 19,"rail_x" = 18, "rail_y" = 24, "under_x" = 34, "under_y" = 16, "stock_x" = 19, "stock_y" = 13)
 	gun_firemode_list = list(GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	aim_fire_delay = 0.15 SECONDS
@@ -1262,8 +1272,8 @@
 	name = "\improper Type 73 'Commando' pulse carbine"
 	desc = "An much rarer variant of the standard Type 71, this version contains an integrated supressor, a scope, and lots of fine-tuning. Many parts have been replaced, filed down, and improved upon. As a result, this variant is rarely seen outside of elite units."
 	icon_state = "type71"
-	item_state = "type71"
-	wield_delay = 0 //Ends up being .5 seconds due to scope
+	worn_icon_state = "type71"
+	wield_delay = 0.2 SECONDS
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 19,"rail_x" = 10, "rail_y" = 22, "under_x" = 21, "under_y" = 18, "stock_x" = 21, "stock_y" = 18)
 	starting_attachment_types = list(/obj/item/attachable/suppressor/unremovable/invisible, /obj/item/attachable/scope/unremovable)
 
@@ -1283,7 +1293,8 @@
 	name = "\improper Zauer SH-15 automatic shotgun"
 	desc = "The Zauer SH-15 Automatic Assault Shotgun, this is a Terran Armories variant. Another iteration of the ZX series of firearms though it has been since regulated as part of the TGMC arsenal, hence the SH designation. It took over the various shotgun models as the semi-automatic shotgun provided to the TGMC. It is rifled, and loads primarily longer ranged munitions, being incompatible with buckshot shells. Takes 12-round 16 gauge magazines."
 	icon_state = "tx15"
-	item_state = "tx15"
+	worn_icon_state = "tx15"
+	icon = 'icons/obj/items/gun/shotgun.dmi'
 	fire_sound =   'sound/weapons/guns/shotgun/SH-15/SH15.ogg'
 	unload_sound = 'sound/weapons/guns/shotgun/SH-15/SH15_clipout.ogg'
 	reload_sound = 'sound/weapons/guns/shotgun/SH-15/SH15_clipin.ogg'
@@ -1293,9 +1304,9 @@
 	max_shells = 12 //codex
 	force = 20
 	default_ammo_type = /obj/item/ammo_magazine/rifle/sh15_slug
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/shotgun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/shotgun_righthand_1.dmi',
 	)
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/sh15_slug,
@@ -1324,7 +1335,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam, //RUTGMC EDIT
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES //Its a shotgun type weapon effectively, most shotgun type weapons shouldn't be able to point blank 1 handed.
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES //Its a shotgun type weapon effectively, most shotgun type weapons shouldn't be able to point blank 1 handed.
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	starting_attachment_types = list(/obj/item/attachable/stock/sh15)
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 16,"rail_x" = 12, "rail_y" = 17, "under_x" = 20, "under_y" = 13, "stock_x" = 26, "stock_y" = 13)
@@ -1352,19 +1363,20 @@
 	name = "\improper SG-29 Raummetall-KT smart machine gun"
 	desc = "The Raummetall-KT SG-29 is the TGMC's current standard IFF-capable medium machine gun. It's known for its ability to lay down heavy fire support very well. It is generally used when someone wants to hold a position or provide fire support. Requires special training and it cannot turn off IFF. It uses 10x26mm ammunition."
 	icon_state = "sg29"
-	item_state = "sg29"
+	worn_icon_state = "sg29"
+	icon = 'icons/obj/items/gun/machinegun.dmi'
 	caliber = CALIBER_10X26_CASELESS //codex
 	max_shells = 300 //codex
 	force = 30
 	aim_slowdown = 0.95
-	wield_delay = 1.3 SECONDS
+	wield_delay = 1.5 SECONDS
 	fire_sound = SFX_GUN_SMARTGUN
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/T42_unload.ogg'
 	reload_sound = 'sound/weapons/guns/interact/T42_reload.ogg'
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_1.dmi',
 	)
 	default_ammo_type = /obj/item/ammo_magazine/sg29
 	allowed_ammo_types = list(/obj/item/ammo_magazine/sg29)
@@ -1384,7 +1396,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_IFF|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_IFF|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	starting_attachment_types = list(/obj/item/attachable/stock/sgstock, /obj/item/attachable/sgbarrel)
 	gun_skill_category = SKILL_SMARTGUN //Uses SG skill for the penalties.
@@ -1415,13 +1427,17 @@
 /obj/item/weapon/gun/rifle/sg62
 	name = "\improper SG-62 Kauser-KT smart target rifle"
 	desc = "The Kauser-KT SG-62 is a IFF-capable rifle used by the TerraGov Marine Corps, coupled with a spotting rifle that is also IFF capable of applying various bullets with specialized ordnance, this is a gun with many answers to many situations... if you have the right ammo loaded. Requires special training and it cannot turn off IFF. It uses high velocity 10x27mm for the rifle and 12x66mm ammunition for the underslung rifle."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/marksman64.dmi'
 	icon_state = "sg62"
-	item_state = "sg62"
+	worn_icon_state = "sg62"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_1.dmi',
+	)
 	caliber = CALIBER_10X27_CASELESS //codex
 	max_shells = 40 //codex
 	aim_slowdown = 0.55
-	wield_delay = 0.65 SECONDS
+	wield_delay = 0.85 SECONDS
 	fire_sound =  'sound/weapons/guns/fire/t62.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/T42_unload.ogg'
@@ -1441,7 +1457,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_IFF|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_IFF|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	gun_skill_category = SKILL_SMARTGUN //Uses SG skill for the penalties.
 	attachable_offset = list("muzzle_x" = 12, "muzzle_y" = 22, "rail_x" = 15, "rail_y" = 22, "under_x" = 28, "under_y" = 16, "stock_x" = 12, "stock_y" = 14)
@@ -1464,7 +1480,7 @@
 	name = "SG-153 spotting rifle"
 	desc = "An underslung spotting rifle, generally found ontop of another gun."
 	icon_state = "sg153"
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/marksman64.dmi'
 	fire_sound =  'sound/weapons/guns/fire/spottingrifle.ogg'
 	caliber = CALIBER_12X7
 	slot = ATTACHMENT_SLOT_UNDER
@@ -1483,8 +1499,8 @@
 	attachable_allowed = list()
 	actions_types = list()
 	gun_firemode_list = list(GUN_FIREMODE_SEMIAUTO)
-	flags_gun_features = GUN_IS_ATTACHMENT|GUN_WIELDED_FIRING_ONLY|GUN_ATTACHMENT_FIRE_ONLY|GUN_AMMO_COUNTER|GUN_IFF|GUN_SMOKE_PARTICLES
-	flags_attach_features = NONE
+	gun_features_flags = GUN_IS_ATTACHMENT|GUN_WIELDED_FIRING_ONLY|GUN_ATTACHMENT_FIRE_ONLY|GUN_AMMO_COUNTER|GUN_IFF|GUN_SMOKE_PARTICLES
+	attach_features_flags = NONE
 	fire_delay = 1 SECONDS
 	accuracy_mult = 1.5
 	scatter = -5
@@ -1498,20 +1514,25 @@
 	name = "alien rifle"
 	desc = "An unusual gun of alien origin. It is lacking a trigger or any obvious way to fire it."
 	icon_state = "alien_rifle"
-	item_state = "alien_rifle"
+	worn_icon_state = "alien_rifle"
+	icon = 'icons/obj/items/gun/energy.dmi'
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/energy_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/energy_righthand_1.dmi',
+	)
 	fire_sound = 'sound/weapons/guns/fire/alienplasma.ogg'
 	fire_rattle = 'sound/weapons/guns/fire/alienplasma.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/vp70_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/m41a_unload.ogg'
 	reload_sound = 'sound/weapons/guns/interact/m4ra_reload.ogg'
 	max_shells = 20//codex stuff
-	ammo_datum_type = /datum/ammo/energy/plasma
+	ammo_datum_type = /datum/ammo/energy/sectoid_plasma
 	muzzleflash_iconstate = "muzzle_flash_pulse"
 	default_ammo_type = /obj/item/ammo_magazine/rifle/sectoid_rifle
 	allowed_ammo_types = list(/obj/item/ammo_magazine/rifle/sectoid_rifle)
-	wield_delay = 0.4 SECONDS
+	wield_delay = 0.6 SECONDS
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_ENERGY|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_ENERGY|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_SEMIAUTO, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	attachable_offset = list("muzzle_x" = 32, "muzzle_y" = 18,"rail_x" = 12, "rail_y" = 23, "under_x" = 23, "under_y" = 15, "stock_x" = 22, "stock_y" = 12)
 
@@ -1539,20 +1560,18 @@
 		return FALSE
 	return TRUE
 
-
 //-------------------------------------------------------
 //SR-127 bolt action sniper rifle
-
 
 /obj/item/weapon/gun/rifle/sr127
 	name = "\improper SR-127 Bauer bolt action rifle"
 	desc = "The Bauer SR-127 is the standard issue bolt action rifle used by the TGMC. Known for its long range accuracy and use by marksmen despite its age and lack of IFF, though careful aim allows fire support from behind. It has an irremoveable scope. Uses 8.6×70mm box magazines."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/marksman64.dmi'
 	icon_state = "tl127"
-	item_state = "tl127"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "tl127"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_64.dmi',
 	)
 
 	inhand_x_dimension = 64
@@ -1585,7 +1604,7 @@
 		/obj/item/attachable/foldable/bipod,
 	)
 
-	flags_gun_features = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	reciever_flags = AMMO_RECIEVER_REQUIRES_UNIQUE_ACTION|AMMO_RECIEVER_MAGAZINES|AMMO_RECIEVER_UNIQUE_ACTION_LOCKS|AMMO_RECIEVER_AUTO_EJECT
 
 	cock_animation = "tl127_cock"
@@ -1610,7 +1629,7 @@
 	recoil = 0
 	recoil_unwielded = 4
 	aim_slowdown = 1
-	wield_delay = 1.3 SECONDS
+	wield_delay = 1.5 SECONDS
 	cock_delay = 0.7 SECONDS
 	movement_acc_penalty_mult = 6
 
@@ -1625,7 +1644,8 @@
 	name = "\improper SR-81 Kauser-KT automatic sniper rifle"
 	desc = "The Kauser-KT SR-81 is the TerraGov Marine Corps's automatic sniper rifle usually married to it's iconic NVG/KTLD scope combo. It is notable for its high rate of fire for its class, and has decent performance in any range. Uses 8.6x70mm caseless with specialized pressures for IFF fire."
 	icon_state = "t81"
-	item_state = "t81"
+	worn_icon_state = "t81"
+	icon = 'icons/obj/items/gun/marksman.dmi'
 	fire_sound = 'sound/weapons/guns/fire/sniper.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/sniper_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/m41a_unload.ogg'
@@ -1634,9 +1654,9 @@
 	max_shells = 20 //codex
 	default_ammo_type = /obj/item/ammo_magazine/rifle/sr81
 	allowed_ammo_types = list(/obj/item/ammo_magazine/rifle/sr81)
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_1.dmi',
 	)
 	attachable_allowed = list(
 		/obj/item/attachable/sr81,
@@ -1649,7 +1669,7 @@
 		/obj/item/attachable/compensator,
 	)
 
-	flags_gun_features = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_IFF|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_IFF|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 48, "muzzle_y" = 18,"rail_x" = 23, "rail_y" = 23, "under_x" = 38, "under_y" = 16, "stock_x" = 9, "stock_y" = 12)
 	starting_attachment_types = list(
@@ -1666,7 +1686,7 @@
 	recoil = 0
 	recoil_unwielded = 4
 	aim_slowdown = 1
-	wield_delay = 1.3 SECONDS
+	wield_delay = 1.5 SECONDS
 	movement_acc_penalty_mult = 6
 
 //-------------------------------------------------------
@@ -1676,10 +1696,10 @@
 	name = "\improper AR-11 K&H combat rifle"
 	desc = "The Keckler and Hoch AR-11 is the former standard issue rifle of the TGMC. Most of them have been mothballed into storage long ago, but some still pop up in marine or mercenary hands. It is known for its large magazine size and great burst fire, but rather awkward to use, especially during combat. It uses 4.92×34mm caseless HV ammunition."
 	icon_state = "tx11"
-	item_state = "tx11"
+	worn_icon_state = "tx11"
 	caliber = CALIBER_492X34_CASELESS //codex
 	max_shells = 70 //codex
-	wield_delay = 0.65 SECONDS
+	wield_delay = 0.85 SECONDS
 	fire_sound = 'sound/weapons/guns/fire/tgmc/kinetic/gun_ar11.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/rifles/AR-11/AR11_clipout.ogg'
@@ -1687,10 +1707,6 @@
 	cocked_sound = 'sound/weapons/guns/rifles/AR-11/AR11_boltpull.ogg'
 	default_ammo_type = /obj/item/ammo_magazine/rifle/ar11
 	allowed_ammo_types = list(/obj/item/ammo_magazine/rifle/ar11)
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
-	)
 	attachable_allowed = list(
 		/obj/item/attachable/reddot,
 		/obj/item/attachable/b7_scope,
@@ -1707,7 +1723,7 @@
 		/obj/item/attachable/scope/marine,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(/obj/item/attachable/stock/ar11, /obj/item/attachable/scope/mini/ar11)
 	attachable_offset = list("muzzle_x" = 31, "muzzle_y" = 17,"rail_x" = 6, "rail_y" = 20, "under_x" = 20, "under_y" = 12, "stock_x" = 17, "stock_y" = 14)
@@ -1742,12 +1758,12 @@
 /obj/item/weapon/gun/rifle/ar21
 	name = "\improper AR-21 Kauser skirmish rifle"
 	desc = "The Kauser AR-21 is a versatile rifle is developed to bridge a gap between higher caliber weaponry and a normal rifle. It fires a strong 10x25mm round, which has decent stopping power. It however suffers in magazine size and movement capablity compared to smaller peers."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "t21"
-	item_state = "t21"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "t21"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/rifle_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/rifle_righthand_64.dmi',
 	)
 	inhand_x_dimension = 64
 	inhand_y_dimension = 32
@@ -1764,9 +1780,6 @@
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/ar21,
 		/obj/item/ammo_magazine/rifle/ar21/extended,
-		/obj/item/ammo_magazine/rifle/ar21/ap,
-		/obj/item/ammo_magazine/rifle/ar21/hp,
-		/obj/item/ammo_magazine/rifle/ar21/incendiary,
 	)
 	attachable_allowed = list(
 		/obj/item/attachable/reddot,
@@ -1798,7 +1811,7 @@
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/pocket_beam,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 46, "muzzle_y" = 16,"rail_x" = 18, "rail_y" = 19, "under_x" = 34, "under_y" = 13, "stock_x" = 0, "stock_y" = 13)
 	aim_fire_delay = 0.15 SECONDS
@@ -1809,7 +1822,7 @@
 	burst_delay = 0.15 SECONDS
 	accuracy_mult = 1.2
 	scatter = -2
-	wield_delay = 0.6 SECONDS
+	wield_delay = 0.8 SECONDS
 	aim_slowdown = 0.5
 	damage_falloff_mult = 0.5
 
@@ -1827,7 +1840,12 @@
 	name = "\improper ALF-51B Kauser machinecarbine"
 	desc = "The Kauser ALF-51B is an unoffical modification of a ALF-51, or better known as the AR-18 carbine, modified to SMG length of barrel, rechambered for a stronger round, and belt based. Truly the peak of CQC. Useless past that. Aiming is impossible. Uses 10x25mm caseless ammunition."
 	icon_state = "alf51b"
-	item_state = "alf51b"
+	worn_icon_state = "alf51b"
+	icon = 'icons/obj/items/gun/machinegun.dmi'
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_1.dmi',
+	)
 	fire_animation = "alf51b_fire"
 	fire_sound = 'sound/weapons/guns/fire/t18b.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
@@ -1850,7 +1868,7 @@
 		/obj/item/attachable/bayonetknife/som,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	attachable_offset = list("muzzle_x" = 31, "muzzle_y" = 16,"rail_x" = 10, "rail_y" = 19, "under_x" = 21, "under_y" = 13, "stock_x" = 0, "stock_y" = 13)
 
@@ -1860,7 +1878,7 @@
 	scatter = 4
 	burst_amount = 4
 	aim_slowdown = 0.3
-	wield_delay = 0.4 SECONDS
+	wield_delay = 0.6 SECONDS
 	damage_falloff_mult = 3
 
 	movement_acc_penalty_mult = 4
@@ -1884,9 +1902,9 @@
 /obj/item/weapon/gun/rifle/mkh
 	name = "\improper MKH-98 storm rifle"
 	desc = "A certified classic, this reproduction design was hailed as the first successful assault rifle concept, generally termed a 'storm rifle'. Has a higher than usual firerate for its class, but suffers in capacity. This version of it chambers 7.62x39mm."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "mkh98"
-	item_state = "mkh98"
+	worn_icon_state = "mkh98"
 	caliber = CALIBER_762X39 //codex
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	max_shells = 30 //codex
@@ -1910,7 +1928,7 @@
 		/obj/item/attachable/bayonetknife/som,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 51, "muzzle_y" = 18,"rail_x" = 24, "rail_y" = 22, "under_x" = 36, "under_y" = 16, "stock_x" = 0, "stock_y" = 12)
 
@@ -1918,7 +1936,7 @@
 	burst_amount = 1
 	fire_delay = 0.2 SECONDS
 	scatter = 1
-	wield_delay = 0.5 SECONDS
+	wield_delay = 0.7 SECONDS
 	movement_acc_penalty_mult = 4
 
 //-------------------------------------------------------
@@ -1926,9 +1944,13 @@
 /obj/item/weapon/gun/rifle/tx54
 	name = "\improper GL-54 grenade launcher"
 	desc = "A magazine fed, semi-automatic grenade launcher designed to shoot airbursting smart grenades. Requires a T49 scope for precision aiming."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/special64.dmi'
 	icon_state = "tx54"
-	item_state = "tx54" ///todo
+	worn_icon_state = "tx54"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/special_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/special_righthand_1.dmi',
+	)
 	max_shells = 5 //codex
 	max_chamber_items = 1
 	fire_delay = 1.2 SECONDS
@@ -1952,7 +1974,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_WIELDED_STABLE_FIRING_ONLY|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_WIELDED_STABLE_FIRING_ONLY|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
 	starting_attachment_types = list(/obj/item/attachable/scope/optical)
 	default_ammo_type = null
 	allowed_ammo_types = list(
@@ -1966,7 +1988,7 @@
 	gun_firemode_list = list(GUN_FIREMODE_SEMIAUTO)
 	attachable_offset = list("muzzle_x" = 31, "muzzle_y" = 17,"rail_x" = 12, "rail_y" = 20, "under_x" = 28, "under_y" = 13, "stock_x" = -1, "stock_y" = 17)
 	aim_slowdown = 0.8
-	wield_delay = 0.8 SECONDS
+	wield_delay = 1 SECONDS
 	burst_amount = 1
 	accuracy_mult = 1.15
 	scatter = -2
@@ -1979,12 +2001,12 @@
 /obj/item/weapon/gun/rifle/tx54/mini
 	name = "\improper GL-55 20mm grenade launcher"
 	desc = "A weapon-mounted, reloadable, five-shot grenade launcher."
-	icon = 'icons/Marine/marine-weapons.dmi'
+	icon = 'icons/obj/items/attachments/attachments.dmi'
 	icon_state = "tx55gl"
 	placed_overlay_iconstate = "tx55gl"
 	attachable_allowed = list()
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_IS_ATTACHMENT|GUN_ATTACHMENT_FIRE_ONLY|GUN_WIELDED_STABLE_FIRING_ONLY|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
-	flags_attach_features = NONE
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_IS_ATTACHMENT|GUN_ATTACHMENT_FIRE_ONLY|GUN_WIELDED_STABLE_FIRING_ONLY|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
+	attach_features_flags = NONE
 	slot = ATTACHMENT_SLOT_STOCK
 	default_ammo_type = /obj/item/ammo_magazine/rifle/tx54
 	attach_delay = 3 SECONDS
@@ -1998,19 +2020,17 @@
 	name = "\improper AR-55 assault rifle"
 	desc = "Officially designated an Objective Individual Combat Weapon, the AR-55 features an upper bullpup 20mm grenade launcher designed to fire a variety of specialised rounds, and an underslung assault rifle using 10x24mm caseless ammunition. Somewhat cumbersome to use due to its size and weight. Requires a T49 scope for precision aiming."
 	icon_state = "tx55"
-	item_state = "tx55"
+	worn_icon_state = "tx55"
 	fire_sound = SFX_GUN_AR12
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/t18_unload.ogg'
 	reload_sound = 'sound/weapons/guns/interact/t18_reload.ogg'
 	caliber = CALIBER_10X24_CASELESS //codex
 	max_shells = 36 //codex
-	wield_delay = 1 SECONDS
+	wield_delay = 1.2 SECONDS
 	default_ammo_type = /obj/item/ammo_magazine/rifle/ar12
 	allowed_ammo_types = list(
 		/obj/item/ammo_magazine/rifle/ar12,
-		/obj/item/ammo_magazine/rifle/ar12/ap,
-		/obj/item/ammo_magazine/rifle/ar12/hp,
 		/obj/item/ammo_magazine/rifle/ar12/incendiary,
 	)
 	attachable_allowed = list(
@@ -2039,7 +2059,7 @@
 		/obj/item/attachable/scope/optical,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(
 		/obj/item/weapon/gun/rifle/tx54/mini,
@@ -2081,12 +2101,12 @@
 /obj/item/weapon/gun/rifle/garand
 	name = "\improper CAU C1 Garand self loading rifle"
 	desc = "The Carlford-1 is a remastered classic made by Carlford Armories, made to fit in the modern day. Most of the noticeable differences are minor rail modifications. Other than that, it is a faithful recreation with the trademark ping sound and all. Uses .30-06 enbloc clips."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/marksman64.dmi'
 	icon_state = "garand"
-	item_state = "garand"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "garand"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_64.dmi',
 	)
 
 	inhand_x_dimension = 64
@@ -2115,7 +2135,7 @@
 		/obj/item/attachable/foldable/bipod,
 	)
 
-	flags_gun_features = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	reciever_flags = AMMO_RECIEVER_MAGAZINES|AMMO_RECIEVER_AUTO_EJECT|AMMO_RECIEVER_CYCLE_ONLY_BEFORE_FIRE
 
 	gun_firemode_list = list(GUN_FIREMODE_SEMIAUTO)
@@ -2136,7 +2156,7 @@
 	recoil = 0
 	recoil_unwielded = 4
 	aim_slowdown = 0.75
-	wield_delay = 1 SECONDS
+	wield_delay = 1.2 SECONDS
 	movement_acc_penalty_mult = 6
 
 //-------------------------------------------------------
@@ -2146,8 +2166,8 @@
 	name = "\improper V-31 assault rifle"
 	desc = "The V-31 was the primary rifle of the Sons of Mars until the introduction of more advanced energy weapons. Nevertheless, the V-31 continues to see common use due to its comparative ease of production and maintenance, and due to the inbuilt low velocity railgun designed for so called 'micro' grenades. Has good handling due to its compact bullpup design, and is generally effective at all ranges. Uses 10x25mm caseless ammunition."
 	icon_state = "v31"
-	icon = 'icons/Marine/gun64.dmi'
-	item_state = "v31"
+	icon = 'icons/obj/items/gun/rifle64.dmi'
+	worn_icon_state = "v31"
 	fire_sound = 'sound/weapons/guns/fire/som_rifle.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/t18_unload.ogg'
@@ -2180,14 +2200,14 @@
 		/obj/item/attachable/motiondetector,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	starting_attachment_types = list(
 		/obj/item/weapon/gun/shotgun/micro_grenade,
 	)
 	attachable_offset = list("muzzle_x" = 45, "muzzle_y" = 16,"rail_x" = 23, "rail_y" = 24, "under_x" = 33, "under_y" = 11, "stock_x" = -1, "stock_y" = 17)
 
-	wield_delay = 0.6 SECONDS
+	wield_delay = 0.8 SECONDS
 
 	aim_fire_delay = 0.1 SECONDS
 	aim_speed_modifier = 2
@@ -2197,10 +2217,11 @@
 
 	accuracy_mult = 1
 	accuracy_mult_unwielded = 0.55
-	scatter = 1
+	scatter = -2
 	scatter_unwielded = 15
 
 	burst_amount = 3
+	burst_scatter_mult = 4
 	burst_delay = 0.1 SECONDS
 	extra_delay = 0.1 SECONDS
 
@@ -2243,9 +2264,9 @@
 /obj/item/weapon/gun/rifle/som_carbine
 	name = "\improper V-34 carbine"
 	desc = "An old but robust weapon that saw extensive use in the Martian uprising. A comparatively light and compact weapon, it still packs a considerable punch thanks to a good rate of fire and high calibre, although at range its effective drops off considerably. It is chambered in 7.62x39mm."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "v34"
-	item_state = "v34"
+	worn_icon_state = "v34"
 	caliber = CALIBER_762X39
 	muzzleflash_iconstate = "muzzle_flash"
 	max_shells = 30
@@ -2270,7 +2291,7 @@
 		/obj/item/attachable/verticalgrip,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 18,"rail_x" = 8, "rail_y" = 20, "under_x" = 17, "under_y" = 13, "stock_x" = -6, "stock_y" = 16)
 	starting_attachment_types = list(/obj/item/attachable/foldable/som_carbine)
@@ -2281,7 +2302,7 @@
 	accuracy_mult = 0.75
 	scatter = 12
 	recoil = 1.5
-	wield_delay = 0.4 SECONDS
+	wield_delay = 0.6 SECONDS
 	aim_slowdown = 0.3
 	movement_acc_penalty_mult = 4
 	damage_falloff_mult = 1.4
@@ -2293,7 +2314,7 @@
 /obj/item/weapon/gun/rifle/som_carbine/black
 	desc = "A modern redesign by the SOM of an ancient weapon that saw extensive use in the Martian uprising. A comparatively light and compact weapon, it still packs a considerable punch thanks to a good rate of fire and high calibre, although at range its effective drops off considerably. It is chambered in 7.62x39mm."
 	icon_state = "v34_black"
-	item_state = "v34_black"
+	worn_icon_state = "v34_black"
 	default_ammo_type = /obj/item/ammo_magazine/rifle/mpi_km/carbine/black
 	attachable_allowed = list(
 		/obj/item/attachable/foldable/som_carbine,
@@ -2310,18 +2331,90 @@
 	)
 
 //-------------------------------------------------------
+// V-35 battle rifle
+
+/obj/item/weapon/gun/rifle/som_big
+	name = "\improper V-35 battle rifle"
+	desc = "The V-35 is a more recent addition to the SOM armory, \
+	where its superior per shot firepower serves as a cheaper alternative to vastly more expensive and maintenance intensive volkite weaponry. \
+	A variety of ammunition types further more gives the V-35 significant tactical flexibility that volkite weaponry typically lacks, in addition to the ability to use aim mode."
+
+	icon_state = "v35"
+	icon = 'icons/obj/items/gun/rifle64.dmi'
+	worn_icon_state = "v35"
+	ammo_level_icon = "v35"
+
+	muzzleflash_iconstate = "muzzle_flash_medium"
+	fire_sound = 'sound/weapons/guns/fire/ks23.ogg'
+	dry_fire_sound = 'sound/weapons/guns/fire/deagle_empty.ogg'
+	unload_sound = 'sound/weapons/guns/interact/m4ra_unload.ogg'
+	reload_sound = 'sound/weapons/guns/interact/m4ra_reload.ogg'
+	caliber = CALIBER_10X27_CASELESS
+	aim_slowdown = 0.75
+	wield_delay = 1 SECONDS
+	force = 20
+	max_shells = 20
+	default_ammo_type = /obj/item/ammo_magazine/rifle/som_big
+	allowed_ammo_types = list(
+		/obj/item/ammo_magazine/rifle/som_big,
+		/obj/item/ammo_magazine/rifle/som_big/incendiary,
+		/obj/item/ammo_magazine/rifle/som_big/anti_armour,
+	)
+	attachable_allowed = list(
+		/obj/item/attachable/suppressor,
+		/obj/item/attachable/bayonet,
+		/obj/item/attachable/bayonetknife,
+		/obj/item/attachable/bayonetknife/som,
+		/obj/item/attachable/compensator,
+		/obj/item/attachable/reddot,
+		/obj/item/attachable/verticalgrip,
+		/obj/item/attachable/angledgrip,
+		/obj/item/attachable/lasersight,
+		/obj/item/attachable/flashlight/under,
+		/obj/item/attachable/flashlight,
+		/obj/item/attachable/foldable/bipod,
+		/obj/item/attachable/gyro,
+		/obj/item/attachable/extended_barrel,
+		/obj/item/attachable/heavy_barrel,
+		/obj/item/attachable/magnetic_harness,
+		/obj/item/attachable/scope,
+		/obj/item/attachable/scope/marine,
+		/obj/item/attachable/scope/mini,
+		/obj/item/attachable/motiondetector,
+	)
+
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
+	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
+	attachable_offset = list("muzzle_x" = 54, "muzzle_y" = 20,"rail_x" = 23, "rail_y" = 22, "under_x" = 45, "under_y" = 14, "stock_x" = 14, "stock_y" = 10)
+
+	fire_delay = 0.65 SECONDS
+	accuracy_mult = 1.1
+	scatter = -2
+	burst_amount = 1
+	movement_acc_penalty_mult = 6
+
+	actions_types = list(/datum/action/item_action/aim_mode)
+	aim_fire_delay = 0.2 SECONDS
+	aim_speed_modifier = 2
+
+/obj/item/weapon/gun/rifle/som_big/standard
+	starting_attachment_types = list(/obj/item/attachable/motiondetector, /obj/item/attachable/extended_barrel, /obj/item/attachable/verticalgrip)
+
+/obj/item/weapon/gun/rifle/som_big/support
+	starting_attachment_types = list(/obj/item/attachable/magnetic_harness, /obj/item/attachable/extended_barrel, /obj/item/attachable/foldable/bipod)
+//-------------------------------------------------------
 // V-41 SOM LMG
 
 /obj/item/weapon/gun/rifle/som_mg
 	name = "\improper V-41 machine gun"
 	desc = "The V-41 is a large man portable machine used by the SOM, allowing for sustained, accurate suppressive firepower at the cost of mobility and handling. Commonly seen where their preferred tactics of fast, mobile aggression is ill suited. Takes 10x26mm Caseless."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
 	icon_state = "v41"
-	item_state = "v41"
+	worn_icon_state = "v41"
 	fire_animation = "v41_fire"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_64.dmi',
 	)
 
 	inhand_x_dimension = 64
@@ -2329,7 +2422,7 @@
 	caliber = CALIBER_10X26_CASELESS
 	max_shells = 200
 	force = 35
-	wield_delay = 1.5 SECONDS
+	wield_delay = 1.7 SECONDS
 	fire_sound = 'sound/weapons/guns/fire/v41.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound = 'sound/weapons/guns/interact/T42_unload.ogg'
@@ -2356,7 +2449,7 @@
 		/obj/item/attachable/shoulder_mount,
 	)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	starting_attachment_types = list(/obj/item/attachable/stock/som_mg_stock)
 	gun_skill_category = SKILL_HEAVY_WEAPONS
@@ -2383,12 +2476,12 @@
 /obj/item/weapon/gun/rifle/icc_sharpshooter
 	name = "\improper L-11 sharpshooter rifle"
 	desc = "The L-11 is a venerable and battle-tested rifle used by the ICCAF. Although rather heavy, long and unwieldy compared to most ICCAF rifles, which focus on getting up close and personal, it easily makes up with excellent long-range potential when compared to most of its peers, mostly seen in use by reserve troops who expect to fight at distance, rather than up close. Uses 10x27mm magazines."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/marksman64.dmi'
 	icon_state = "l11"
-	item_state = "l11"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "l11"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/marksman_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/marksman_righthand_64.dmi',
 	)
 	inhand_x_dimension = 64
 	inhand_y_dimension = 32
@@ -2400,7 +2493,7 @@
 	reload_sound = 'sound/weapons/guns/interact/fal_reload.ogg'
 	caliber = CALIBER_10X27_CASELESS //codex
 	aim_slowdown = 0.8
-	wield_delay = 0.85 SECONDS
+	wield_delay = 1.05 SECONDS
 	force = 20
 	max_shells = 20 //codex
 	default_ammo_type = /obj/item/ammo_magazine/rifle/icc_sharpshooter
@@ -2433,7 +2526,7 @@
 	)
 	starting_attachment_types = list(/obj/item/attachable/stock/icc_sharpshooter)
 
-	flags_gun_features = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_CAN_POINTBLANK|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 40, "muzzle_y" = 14, "rail_x" = 15, "rail_y" = 17, "under_x" = 23, "under_y" = 10, "stock_x" = 17, "stock_y" = 10)
 	actions_types = list(/datum/action/item_action/aim_mode)
@@ -2456,12 +2549,12 @@
 /obj/item/weapon/gun/rifle/icc_battlecarbine
 	name = "\improper L-15 battlecarbine"
 	desc = "The L-15 battlecarbine is the standard rifle of the ICCAF, boasting a high caliber round and a menacing profile, it presents an excellent CQC firearm. However it struggles at range due to high dropoff from the short barrel, units that use it say that you need to close the gap at any cost to see the true efficacy of this weapon. Uses 10x25mm caseless ammunition."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "l15"
-	item_state = "l15"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "l15"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/rifle_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/rifle_righthand_64.dmi',
 	)
 
 	inhand_x_dimension = 64
@@ -2503,7 +2596,7 @@
 		/obj/item/weapon/gun/rifle/pepperball/pepperball_mini,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 44, "muzzle_y" = 19,"rail_x" = 20, "rail_y" = 23, "under_x" = 33, "under_y" = 13, "stock_x" = 0, "stock_y" = 13)
 	actions_types = list(/datum/action/item_action/aim_mode)
@@ -2514,7 +2607,7 @@
 	fire_delay = 0.2 SECONDS
 	scatter = 3
 	aim_slowdown = 0.35
-	wield_delay = 0.35 SECONDS
+	wield_delay = 0.55 SECONDS
 	damage_falloff_mult = 2.5
 	movement_acc_penalty_mult = 4
 
@@ -2528,12 +2621,12 @@
 /obj/item/weapon/gun/rifle/icc_confrontationrifle
 	name = "\improper ML-12 confrontation rifle"
 	desc = "The ML-12 confrontation rifle is an absolute beast of a weapon used by the ICCAF. Featuring a high caliber round in a short package, it will absolutely shred enemy targets at close quarters, a operator must mind the incredible recoil while making followup shots, however. Uses 10x28mm caseless ammunition."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "ml12"
-	item_state = "ml12"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_64.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_64.dmi',
+	worn_icon_state = "ml12"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/rifle_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/rifle_righthand_64.dmi',
 	)
 
 	inhand_x_dimension = 64
@@ -2566,7 +2659,7 @@
 		/obj/item/attachable/motiondetector,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 48, "muzzle_y" = 18,"rail_x" = 24, "rail_y" = 26, "under_x" = 36, "under_y" = 14, "stock_x" = 0, "stock_y" = 13)
 	actions_types = list(/datum/action/item_action/aim_mode)
@@ -2576,7 +2669,7 @@
 	burst_amount = 1
 	fire_delay = 0.45 SECONDS
 	aim_slowdown = 0.55
-	wield_delay = 0.65 SECONDS
+	wield_delay = 0.85 SECONDS
 	damage_falloff_mult = 2
 	movement_acc_penalty_mult = 6.5
 
@@ -2595,9 +2688,13 @@
 /obj/item/weapon/gun/rifle/icc_autoshotgun
 	name = "\improper ML-41 autoshotgun"
 	desc = "The ML-41 Automatic Shotgun is used by the ICCAF in fast paced boarding assaults, fielding a wide variety of ammo for all situations. Takes 16-round 12 gauge drums."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/shotgun64.dmi'
 	icon_state = "ml41"
-	item_state = "ml41"
+	worn_icon_state = "ml41"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/shotgun_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/shotgun_righthand_1.dmi',
+	)
 	fire_sound = 'sound/weapons/guns/fire/shotgun.ogg'
 	dry_fire_sound = 'sound/weapons/guns/fire/shotgun_empty.ogg'
 	caliber = CALIBER_12G //codex
@@ -2625,7 +2722,7 @@
 		/obj/item/attachable/motiondetector,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES //Its a shotgun type weapon effectively, most shotgun type weapons shouldn't be able to point blank 1 handed.
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES //Its a shotgun type weapon effectively, most shotgun type weapons shouldn't be able to point blank 1 handed.
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 26,"rail_x" = 26, "rail_y" = 24, "under_x" = 40, "under_y" = 16, "stock_x" = 26, "stock_y" = 13)
 	gun_skill_category = SKILL_SHOTGUNS
@@ -2634,7 +2731,7 @@
 	accuracy_mult = 1.15
 	damage_mult = 0.5
 	aim_slowdown = 0.6
-	wield_delay = 0.55 SECONDS
+	wield_delay = 0.75 SECONDS
 	burst_amount = 1
 	scatter = 8
 	movement_acc_penalty_mult = 2
@@ -2648,9 +2745,9 @@
 /obj/item/weapon/gun/rifle/icc_assaultcarbine
 	name = "\improper L-88 assault carbine"
 	desc = "An aged, reliable but outdated bullpup rifle used by ICCAF reserve personnel it is best used in close quarters when you need to quickly clear corners at rapid pace, has an integral foregrip and unmagnified scope to increase accuracy and reduce drag. Chambered in 5.56x45mm NATO."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "l88"
-	item_state = "l88"
+	worn_icon_state = "l88"
 	muzzleflash_iconstate = "muzzle_flash_medium"
 	caliber = CALIBER_556X45 //codex
 	max_shells = 30 //codex
@@ -2673,7 +2770,7 @@
 		/obj/item/attachable/magnetic_harness,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER
 	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
 	attachable_offset = list("muzzle_x" = 44, "muzzle_y" = 19,"rail_x" = 8, "rail_y" = 21, "under_x" = 28, "under_y" = 12, "stock_x" = 19, "stock_y" = 13)
 
@@ -2683,7 +2780,7 @@
 	accuracy_mult = 1.15
 	damage_mult = 1.2
 	damage_falloff_mult = 1.5
-	wield_delay = 0.65 SECONDS
+	wield_delay = 0.85 SECONDS
 	aim_slowdown = 0.2
 	scatter = 0
 
@@ -2691,7 +2788,7 @@
 	name = "\improper L&S EM-88 assault carbine"
 	desc = "An aged, reliable, but outdated bullpup rifle usually seen within ICC space due to being surplused long ago, some of these surplus models sometimes find themselves within TGMC space via underhanded means. It's best used in close quarters when you need to quickly clear corners at rapid pace, has an integral foregrip and unmagnified scope to increase accuracy and reduce drag. Chambered in 5.56x45mm NATO."
 	icon_state = "l88_export"
-	item_state = "l88_export"
+	worn_icon_state = "l88_export"
 	default_ammo_type = /obj/item/ammo_magazine/rifle/icc_assaultcarbine/export
 
 ///////////////////////////////////////////////////////////////////////
@@ -2701,12 +2798,12 @@
 /obj/item/weapon/gun/rifle/t25
 	name = "\improper T-25 smartrifle"
 	desc = "The T-25 is the TGMC's current standard IFF-capable rifle. It's known for its ability to lay down quick fire support very well. Requires special training and it cannot turn off IFF. It uses 10x26mm ammunition."
-	icon = 'icons/Marine/gun64.dmi'
+	icon = 'icons/obj/items/gun/rifle64.dmi'
 	icon_state = "t25"
-	item_state = "t25"
-	item_icons = list(
-		slot_l_hand_str =  'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str =  'icons/mob/items_righthand_1.dmi',
+	worn_icon_state = "t25"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/rifle_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/rifle_righthand_1.dmi',
 		slot_s_store_str = 'icons/mob/suit_slot.dmi',
 		slot_back_str =    'icons/mob/clothing/back.dmi',
 	)
@@ -2714,7 +2811,7 @@
 	max_shells = 80 //codex
 	force = 20
 	aim_slowdown = 0.5
-	wield_delay = 0.9 SECONDS
+	wield_delay = 1.1 SECONDS
 	fire_sound = SFX_GUN_SMARTGUN
 	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
 	unload_sound =   'sound/weapons/guns/interact/T42_unload.ogg'
@@ -2739,7 +2836,7 @@
 		/obj/item/attachable/motiondetector,
 	)
 
-	flags_gun_features = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_IFF
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_IFF
 	gun_firemode_list = list(GUN_FIREMODE_SEMIAUTO, GUN_FIREMODE_AUTOMATIC)
 	gun_skill_category = SKILL_SMARTGUN //Uses SG skill for the penalties.
 	attachable_offset = list("muzzle_x" = 42, "muzzle_y" = 17,"rail_x" = 15, "rail_y" = 21, "under_x" = 24, "under_y" = 14, "stock_x" = 12, "stock_y" = 13)
@@ -2750,3 +2847,187 @@
 	accuracy_mult = 1.2
 	scatter = -5
 	scatter_unwielded = 60
+
+//-------------------------------------------------------
+//MG-60 General Purpose Machine Gun
+
+/obj/item/weapon/gun/rifle/icc_mg
+	name = "\improper ML-41 assault machine gun"
+	desc = "The ML-41 is an incredibly lightweight machinegun used by ICCAF forces, being incredibly light for its class allows it to be used in rapid manuevers, at the cost of damage at range and generally high scatter. It uses 10x26mm boxes."
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
+	icon_state = "minimi"
+	worn_icon_state = "minimi"
+	fire_animation = "minimi_fire"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_64.dmi',
+	)
+	inhand_x_dimension = 64
+	inhand_y_dimension = 32
+
+	caliber = CALIBER_10X26_CASELESS //codex
+	max_shells = 200 //codex
+	force = 30
+	aim_slowdown = 0.85
+	wield_delay = 0.95 SECONDS
+	fire_sound = 'sound/weapons/guns/fire/tgmc/kinetic/gun_mg60.ogg'
+	dry_fire_sound = 'sound/weapons/guns/fire/m41a_empty.ogg'
+	unload_sound = 'sound/weapons/guns/interact/T42_unload.ogg'
+	reload_sound = 'sound/weapons/guns/interact/T42_reload.ogg'
+	default_ammo_type = /obj/item/ammo_magazine/icc_mg
+	allowed_ammo_types = list(/obj/item/ammo_magazine/icc_mg, /obj/item/ammo_magazine/icc_mg/belt)
+	attachable_allowed = list(
+		/obj/item/attachable/flashlight,
+		/obj/item/attachable/lasersight,
+		/obj/item/attachable/flashlight/under,
+		/obj/item/attachable/foldable/bipod,
+		/obj/item/attachable/extended_barrel,
+		/obj/item/attachable/heavy_barrel,
+		/obj/item/attachable/bayonet,
+		/obj/item/attachable/bayonetknife,
+		/obj/item/attachable/bayonetknife/som,
+		/obj/item/attachable/scope/mini,
+		/obj/item/attachable/stock/t60stock,
+		/obj/item/attachable/magnetic_harness,
+		/obj/item/attachable/motiondetector,
+		/obj/item/attachable/buildasentry,
+		/obj/item/attachable/shoulder_mount,
+	)
+
+	gun_features_flags = GUN_AMMO_COUNTER|GUN_WIELDED_FIRING_ONLY|GUN_SMOKE_PARTICLES
+	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
+	gun_skill_category = SKILL_HEAVY_WEAPONS
+	attachable_offset = list("muzzle_x" = 42, "muzzle_y" = 21,"rail_x" = 6, "rail_y" = 23, "under_x" = 26, "under_y" = 15, "stock_x" = 8, "stock_y" = 13)
+	actions_types = list(/datum/action/item_action/aim_mode)
+	aim_fire_delay = 0.15 SECONDS
+	aim_speed_modifier = 5
+
+	fire_delay = 0.15 SECONDS
+	damage_falloff_mult = 2.5
+	burst_amount = 1
+	accuracy_mult = 0.85
+	accuracy_mult_unwielded = 0.4
+	scatter = 5
+	scatter_unwielded = 45
+	movement_acc_penalty_mult = 6
+
+/obj/item/weapon/gun/rifle/icc_mg/guard
+	starting_attachment_types = list(/obj/item/attachable/magnetic_harness, /obj/item/attachable/heavy_barrel)
+
+// VSD weapons
+// L26
+
+/obj/item/weapon/gun/rifle/vsd_lmg
+	name = "\improper L26 support machine gun"
+	desc = "The Syndicate's main all purpose machine gun, chambered in 5.56. It's design seems... outdated yet still reliable. Fires rapidly with devasting kicks, at a cost of movement speed."
+	icon = 'icons/obj/items/gun/machinegun64.dmi'
+	icon_state = "l26"
+	worn_icon_state = "l26"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_64.dmi',
+	)
+	fire_animation = "l26_fire"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/gun/machinegun_lefthand_64.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/gun/machinegun_righthand_64.dmi',
+	)
+	caliber = CALIBER_556X45 //codex
+	muzzleflash_iconstate = "muzzle_flash_medium"
+	max_shells = 200  //codex
+	wield_delay = 1.4 SECONDS
+	aim_slowdown = 0.95
+	fire_sound = 'sound/weapons/guns/fire/famas.ogg'
+	unload_sound = 'sound/weapons/guns/interact/ak47_unload.ogg'
+	reload_sound = 'sound/weapons/guns/interact/ak47_reload.ogg'
+	cocked_sound = 'sound/weapons/guns/interact/ak47_cocked.ogg'
+	default_ammo_type = /obj/item/ammo_magazine/rifle/vsd_mg
+	allowed_ammo_types = list(/obj/item/ammo_magazine/rifle/vsd_mg)
+	inhand_x_dimension = 64
+	inhand_y_dimension = 32
+
+	attachable_allowed = list(
+		/obj/item/attachable/bayonet,
+		/obj/item/attachable/bayonetknife,
+		/obj/item/attachable/bayonetknife/som,
+		/obj/item/attachable/flashlight,
+		/obj/item/attachable/extended_barrel,
+		/obj/item/attachable/compensator,
+		/obj/item/attachable/magnetic_harness,
+		/obj/item/attachable/buildasentry,
+		/obj/item/attachable/verticalgrip,
+		/obj/item/attachable/foldable/bipod,
+		/obj/item/weapon/gun/pistol/plasma_pistol,
+		/obj/item/weapon/gun/shotgun/combat/masterkey,
+		/obj/item/attachable/reddot,
+		/obj/item/attachable/lasersight,
+		/obj/item/attachable/flashlight/under,
+	)
+
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+	attachable_offset = list("muzzle_x" = 46, "muzzle_y" = 18,"rail_x" = 20, "rail_y" = 20, "under_x" = 31, "under_y" = 11, "stock_x" = 8, "stock_y" = 13)
+	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC)
+	gun_skill_category = SKILL_HEAVY_WEAPONS
+
+	fire_delay = 0.15 SECONDS
+	scatter = 5
+	burst_amount = 1
+	movement_acc_penalty_mult = 8
+
+/obj/item/weapon/gun/rifle/vsd_lmg/standard
+	starting_attachment_types = list(/obj/item/attachable/reddot, /obj/item/attachable/foldable/bipod, /obj/item/attachable/extended_barrel)
+
+/obj/item/weapon/gun/rifle/vsd_lmg/engineer
+	starting_attachment_types = list(/obj/item/attachable/foldable/bipod, /obj/item/attachable/compensator)
+
+/obj/item/weapon/gun/rifle/vsd_lmg/juggernaut
+	starting_attachment_types = list(/obj/item/attachable/magnetic_harness, /obj/item/attachable/foldable/bipod, /obj/item/attachable/extended_barrel)
+
+// C550
+
+/obj/item/weapon/gun/rifle/vsd_rifle
+	name = "\improper C550 combat rifle"
+	desc = "Crash Core's first ever rifle. With designs reminiscent of the Sauer series, this gun is the perfect choice for CQC. Chambered in 10x27mm. Packs a kick to anyone standing infront of you. "
+	icon = 'icons/obj/items/gun/rifle64.dmi'
+	icon_state = "c550"
+	worn_icon_state = "c550"
+	fire_sound = 'sound/weapons/guns/fire/DMR.ogg'
+	dry_fire_sound = 'sound/weapons/guns/fire/deagle_empty.ogg'
+	unload_sound = 'sound/weapons/guns/interact/m41a_unload.ogg'
+	reload_sound = 'sound/weapons/guns/interact/m41a_reload.ogg'
+	aim_slowdown = 0.5
+	wield_delay =  0.9 SECONDS
+	max_shells = 30 //codex
+	default_ammo_type = /obj/item/ammo_magazine/rifle/vsd_rifle
+	allowed_ammo_types = list(/obj/item/ammo_magazine/rifle/vsd_rifle)
+	attachable_allowed = list(
+		/obj/item/attachable/bayonet,
+		/obj/item/attachable/bayonetknife,
+		/obj/item/attachable/bayonetknife/som,
+		/obj/item/attachable/reddot,
+		/obj/item/attachable/suppressor,
+		/obj/item/attachable/compensator,
+		/obj/item/attachable/magnetic_harness,
+		/obj/item/attachable/extended_barrel,
+		/obj/item/attachable/heavy_barrel,
+		/obj/item/attachable/scope/mini,
+		/obj/item/attachable/flashlight,
+		/obj/item/attachable/scope,
+		/obj/item/attachable/buildasentry,
+		/obj/item/attachable/verticalgrip,
+		/obj/item/weapon/gun/grenade_launcher/underslung/invisible,
+	)
+
+	attachable_offset = list("muzzle_x" = 58, "muzzle_y" = 18,"rail_x" = 24, "rail_y" = 21, "under_x" = 35, "under_y" = 15, "stock_x" = 8, "stock_y" = 13)
+	burst_amount = 4
+	gun_firemode_list = list(GUN_FIREMODE_AUTOMATIC, GUN_FIREMODE_BURSTFIRE, GUN_FIREMODE_AUTOBURST)
+	burst_delay = 0.15 SECONDS
+	scatter = 0
+	fire_delay = 0.2 SECONDS
+	gun_features_flags = GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER|GUN_SMOKE_PARTICLES
+
+/obj/item/weapon/gun/rifle/vsd_rifle/standard
+	starting_attachment_types = list(/obj/item/attachable/reddot, /obj/item/attachable/verticalgrip, /obj/item/attachable/extended_barrel)
+
+/obj/item/weapon/gun/rifle/vsd_rifle/medic
+	starting_attachment_types = list(/obj/item/attachable/magnetic_harness, /obj/item/attachable/verticalgrip, /obj/item/attachable/suppressor)

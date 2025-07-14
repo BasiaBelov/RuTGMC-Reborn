@@ -6,7 +6,7 @@
 	aim_speed_mod = 0.5 //Extra slowdown when aiming
 	wield_delay_mod = 0.4 SECONDS
 	scoped_accuracy_mod = SCOPE_RAIL //accuracy mod of 0.4 when scoped
-	flags_attach_features = ATTACH_REMOVABLE|ATTACH_ACTIVATION
+	attach_features_flags = ATTACH_REMOVABLE|ATTACH_ACTIVATION
 	attachment_action_type = /datum/action/item_action/toggle
 	scope_zoom_mod = TRUE // codex
 	accuracy_unwielded_mod = -0.05
@@ -54,11 +54,14 @@
 /obj/item/attachable/scope/standard_magnum
 	name = "R-76 rail scope"
 	desc = "A custom rail mounted zoom sight scope designed specifically for the R-76 Magnum. Allows zoom by activating the attachment."
-	icon = 'icons/Marine/attachments_64.dmi'
+	icon = 'icons/obj/items/attachments/attachments_64.dmi'
 	icon_state = "t76scope"
 
 /obj/item/attachable/scope/unremovable
-	flags_attach_features = ATTACH_ACTIVATION
+	attach_features_flags = ATTACH_ACTIVATION
+
+/obj/item/attachable/scope/unremovable/invisible
+	icon_state = "sniperscope_invisible"
 
 /obj/item/attachable/scope/unremovable/flaregun
 	name = "long range ironsights"
@@ -123,11 +126,11 @@
 			zoom(user)
 		return TRUE
 
-	if(!(master_gun.flags_item & WIELDED) && !CHECK_BITFIELD(master_gun.flags_item, IS_DEPLOYED))
+	if(!(master_gun.item_flags & WIELDED) && !CHECK_BITFIELD(master_gun.item_flags, IS_DEPLOYED))
 		if(user)
 			to_chat(user, span_warning("You must hold [master_gun] with two hands to use [src]."))
 		return FALSE
-	if(CHECK_BITFIELD(master_gun.flags_item, IS_DEPLOYED) && user.dir != master_gun.loc.dir)
+	if(CHECK_BITFIELD(master_gun.item_flags, IS_DEPLOYED) && user.dir != master_gun.loc.dir)
 		user.setDir(master_gun.loc.dir)
 	if(!do_after(user, scope_delay, NONE, src, BUSY_ICON_BAR))
 		return FALSE
@@ -147,7 +150,7 @@
 		RegisterSignal(user, COMSIG_CARBON_SWAPPED_HANDS, PROC_REF(zoom_item_turnoff))
 	else
 		RegisterSignals(user, list(COMSIG_MOVABLE_MOVED, COMSIG_CARBON_SWAPPED_HANDS), PROC_REF(zoom_item_turnoff))
-	if(!CHECK_BITFIELD(master_gun.flags_item, IS_DEPLOYED))
+	if(!CHECK_BITFIELD(master_gun.item_flags, IS_DEPLOYED))
 		RegisterSignal(user, COMSIG_MOB_FACE_DIR, PROC_REF(change_zoom_offset))
 	RegisterSignals(master_gun, list(COMSIG_ITEM_EQUIPPED, COMSIG_ITEM_UNWIELD, COMSIG_ITEM_DROPPED), PROC_REF(zoom_item_turnoff))
 	master_gun.accuracy_mult += scoped_accuracy_mod
@@ -156,7 +159,7 @@
 		user.reset_perspective(src)
 		active_nightvision = TRUE
 
-/obj/item/attachable/scope/onunzoom(mob/living/user)
+/obj/item/attachable/scope/on_unzoomed(mob/living/user)
 	if(zoom_allow_movement)
 		user.remove_movespeed_modifier(MOVESPEED_ID_SCOPE_SLOWDOWN)
 		UnregisterSignal(user, list(COMSIG_CARBON_SWAPPED_HANDS, COMSIG_MOB_FACE_DIR))
@@ -192,8 +195,13 @@
 /obj/item/attachable/scope/unremovable/laser_sniper_scope
 	name = "Terra Experimental laser sniper rifle rail scope"
 	desc = "A marine standard mounted zoom sight scope made for the Terra Experimental laser sniper rifle otherwise known as TE-S abbreviated, allows zoom by activating the attachment. Use F12 if your HUD doesn't come back."
-	icon = 'icons/Marine/marine-weapons.dmi'
+	icon = 'icons/obj/items/attachments/attachments.dmi'
 	icon_state = "tes"
+
+/obj/item/attachable/scope/unremovable/plasma_sniper_scope
+	name = "PL-02 sniper rifle rail scope"
+	desc = "A marine standard mounted zoom sight scope made for the PL-02 plasma sniper rifle, allows zoom by activating the attachment. Use F12 if your HUD doesn't come back."
+	icon_state = "plasma_scope"
 
 /obj/item/attachable/scope/mini
 	name = "mini rail scope"
@@ -223,7 +231,7 @@
 	scoped_accuracy_mod = SCOPE_RAIL_SNIPER
 	has_nightvision = TRUE
 	zoom_allow_movement = FALSE
-	flags_attach_features = ATTACH_ACTIVATION|ATTACH_REMOVABLE
+	attach_features_flags = ATTACH_ACTIVATION|ATTACH_REMOVABLE
 	pixel_shift_x = 0
 	pixel_shift_y = 17
 
@@ -232,7 +240,7 @@
 
 /obj/item/attachable/scope/pmc
 	icon_state = "pmcscope"
-	flags_attach_features = ATTACH_ACTIVATION
+	attach_features_flags = ATTACH_ACTIVATION
 
 /obj/item/attachable/scope/mini/dmr
 	name = "DMR-37 mini rail scope"

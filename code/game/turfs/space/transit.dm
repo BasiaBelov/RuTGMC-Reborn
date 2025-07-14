@@ -58,7 +58,7 @@
 	//find a random spot to drop them
 	var/list/area/potential_areas = shuffle(SSmapping.areas_in_z["[ground_z_levels[1]]"])
 	for(var/area/potential_area in potential_areas)
-		if(potential_area.flags_area & NO_DROPPOD || !potential_area.outside) // no dropping inside the caves and etc.
+		if(potential_area.area_flags & NO_DROPPOD || !potential_area.outside) // no dropping inside the caves and etc.
 			continue
 		if(isspacearea(potential_area)) // make sure its not space, just in case
 			continue
@@ -139,7 +139,7 @@
 	take_overall_damage(300, BRUTE, BOMB, updating_health = TRUE)
 	take_overall_damage(300, BRUTE, MELEE, updating_health = TRUE)
 	spawn_gibs()
-	visible_message(span_warning("[src] falls out of the sky."), span_highdanger("As you fall out of the sky, you plummet towards the ground."))
+	visible_message(span_warning("[src] falls out of the sky."), span_userdanger("As you fall out of the sky, you plummet towards the ground."))
 
 /mob/living/carbon/human/handle_airdrop(turf/target_turf)
 	. = ..()

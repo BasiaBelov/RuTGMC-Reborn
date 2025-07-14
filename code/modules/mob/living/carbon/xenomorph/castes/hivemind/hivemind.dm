@@ -57,16 +57,16 @@
 	newlevel = XENO_UPGRADE_BASETYPE
 	return ..()
 
-/mob/living/carbon/xenomorph/hivemind/updatehealth()
+/mob/living/carbon/xenomorph/hivemind/update_health()
 	if(on_fire)
 		ExtinguishMob()
-	health = maxHealth - getFireLoss() - getBruteLoss() //Xenos can only take brute and fire damage.
+	health = maxHealth - get_fire_loss() - get_brute_loss() //Xenos can only take brute and fire damage.
 	if(health <= 0 && !(status_flags & INCORPOREAL))
-		setBruteLoss(0)
-		setFireLoss(-minimum_health)
+		set_brute_loss(0)
+		set_fire_loss(-minimum_health)
 		change_form()
 		remove_status_effect(/datum/status_effect/spacefreeze)
-	health = maxHealth - getFireLoss() - getBruteLoss()
+	health = maxHealth - get_fire_loss() - get_brute_loss()
 	med_hud_set_health()
 	if(TIMER_COOLDOWN_CHECK(src, COOLDOWN_HIVEMIND_MANIFESTATION))
 		return
@@ -81,17 +81,17 @@
 		return
 	// If manifested and off weeds, lets deal some damage.
 	if(!(status_flags & INCORPOREAL) && !loc_weeds_type)
-		adjustBruteLoss(20 * XENO_RESTING_HEAL, TRUE)
+		adjust_brute_loss(20 * XENO_RESTING_HEAL, TRUE)
 		return
 	// If not manifested
 	if(health < minimum_health + maxHealth)
-		setBruteLoss(0)
-		setFireLoss(-minimum_health)
+		set_brute_loss(0)
+		set_fire_loss(-minimum_health)
 	if(health >= maxHealth) //can't regenerate.
-		updatehealth() //Update health-related stats, like health itself (using brute and fireloss), health HUD and status.
+		update_health() //Update health-related stats, like health itself (using brute and fireloss), health HUD and status.
 		return
 	heal_wounds(XENO_RESTING_HEAL)
-	updatehealth()
+	update_health()
 
 /mob/living/carbon/xenomorph/hivemind/Destroy()
 	var/obj/structure/xeno/hivemindcore/hive_core = get_core()
@@ -124,7 +124,7 @@
 	setDir(SOUTH)
 	addtimer(CALLBACK(src, PROC_REF(do_change_form)), TIME_TO_TRANSFORM)
 
-/mob/living/carbon/xenomorph/hivemind/set_jump_component(duration = 0.5 SECONDS, cooldown = 2 SECONDS, cost = 0, height = 16, sound = null, flags = JUMP_SHADOW, flags_pass = PASS_LOW_STRUCTURE|PASS_FIRE|PASS_TANK)
+/mob/living/carbon/xenomorph/hivemind/set_jump_component(duration = 0.5 SECONDS, cooldown = 2 SECONDS, cost = 0, height = 16, sound = null, flags = JUMP_SHADOW, jump_pass_flags = PASS_LOW_STRUCTURE|PASS_FIRE|PASS_TANK)
 	return //no jumping, bad hivemind
 
 ///Finish the form changing of the hivemind and give the needed stats
@@ -160,19 +160,6 @@
 /mob/living/carbon/xenomorph/hivemind/fire_act(burn_level, flame_color)
 	return_to_core()
 	to_chat(src, span_xenonotice("We were on top of fire, we got moved to our core."))
-
-/mob/living/carbon/xenomorph/hivemind/proc/check_weeds(turf/T, strict_turf_check = FALSE)
-	SHOULD_BE_PURE(TRUE)
-	if(isnull(T))
-		return FALSE
-	. = TRUE
-	if(locate(/obj/fire/flamer) in T)
-		return FALSE
-	for(var/obj/alien/weeds/W in range(strict_turf_check ? 0 : 1, T ? T : get_turf(src)))
-		if(QDESTROYING(W))
-			continue
-		return
-	return FALSE
 
 /mob/living/carbon/xenomorph/hivemind/handle_weeds_adjacent_removed()
 	if(loc_weeds_type || check_weeds(get_turf(src)))
@@ -225,8 +212,8 @@
 	abstract_move(newloc)
 
 /mob/living/carbon/xenomorph/hivemind/receive_hivemind_message(mob/living/carbon/xenomorph/speaker, message)
-	var/track = "<a href='?src=[REF(src)];hivemind_jump=[REF(speaker)]'>(F)</a>"
-	show_message("[track] [speaker.hivemind_start()] [span_message("hisses, '[message]'")][speaker.hivemind_end()]", 2)
+	var/track = "<a href='byond://?src=[REF(src)];hivemind_jump=[REF(speaker)]'>(F)</a>"
+	return show_message("[track] [speaker.hivemind_start()] [span_message("hisses, '[message]'")][speaker.hivemind_end()]", 2)
 
 /mob/living/carbon/xenomorph/hivemind/Topic(href, href_list)
 	. = ..()
@@ -310,21 +297,15 @@
 	icon = 'icons/Xeno/1x1building.dmi'
 	icon_state = "hivemind_core"
 	plane = FLOOR_PLANE
-	xeno_structure_flags = IGNORE_WEED_REMOVAL|CRITICAL_STRUCTURE|DEPART_DESTRUCTION_IMMUNE
-	///The cooldown of the alert hivemind gets when a hostile is near it's core
-	COOLDOWN_DECLARE(hivemind_proxy_alert_cooldown)
+	xeno_structure_flags = IGNORE_WEED_REMOVAL|CRITICAL_STRUCTURE|DEPART_DESTRUCTION_IMMUNE|XENO_STRUCT_WARNING_RADIUS|XENO_STRUCT_DAMAGE_ALERT
 	///The weakref to the parent hivemind mob that we're attached to
 	var/datum/weakref/parent
-	///For minimap icon change if silo takes damage or nearby hostile
-	var/warning
 
 /obj/structure/xeno/hivemindcore/Initialize(mapload)
 	. = ..()
 	GLOB.hive_datums[hivenumber].hivemindcores += src
 	new /obj/alien/weeds/node(loc)
 	set_light(7, 5, LIGHT_COLOR_PURPLE)
-	for(var/turfs in RANGE_TURFS(XENO_HIVEMIND_DETECTION_RANGE, src))
-		RegisterSignal(turfs, COMSIG_ATOM_ENTERED, PROC_REF(hivemind_proxy_alert))
 	update_minimap_icon()
 
 /obj/structure/xeno/hivemindcore/Destroy()
@@ -333,7 +314,7 @@
 	if(isnull(our_parent))
 		return ..()
 	our_parent.playsound_local(our_parent, SFX_ALIEN_HELP, 30, TRUE)
-	to_chat(our_parent, span_xenohighdanger("Your core has been destroyed!"))
+	to_chat(our_parent, span_xenouserdanger("Your core has been destroyed!"))
 	xeno_message("A sudden tremor ripples through the hive... \the [our_parent] has been slain!", "xenoannounce", 5, our_parent.hivenumber)
 	GLOB.key_to_time_of_role_death[our_parent.key] = world.time
 	GLOB.key_to_time_of_death[our_parent.key] = world.time
@@ -354,7 +335,7 @@
 	xeno_attacker.visible_message(span_danger("[xeno_attacker] nudges its head against [src]."), \
 	span_danger("You nudge your head against [src]."))
 
-/obj/structure/xeno/hivemindcore/take_damage(damage_amount, damage_type, damage_flag, sound_effect, attack_dir, armour_penetration)
+/obj/structure/xeno/hivemindcore/take_damage(damage_amount, damage_type, damage_flag = null, effects = TRUE, attack_dir, armour_penetration, mob/living/blame_mob)
 	. = ..()
 	var/mob/living/carbon/xenomorph/hivemind/our_parent = get_parent()
 	if(isnull(our_parent))
@@ -362,49 +343,15 @@
 	var/health_percent = round((max_integrity / obj_integrity) * 100)
 	switch(health_percent)
 		if(-INFINITY to 25)
-			to_chat(our_parent, span_xenohighdanger("Your core is under attack, and dangerous low on health!"))
+			to_chat(our_parent, span_xenouserdanger("Your core is under attack, and dangerous low on health!"))
 		if(26 to 75)
 			to_chat(our_parent, span_xenodanger("Your core is under attack, and low on health!"))
 		if(76 to INFINITY)
 			to_chat(our_parent, span_xenodanger("Your core is under attack!"))
 
-/**
- * Proc checks if we should alert the hivemind, and if it can, it does so.
- * datum/source - the atom (in this case it should be a turf) sending the crossed signal
- * atom/movable/hostile - the atom that triggered the crossed signal, in this case we're looking for a mob
- */
-/obj/structure/xeno/hivemindcore/proc/hivemind_proxy_alert(datum/source, atom/movable/hostile)
-	SIGNAL_HANDLER
-	if(!COOLDOWN_CHECK(src, hivemind_proxy_alert_cooldown)) //Proxy alert triggered too recently; abort
-		return
-
-	if(!isliving(hostile))
-		return
-
-	var/mob/living/living_triggerer = hostile
-	if(living_triggerer.stat == DEAD) //We don't care about the dead
-		return
-
-	if(isxeno(hostile))
-		var/mob/living/carbon/xenomorph/X = hostile
-		if(X.hivenumber == hivenumber) //Trigger proxy alert only for hostile xenos
-			return
-	warning = TRUE
-	update_minimap_icon()
-	to_chat(get_parent(), span_xenoannounce("Our [src.name] has detected a nearby hostile [hostile] at [get_area(hostile)] (X: [hostile.x], Y: [hostile.y])."))
-	SEND_SOUND(get_parent(), 'sound/voice/alien/help1.ogg')
-	COOLDOWN_START(src, hivemind_proxy_alert_cooldown, XENO_HIVEMIND_DETECTION_COOLDOWN) //set the cooldown.
-	addtimer(CALLBACK(src, PROC_REF(clear_warning)), XENO_HIVEMIND_DETECTION_COOLDOWN) //clear warning
-
-///Clears the warning for minimap if its warning for hostiles
-/obj/structure/xeno/hivemindcore/proc/clear_warning()
-	warning = FALSE
-	update_minimap_icon()
-
-///Updates the minimap marker
-/obj/structure/xeno/hivemindcore/proc/update_minimap_icon()
+/obj/structure/xeno/hivemindcore/update_minimap_icon()
 	SSminimaps.remove_marker(src)
-	SSminimaps.add_marker(src, MINIMAP_FLAG_XENO, image('icons/UI_icons/map_blips.dmi', null, "hivemindcore[warning ? "_warn" : "_passive"]", VERY_HIGH_FLOAT_LAYER))
+	SSminimaps.add_marker(src, MINIMAP_FLAG_XENO, image('icons/UI_icons/map_blips.dmi', null, "hivemindcore[threat_warning ? "_warn" : "_passive"]", VERY_HIGH_FLOAT_LAYER))
 
 /// Getter for the parent of this hive core
 /obj/structure/xeno/hivemindcore/proc/get_parent()

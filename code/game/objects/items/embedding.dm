@@ -79,14 +79,10 @@
 		stack_trace("limb_embed called for QDELETED [embedding]")
 		embedding?.unembed_ourself()
 		return FALSE
-	if(HAS_TRAIT(embedding, TRAIT_NODROP) || (embedding.flags_item & DELONDROP))
+	if(HAS_TRAIT(embedding, TRAIT_NODROP) || (embedding.item_flags & DELONDROP))
 		stack_trace("limb_embed called for TRAIT_NODROP or DELONDROP [embedding]")
 		embedding.unembed_ourself()
 		return FALSE
-	//RUTGMC EDIT START
-	if(embedding.w_class >= WEIGHT_CLASS_NORMAL)
-		return FALSE
-	//RUTGMC EDIT END
 	if(limb_status & LIMB_DESTROYED)
 		return FALSE
 	if(!silent)
@@ -150,7 +146,7 @@
 
 
 /mob/living/proc/yank_out_object()
-	set category = "Object.Mob"
+	set category = "IC.Mob"
 	set name = "Yank out object"
 	set desc = "Remove an embedded item at the cost of bleeding and pain."
 	set src in view(1)

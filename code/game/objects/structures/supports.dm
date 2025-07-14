@@ -13,7 +13,7 @@
 	var/collapsed_type = /turf/closed/mineral
 
 /obj/structure/support/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_WOOD, -10, 5)
+	AddElement(/datum/element/debris, DEBRIS_WOOD, -40, 5)
 
 /obj/structure/support/deconstruct(disassembled)
 	collapse()
@@ -29,4 +29,4 @@
 			continue
 		var/list/baseturfs = islist(T.baseturfs) ? T.baseturfs : list(T.baseturfs)
 		baseturfs |= T.type
-		T.ChangeTurf(collapsed_type, baseturfs)
+		T.change_turf(collapsed_type, baseturfs)

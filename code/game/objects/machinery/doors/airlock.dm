@@ -7,7 +7,7 @@
 	use_power = IDLE_POWER_USE
 	idle_power_usage = 5
 	active_power_usage = 360
-	flags_atom = HTML_USE_INITAL_ICON_1
+	atom_flags = HTML_USE_INITAL_ICON_1
 	obj_flags = CAN_BE_HIT
 	autoclose = TRUE
 	/**
@@ -47,7 +47,6 @@
 	var/abandoned = FALSE
 	smoothing_groups = list(SMOOTH_GROUP_AIRLOCK)
 
-
 /obj/machinery/door/airlock/bumpopen(mob/living/user) //Airlocks now zap you when you 'bump' them open when they're electrified. --NeoFite
 	if(issilicon(user))
 		return ..(user)
@@ -63,7 +62,7 @@
 		var/mob/living/carbon/human/H = user
 		if(!H.gloves || H.gloves.siemens_coefficient)
 			to_chat(H, span_danger("You feel a powerful shock course through your body!"))
-			H.adjustStaminaLoss(200)
+			H.adjust_stamina_loss(200)
 			return
 	return ..(user)
 
@@ -73,6 +72,8 @@
 
 /obj/machinery/door/airlock/LateInitialize()
 	. = ..()
+	if(cyclelinkeddir)
+		cyclelinkairlock()
 	if(!abandoned)
 		return
 	var/outcome = rand(1,40)
@@ -80,9 +81,9 @@
 		if(1 to 9)
 			var/turf/here = get_turf(src)
 			for(var/turf/closed/T in range(2, src))
-				here.PlaceOnTop(T.type)
+				here.place_on_top(T.type)
 				return
-			here.PlaceOnTop(/turf/closed/wall)
+			here.place_on_top(/turf/closed/wall)
 			return
 		if(9 to 11)
 			lights = FALSE
@@ -94,12 +95,43 @@
 		if(24 to 30)
 			machine_stat ^= PANEL_OPEN
 
+/obj/machinery/door/airlock/emp_act(severity)
+	. = ..()
+	if(prob(75 / severity))
+		set_electrified(MACHINE_DEFAULT_ELECTRIFY_TIME)
+	if(prob(30 / severity))
+		open()
+
+///connect potential airlocks to each other for cycling
+/obj/machinery/door/airlock/proc/cyclelinkairlock()
+	if(cycle_linked_airlock)
+		cycle_linked_airlock.cycle_linked_airlock = null
+		cycle_linked_airlock = null
+	if(!cyclelinkeddir)
+		return
+	var/limit = world.view
+	var/turf/T = get_turf(src)
+	var/obj/machinery/door/airlock/FoundDoor
+	do
+		T = get_step(T, cyclelinkeddir)
+		FoundDoor = locate() in T
+		if (FoundDoor && FoundDoor.cyclelinkeddir != get_dir(FoundDoor, src))
+			FoundDoor = null
+		limit--
+	while(!FoundDoor && limit)
+	if(!FoundDoor)
+		return
+	FoundDoor.cycle_linked_airlock = src
+	cycle_linked_airlock = FoundDoor
+
 /obj/machinery/door/airlock/proc/isElectrified()
 	if(secondsElectrified != MACHINE_NOT_ELECTRIFIED)
 		return TRUE
 	return FALSE
 
 /obj/machinery/door/airlock/proc/canAIControl(mob/user)
+	if(hackProof)
+		return
 	if(z != user.z)
 		return
 	return ((aiControlDisabled != 1) && !isAllPowerCut())
@@ -198,11 +230,29 @@
 		return
 	if(emergency && hasPower())
 		. += image(icon, "emergency_access_on")
-	if(CHECK_BITFIELD(machine_stat, PANEL_OPEN) || welded)
-		if(CHECK_BITFIELD(machine_stat, PANEL_OPEN))
-			. += image(icon, "panel_open")
-		if(welded)
-			. += image(icon, "welded")
+	if(CHECK_BITFIELD(machine_stat, PANEL_OPEN))
+		. += image(icon, "panel_open")
+	if(welded)
+		. += image(icon, "welded")
+	if(hasPower() && unres_sides)
+		for(var/heading in list(NORTH,SOUTH,EAST,WEST))
+			if(!(unres_sides & heading))
+				continue
+			var/image/access_overlay = image('icons/obj/doors/overlays.dmi', "unres_[heading]", layer = DOOR_HELPER_LAYER, pixel_y = -4)
+			switch(heading)
+				if(NORTH)
+					access_overlay.pixel_x = 0
+					access_overlay.pixel_y = 32
+				if(SOUTH)
+					access_overlay.pixel_x = 0
+					access_overlay.pixel_y = -32
+				if(EAST)
+					access_overlay.pixel_x = 32
+					access_overlay.pixel_y = 0
+				if(WEST)
+					access_overlay.pixel_x = -32
+					access_overlay.pixel_y = 0
+			. += access_overlay
 
 /obj/machinery/door/airlock/do_animate(animation)
 	switch(animation)
@@ -333,6 +383,8 @@
 
 /obj/machinery/door/airlock/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/clothing/mask/cigarette) && isElectrified())
 		var/obj/item/clothing/mask/cigarette/L = I
@@ -353,15 +405,15 @@
 				return
 
 			user.visible_message(span_notice("[user] is [welded ? "unwelding":"welding"] the airlock."), \
-							span_notice("You begin [welded ? "unwelding":"welding"] the airlock..."), \
-							span_italics("You hear welding."))
+				span_notice("You begin [welded ? "unwelding":"welding"] the airlock..."), \
+				span_italics("You hear welding."))
 
 			if(!W.use_tool(src, user, 40, volume = 50, extra_checks = CALLBACK(src, PROC_REF(weld_checks))))
 				return
 
 			welded = !welded
 			user.visible_message("[user.name] has [welded? "welded shut":"unwelded"] [src].", \
-								span_notice("You [welded ? "weld the airlock shut":"unweld the airlock"]."))
+				span_notice("You [welded ? "weld the airlock shut":"unweld the airlock"]."))
 			update_icon()
 		else
 			if(obj_integrity >= max_integrity)
@@ -372,8 +424,8 @@
 				return
 
 			user.visible_message(span_notice("[user] is welding the airlock."), \
-							span_notice("You begin repairing the airlock..."), \
-							span_italics("You hear welding."))
+				span_notice("You begin repairing the airlock..."), \
+				span_italics("You hear welding."))
 
 			if(!W.use_tool(src, user, 40, volume = 50, extra_checks = CALLBACK(src, PROC_REF(weld_checks))))
 				return
@@ -381,7 +433,7 @@
 			repair_damage(max_integrity, user)
 			DISABLE_BITFIELD(machine_stat, BROKEN)
 			user.visible_message(span_notice("[user.name] has repaired [src]."), \
-								span_notice("You finish repairing the airlock."))
+				span_notice("You finish repairing the airlock."))
 			update_icon()
 
 	else if(iswirecutter(I))
@@ -465,7 +517,6 @@
 			open(TRUE)
 		else
 			close(TRUE)
-
 	return TRUE
 
 /obj/machinery/door/airlock/screwdriver_act(mob/user, obj/item/I)
@@ -535,7 +586,7 @@
 	return ..()
 
 /obj/machinery/door/airlock/proc/lock(forced = FALSE)
-	if ((operating && !forced) || locked)
+	if((operating && !forced) || locked)
 		return
 
 	locked = TRUE
@@ -543,7 +594,7 @@
 	update_icon()
 
 /obj/machinery/door/airlock/proc/unlock(forced = FALSE)
-	if ((operating && !forced) || !locked)
+	if((operating && !forced) || !locked)
 		return
 
 	if(forced || hasPower()) //only can raise bolts if power's on

@@ -3,16 +3,16 @@
 #########################################*/
 /obj/item/weapon/twohanded/yautja
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_back_str = 'icons/mob/hunter/pred_gear.dmi',
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi',
 		slot_s_store_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
 
-	flags_item = TWOHANDED|ITEM_PREDATOR
+	item_flags = TWOHANDED|ITEM_PREDATOR
 	resistance_flags = UNACIDABLE
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	w_class = WEIGHT_CLASS_HUGE
 	throw_speed = 10
 	edge = TRUE
@@ -23,8 +23,8 @@
 	name = "hunter spear"
 	desc = "A spear of exquisite design, used by an ancient civilisation."
 	icon_state = "spearhunter"
-	item_state = "spearhunter"
-	flags_item = TWOHANDED
+	worn_icon_state = "spearhunter"
+	item_flags = TWOHANDED
 	force = 20
 	force_wielded = 45
 	penetration = 25
@@ -36,14 +36,14 @@
 	name = "war glaive"
 	desc = "A huge, powerful blade on a metallic pole. Mysterious writing is carved into the weapon."
 	icon_state = "glaive"
-	item_state = "glaive"
+	worn_icon_state = "glaive"
 	force = 20
 	force_wielded = 45
 	reach = 2
 	penetration = 30
 	throwforce = 20
 	sharp = IS_SHARP_ITEM_BIG
-	flags_atom = CONDUCT
+	atom_flags = CONDUCT
 	attack_verb = list("sliced", "slashed", "carved", "diced", "gored")
 	attack_speed = 20 //Default is 7.
 
@@ -67,7 +67,7 @@
 
 /obj/item/weapon/twohanded/yautja/glaive/alt
 	icon_state = "glaive_alt"
-	item_state = "glaive_alt"
+	worn_icon_state = "glaive_alt"
 
 /obj/item/weapon/twohanded/yautja/glaive/damaged
 	name = "ancient war glaive"
@@ -77,6 +77,6 @@
 	penetration = 5
 	throwforce = 10
 	icon_state = "glaive_alt"
-	item_state = "glaive_alt"
-	flags_item = TWOHANDED
+	worn_icon_state = "glaive_alt"
+	item_flags = TWOHANDED
 

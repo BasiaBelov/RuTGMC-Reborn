@@ -1,7 +1,7 @@
 /////////////////////////////// Placement Actions
 
 /datum/action/innate/remote_fob //Parent stuff
-	action_icon = 'icons/Marine/remotefob.dmi'
+	action_icon = 'icons/mob/actions.dmi'
 	var/mob/living/builder //the mob using the action
 	var/mob/camera/aiEye/remote/fobdrone //the drone belonging to the computer
 	var/obj/machinery/computer/camera_advanced/remote_fob/console //the computer itself
@@ -38,7 +38,8 @@
 
 /datum/action/innate/remote_fob/metal_cade
 	name = "Place Metal Barricade"
-	action_icon_state = "metal_cade"
+	action_icon = 'icons/obj/structures/barricades/metal.dmi'
+	action_icon_state = "metal_0"
 
 /datum/action/innate/remote_fob/metal_cade/Activate()
 	. = ..()
@@ -54,7 +55,7 @@
 	for(var/obj/thing in buildplace)
 		if(!thing.density) //not dense, move on
 			continue
-		if(!(thing.flags_atom & ON_BORDER)) //dense and non-directional, end
+		if(!(thing.atom_flags & ON_BORDER)) //dense and non-directional, end
 			fobdrone.balloon_alert(owner, "No space here for a barricade")
 			return
 		if(thing.dir != fobdrone.dir)
@@ -64,23 +65,22 @@
 	if(!do_after(fobdrone, 1.5 SECONDS, IGNORE_HELD_ITEM, buildplace, BUSY_ICON_BUILD))
 		return
 	console.metal_remaining -= 4
-	cade = new /obj/structure/barricade/metal(buildplace)
+	cade = new /obj/structure/barricade/solid(buildplace)
 	cade.setDir(fobdrone.dir)
 	if(console.do_wiring)
-		if(console.metal_remaining <= 1)
+		if(!console.metal_remaining)
 			fobdrone.balloon_alert(owner, "Not enough material for razor-wiring.")
 			return
-
-		console.metal_remaining -=2
+		console.metal_remaining -= 1
 		cade.wire()
 		fobdrone.balloon_alert(owner, "Barricade placed with wiring. [console.metal_remaining] metal sheets remaining.")
 		return
 	fobdrone.balloon_alert(owner, "Barricade placed. [console.metal_remaining] metal sheets remaining.")
 
-//RUTGMC ADDON BEGIN
 /datum/action/innate/remote_fob/metal_folding_cade
 	name = "Place Metal Folding Barricade"
-	action_icon_state = "metal_folding_cade"
+	action_icon = 'icons/obj/structures/barricades/folding_metal.dmi'
+	action_icon_state = "folding_metal_0"
 
 /datum/action/innate/remote_fob/metal_folding_cade/Activate()
 	. = ..()
@@ -96,7 +96,7 @@
 	for(var/obj/thing in buildplace)
 		if(!thing.density) //not dense, move on
 			continue
-		if(!(thing.flags_atom & ON_BORDER)) //dense and non-directional, end
+		if(!(thing.atom_flags & ON_BORDER)) //dense and non-directional, end
 			fobdrone.balloon_alert(owner, "No space here for a barricade")
 			return
 		if(thing.dir != fobdrone.dir)
@@ -106,7 +106,7 @@
 	if(!do_after(fobdrone, 1.5 SECONDS, IGNORE_HELD_ITEM, buildplace, BUSY_ICON_BUILD))
 		return
 	console.metal_remaining -= 6
-	cade = new /obj/structure/barricade/plasteel/metal(buildplace)
+	cade = new /obj/structure/barricade/folding/metal(buildplace)
 	cade.setDir(fobdrone.dir)
 	cade.closed = FALSE
 	cade.density = TRUE
@@ -123,7 +123,8 @@
 
 /datum/action/innate/remote_fob/plasteel_cade
 	name = "Place Plasteel Barricade"
-	action_icon_state = "plast_cade"
+	action_icon = 'icons/obj/structures/barricades/new_plasteel.dmi'
+	action_icon_state = "new_plasteel_0"
 
 /datum/action/innate/remote_fob/plasteel_cade/Activate()
 	. = ..()
@@ -139,7 +140,7 @@
 	for(var/obj/thing in buildplace)
 		if(!thing.density) //not dense, move on
 			continue
-		if(!(thing.flags_atom & ON_BORDER)) //dense and non-directional, end
+		if(!(thing.atom_flags & ON_BORDER)) //dense and non-directional, end
 			fobdrone.balloon_alert(owner, "No space here for a barricade")
 			return
 		if(thing.dir != fobdrone.dir)
@@ -149,7 +150,7 @@
 	if(!do_after(fobdrone, 1.5 SECONDS, FALSE, buildplace, BUSY_ICON_BUILD))
 		return
 	console.plasteel_remaining -= 4
-	cade = new /obj/structure/barricade/metal/plasteel(buildplace)
+	cade = new /obj/structure/barricade/solid/plasteel(buildplace)
 	cade.setDir(fobdrone.dir)
 	cade.closed = FALSE
 	cade.density = TRUE
@@ -163,19 +164,18 @@
 		fobdrone.balloon_alert(owner, "Barricade placed with wiring. [console.plasteel_remaining] plasteel sheets, [console.metal_remaining] metal sheets remaining.")
 		return
 	fobdrone.balloon_alert(owner, "Barricade placed. [console.plasteel_remaining] plasteel sheets remaining.")
-//RUTGMC ADDON END
 
 /datum/action/innate/remote_fob/plast_folding_cade
 	name = "Place Plasteel Barricade"
-	action_icon_state = "plast_folding_cade"
+	action_icon = 'icons/obj/structures/barricades/plasteel.dmi'
+	action_icon_state = "plasteel_0"
 
 /datum/action/innate/remote_fob/plast_folding_cade/Activate()
 	. = ..()
 	if(. || !check_spot())
 		return
 
-	//if(console.plasteel_remaining < 5) //ORIGINAL
-	if(console.plasteel_remaining < 6) //RUTGMC EDIT
+	if(console.plasteel_remaining < 6)
 		fobdrone.balloon_alert(owner, "Out of material")
 		return
 
@@ -184,7 +184,7 @@
 	for(var/obj/thing in buildplace)
 		if(!thing.density) //not dense, move on
 			continue
-		if(!(thing.flags_atom & ON_BORDER)) //dense and non-directional, end
+		if(!(thing.atom_flags & ON_BORDER)) //dense and non-directional, end
 			fobdrone.balloon_alert(owner, "No space here for a barricade")
 			return
 		if(thing.dir != fobdrone.dir)
@@ -193,9 +193,8 @@
 		return
 	if(!do_after(fobdrone, 1.5 SECONDS, FALSE, buildplace, BUSY_ICON_BUILD))
 		return
-	//console.plasteel_remaining -= 5 //ORIGINAL
-	console.plasteel_remaining -= 6 //RUTGMC EDIT
-	cade = new /obj/structure/barricade/plasteel(buildplace)
+	console.plasteel_remaining -= 6
+	cade = new /obj/structure/barricade/folding(buildplace)
 	cade.setDir(fobdrone.dir)
 	cade.closed = FALSE
 	cade.density = TRUE
@@ -212,7 +211,8 @@
 
 /datum/action/innate/remote_fob/toggle_wiring
 	name = "Toggle Razorwire"
-	action_icon_state = "wire"
+	action_icon_state = "barbed_wire"
+	action_icon = 'icons/obj/stack_objects.dmi'
 
 /datum/action/innate/remote_fob/toggle_wiring/Activate()
 	. = ..()
@@ -220,6 +220,7 @@
 		return
 	console.do_wiring = !console.do_wiring
 	to_chat(owner, span_notice("Will now [console.do_wiring ? "do wiring" : "stop wiring"]."))
+
 /datum/action/innate/remote_fob/eject_metal_action
 	name = "Eject All Metal"
 	action_icon_state = "fobpc-eject_m"

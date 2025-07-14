@@ -1,6 +1,6 @@
 /mob/living
 	see_invisible = SEE_INVISIBLE_LIVING
-	flags_atom = CRITICAL_ATOM|PREVENT_CONTENTS_EXPLOSION|BUMP_ATTACKABLE
+	atom_flags = CRITICAL_ATOM|PREVENT_CONTENTS_EXPLOSION|BUMP_ATTACKABLE
 	///0 for no override, sets see_invisible = see_override in silicon & carbon life process via update_sight()
 	var/see_override = 0
 	///Badminnery resize
@@ -8,9 +8,9 @@
 
 	/* Health and life related vars */
 	/// Maximum health that should be possible.
-	var/maxHealth = 100
+	var/maxHealth = LIVING_DEFAULT_MAX_HEALTH
 	/// Mob's current health
-	var/health = 100
+	var/health = LIVING_DEFAULT_MAX_HEALTH
 	/// Health at which a mob dies
 	var/health_threshold_dead = -100
 	/// Health at which a mob goes into crit
@@ -81,8 +81,6 @@
 	var/on_fire
 	///Tracks how many stacks of fire we have on, max is
 	var/fire_stacks = 0
-	///0: normal, 1: bursting, 2: bursted.
-	var/chestburst = 0
 	///more or less efficiency to metabolize helpful/harmful reagents and (TODO) regulate body temperature..
 	var/metabolism_efficiency = 1
 
@@ -101,6 +99,12 @@
 	var/resting = FALSE
 
 	var/list/icon/pipes_shown = list()
+	var/last_played_vent = 0
+	/// The last direction we moved in a vent. Used to make holding two directions feel nice
+	var/last_vent_dir = 0
+	/// Cell tracker datum we use to manage the pipes around us, for faster ventcrawling
+	/// Should only exist if you're in a pipe
+	var/datum/cell_tracker/pipetracker
 	/// TODO MAKE ME A TRAIT
 	var/is_ventcrawling
 
@@ -123,7 +127,10 @@
 	var/grab_resist_level = 0
 	var/datum/job/job
 	var/comm_title = ""
-	///how much blood the mob has
+	/**
+	 * How much blood the mob has.
+	 * !!! Use the adjust_blood_volume() and set_blood_volume() to set this variable instead of directly modifying it!!!
+	 */
 	var/blood_volume = 0
 	///Multiplier.
 	var/heart_multi = 1

@@ -6,7 +6,7 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 )))
 
 /obj/docking_port/stationary/supply
-	id = "supply_home"
+	shuttle_id = "supply_home"
 	roundstart_template = /datum/map_template/shuttle/supply
 	width = 5
 	dwidth = 2
@@ -15,7 +15,7 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 
 /obj/docking_port/mobile/supply
 	name = "supply shuttle"
-	id = SHUTTLE_SUPPLY
+	shuttle_id = SHUTTLE_SUPPLY
 	callTime = 15 SECONDS
 
 	dir = WEST
@@ -26,10 +26,9 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 	height = 5
 	movement_force = list("KNOCKDOWN" = 0, "THROW" = 0)
 	use_ripples = FALSE
+	faction = FACTION_TERRAGOV
 	var/list/gears = list()
 	var/list/obj/machinery/door/poddoor/railing/railings = list()
-	///The faction of this docking port (aka, on which ship it is located)
-	var/faction = FACTION_TERRAGOV
 	/// Id of the home docking port
 	var/home_id = "supply_home"
 	///prefix for railings and gear todo should probbaly be defines instead?
@@ -42,7 +41,7 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 	railings.Cut()
 	return ..()
 
-/obj/docking_port/mobile/supply/afterShuttleMove()
+/obj/docking_port/mobile/supply/after_shuttle_move()
 	. = ..()
 	if(getDockedId() != home_id)
 		return
@@ -183,7 +182,7 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 
 /obj/docking_port/mobile/supply/vehicle
 	railing_gear_name = "vehicle"
-	id = SHUTTLE_VEHICLE_SUPPLY
+	shuttle_id = SHUTTLE_VEHICLE_SUPPLY
 	home_id = "vehicle_home"
 
 /obj/docking_port/mobile/supply/vehicle/buy(mob/user, datum/supply_ui/supply_ui)
@@ -191,7 +190,7 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 	if(!veh_ui || !veh_ui.current_veh_type)
 		return
 	var/obj/vehicle/sealed/armored/tanktype = veh_ui.current_veh_type
-	var/is_assault = initial(tanktype.flags_armored) & ARMORED_PURCHASABLE_ASSAULT
+	var/is_assault = initial(tanktype.armored_flags) & ARMORED_PURCHASABLE_ASSAULT
 	if(GLOB.purchased_tanks[user.faction]?["[is_assault]"])
 		to_chat(usr, span_danger("A vehicle of this type has already been purchased!"))
 		return
@@ -221,7 +220,8 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 		for(var/ammo in veh_ui.secondary_ammo)
 			for(var/i=1 to veh_ui.secondary_ammo[ammo])
 				new ammo(dumploc)
+	SStgui.close_user_uis(user, veh_ui)
 
 /obj/docking_port/stationary/supply/vehicle
-	id = "vehicle_home"
+	shuttle_id = "vehicle_home"
 	roundstart_template = /datum/map_template/shuttle/supply/vehicle

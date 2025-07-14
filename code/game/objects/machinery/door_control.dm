@@ -13,6 +13,7 @@
 	use_power = IDLE_POWER_USE
 	idle_power_usage = 2
 	active_power_usage = 4
+	layer = ABOVE_OBJ_LAYER
 	var/id = null
 	var/range = 10
 	var/normaldoorcontrol = CONTROL_POD_DOORS
@@ -45,10 +46,9 @@
 	. = ..()
 	if(.)
 		return
-	if(istype(I, /obj/item/detective_scanner))
+	if(istype(I, /obj/item/detective_scanner) || istype(I, /obj/item/weapon/zombie_claw)) // fucking die
 		return
-	else
-		return attack_hand(user)
+	return attack_hand(user)
 
 /obj/machinery/door_control/proc/handle_door()
 	for(var/obj/machinery/door/airlock/D in range(range))

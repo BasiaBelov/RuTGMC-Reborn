@@ -108,7 +108,7 @@ GLOBAL_LIST_INIT(restricted_camera_networks, list( //Those networks can only be 
 //Razor wire
 
 #define RAZORWIRE_BASE_DAMAGE 40
-#define RAZORWIRE_ENTANGLE_DELAY 5 SECONDS
+#define RAZORWIRE_ENTANGLE_DELAY 2 SECONDS
 #define RAZORWIRE_SOAK 5
 #define RAZORWIRE_MAX_HEALTH 120
 #define RAZORWIRE_MIN_DAMAGE_MULT_LOW 0.4 //attacking
@@ -247,3 +247,8 @@ GLOBAL_LIST_INIT(restricted_camera_networks, list( //Those networks can only be 
 
 ///Amount of fire stacks removed by extinguishers or similar effects
 #define EXTINGUISH_AMOUNT 20
+
+///Rods needed to build a catwalk
+#define CATWALK_ROD_REQ 4
+///Rods needed to reinforce a floor
+#define REINFORCED_FLOOR_ROD_REQ 2

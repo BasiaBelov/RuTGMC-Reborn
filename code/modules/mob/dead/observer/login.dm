@@ -13,9 +13,6 @@
 	if(ghost_medhud)
 		H = GLOB.huds[DATA_HUD_MEDICAL_OBSERVER]
 		H.add_hud_to(src)
-	if(ghost_sechud)
-		H = GLOB.huds[DATA_HUD_SECURITY_ADVANCED]
-		H.add_hud_to(src)
 	if(ghost_squadhud)
 		H = GLOB.huds[DATA_HUD_SQUAD_TERRAGOV]
 		H.add_hud_to(src)
@@ -26,7 +23,7 @@
 		H = GLOB.huds[DATA_HUD_ORDER]
 		H.add_hud_to(src)
 
-	GLOB.observer_list += src
+	GLOB.observer_list |= src
 
 	ghost_others = client.prefs.ghost_others
 
@@ -47,5 +44,17 @@
 	if(length(GLOB.offered_mob_list))
 		to_chat(src, span_boldnotice("There's mobs available for taking! Ghost > Take Offered Mob"))
 
-	if(SSticker.mode && SSticker.mode.flags_round_type & MODE_PREDATOR)
+	if(SSticker.mode && SSticker.mode.round_type_flags & MODE_PREDATOR)
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), src, "<span style='color: red;'>This is a <B>PREDATOR ROUND</B>! If you are whitelisted, you may Join the Hunt!</span>"), 2 SECONDS)
+
+///Warn the ghost and send them into their body after a few seconds
+/mob/dead/observer/proc/revived_while_away()
+	SIGNAL_HANDLER
+	to_chat(src, assemble_alert(
+		title = "Revived",
+		subtitle = "You were revived while disconnected.",
+		message = "Someone resuscitated you while you were disconnected. [isnull(can_reenter_corpse) ? "You're currently unable to re-enter your body." : "You will re-enter your body in a few seconds."]",
+		color_override = "red"
+	))
+	if(!isnull(can_reenter_corpse))
+		addtimer(CALLBACK(src, TYPE_VERB_REF(/mob/dead/observer, reenter_corpse)), 6 SECONDS)

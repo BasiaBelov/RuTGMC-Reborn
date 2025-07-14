@@ -8,18 +8,15 @@
 	w_class = WEIGHT_CLASS_TINY
 	force = 5
 	throwforce = 8
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/civilian_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/civilian_right.dmi',
 	)
-	item_state = "shard-glass"
-	attack_verb = list("stabbed", "slashed", "sliced", "cut")
+	worn_icon_state = "shard-glass"
+	attack_verb = list("stabs", "slashes", "slices", "cuts")
+	hitsound = 'sound/weapons/bladeslice.ogg'
 	var/source_sheet_type = /obj/item/stack/sheet/glass/glass
 	var/shardsize = TRUE
-
-/obj/item/shard/attack(mob/living/carbon/M, mob/living/carbon/user)
-	playsound(loc, 'sound/weapons/bladeslice.ogg', 25, 1, 6)
-	return ..()
 
 //Override to ignore the message
 /obj/item/shard/ex_act(severity, explosion_direction)
@@ -54,34 +51,24 @@
 	)
 	AddElement(/datum/element/connect_loc, connections)
 
-
-/obj/item/shard/attackby(obj/item/I, mob/user, params)
+/obj/item/shard/welder_act(mob/living/user, obj/item/tool/weldingtool/WT)
 	. = ..()
 
-	if(iswelder(I))
-		var/obj/item/tool/weldingtool/WT = I
-		if(!source_sheet_type) //can be melted into something
-			return
-
-		if(!WT.remove_fuel(0, user))
-			return
-
-		var/obj/item/stack/sheet/NG = new source_sheet_type(user.loc)
-		for(var/obj/item/stack/sheet/G in user.loc)
-			if(G == NG)
-				continue
-
-			if(!istype(G, source_sheet_type))
-				continue
-
-			if(G.amount >= G.max_amount)
-				continue
-
-			G.attackby(NG, user, params)
-			to_chat(user, "You add the newly-formed glass to the stack. It now contains [NG.amount] sheets.")
-
-		qdel(src)
-
+	if(!source_sheet_type) //can be melted into something
+		return
+	if(!WT.remove_fuel(0, user))
+		return
+	var/obj/item/stack/sheet/NG = new source_sheet_type(user.loc)
+	for(var/obj/item/stack/sheet/G in user.loc)
+		if(G == NG)
+			continue
+		if(!istype(G, source_sheet_type))
+			continue
+		if(G.amount >= G.max_amount)
+			continue
+		G.attackby(NG, user)
+		to_chat(user, "You add the newly-formed glass to the stack. It now contains [NG.amount] sheets.")
+	qdel(src)
 
 /obj/item/shard/proc/on_cross(datum/source, atom/movable/AM, oldloc, oldlocs)
 	SIGNAL_HANDLER
@@ -111,7 +98,7 @@
 	if(H.species.species_flags & ROBOTIC_LIMBS || H.species.species_flags & IS_INSULATED)
 		return
 
-	if(!H.shoes && !(H.wear_suit?.flags_armor_protection & FEET))
+	if(!H.shoes && !(H.wear_suit?.armor_protection_flags & FEET))
 		INVOKE_ASYNC(src, PROC_REF(pierce_foot), H)
 
 /obj/item/shard/proc/pierce_foot(mob/living/carbon/human/target)

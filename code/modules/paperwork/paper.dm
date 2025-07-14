@@ -1,33 +1,35 @@
-/*
-* Paper
-* also scraps of paper
-*/
-
 /obj/item/paper
 	name = "paper"
 	gender = PLURAL
 	icon = 'icons/obj/items/paper.dmi'
 	icon_state = "paper"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/civilian_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/civilian_right.dmi',
 	)
-	item_state = "paper"
+	worn_icon_state = "paper"
 	w_class = WEIGHT_CLASS_TINY
 	throw_range = 1
 	throw_speed = 1
-	flags_equip_slot = ITEM_SLOT_HEAD
-	flags_armor_protection = HEAD
-	attack_verb = list("bapped")
+	equip_slot_flags = ITEM_SLOT_HEAD
+	armor_protection_flags = HEAD
+	attack_verb = list("baps")
 
-	var/info		//What's actually written on the paper.
-	var/info_links	//A different version of the paper which includes html links at fields and EOF
-	var/stamps		//The (text for the) stamps on the paper.
-	var/fields		//Amount of user created fields
+	/// What's actually written on the paper.
+	var/info
+	/// A different version of the paper which includes html links at fields and EOF
+	var/info_links
+	/// The (text for the) stamps on the paper.
+	var/stamps
+	/// Amount of user created fields
+	var/fields
 	var/list/stamped
-	var/ico[0]      //Icons and
-	var/offset_x[0] //offsets stored for later
-	var/offset_y[0] //usage by the photocopier
+	/// Icons stored for later
+	var/ico[0]
+	/// Offsets stored for later
+	var/offset_x[0]
+	/// Used by the photocopier
+	var/offset_y[0]
 	var/rigged = 0
 	var/spam_flag = 0
 
@@ -65,25 +67,22 @@
 		paper_asset.send(user)
 		if(!(isobserver(user) || ishuman(user) || issilicon(user)))
 			// Show scrambled paper if they aren't a ghost, human, or silicone.
-			usr << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[name]</TITLE></HEAD><BODY>[stars(info)][stamps]</BODY></HTML>", "window=[name]")
+			usr << browse(HTML_SKELETON_TITLE(name, stars(info)+stamps), "window=[name]")
 			onclose(user, "[name]")
 		else
-			user << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[name]</TITLE></HEAD><BODY>[info][stamps]</BODY></HTML>", "window=[name]")
+			user << browse(HTML_SKELETON_TITLE(name, info+stamps), "window=[name]")
 			onclose(user, "[name]")
 	else
 		. += span_notice("It is too far away to read.")
 
-
 /obj/item/paper/verb/rename()
 	set name = "Rename paper"
-	set category = "Object"
+	set category = "IC.Object"
 	set src in usr
 
 	var/n_name = stripped_input(usr, "What would you like to label the paper?", "Paper Labelling")
 	if((loc == usr && usr.stat == 0))
 		name = "[(n_name ? "[n_name]" : "paper")]"
-
-
 
 /obj/item/paper/attack_ai(mob/living/silicon/ai/user as mob)
 	var/dist
@@ -92,35 +91,38 @@
 	else //cyborg or AI not seeing through a camera
 		dist = get_dist(src, user)
 	if(dist < 2)
-		usr << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[name]</TITLE></HEAD><BODY>[info][stamps]</BODY></HTML>", "window=[name]")
+		usr << browse(HTML_SKELETON_TITLE(name, info+stamps), "window=[name]")
 		onclose(usr, "[name]")
 	else
 		//Show scrambled paper
-		usr << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[name]</TITLE></HEAD><BODY>[stars(info)][stamps]</BODY></HTML>", "window=[name]")
+		usr << browse(HTML_SKELETON_TITLE(name, stars(info)+stamps), "window=[name]")
 		onclose(usr, "[name]")
-
 
 /obj/item/paper/attack(mob/living/carbon/M, mob/living/carbon/user)
 	if(user.zone_selected == "eyes")
 		user.visible_message(span_notice("You show the paper to [M]. "), \
 			span_notice(" [user] holds up a paper and shows it to [M]. "))
 		examine(M)
+		return
 
-	else if(user.zone_selected == "mouth") // lipstick wiping
-		if(ishuman(M))
-			var/mob/living/carbon/human/H = M
-			if(H == user)
-				to_chat(user, span_notice("You wipe off the lipstick with [src]."))
-				H.lip_style = null
-				H.update_body()
-			else
-				user.visible_message(span_warning("[user] begins to wipe [H]'s lipstick off with \the [src]."), \
-									span_notice("You begin to wipe off [H]'s lipstick."))
-				if(do_after(user, 10, NONE, H, BUSY_ICON_FRIENDLY))
-					user.visible_message(span_notice("[user] wipes [H]'s lipstick off with \the [src]."), \
-										span_notice("You wipe off [H]'s lipstick."))
-					H.lip_style = null
-					H.update_body()
+	if(user.zone_selected == "mouth") // lipstick wiping
+		if(!ishuman(M))
+			return
+		var/mob/living/carbon/human/H = M
+		if(H == user)
+			to_chat(user, span_notice("You wipe off the lipstick with [src]."))
+			H.makeup_style = null
+			H.update_body()
+			return
+
+		user.visible_message(span_warning("[user] begins to wipe [H]'s lipstick off with \the [src]."), \
+			span_notice("You begin to wipe off [H]'s lipstick."))
+		if(!do_after(user, 1 SECONDS, NONE, H, BUSY_ICON_FRIENDLY))
+			return
+		user.visible_message(span_notice("[user] wipes [H]'s lipstick off with \the [src]."), \
+			span_notice("You wipe off [H]'s lipstick."))
+		H.makeup_style = null
+		H.update_body()
 
 /obj/item/paper/proc/addtofield(id, text, links = 0)
 	var/locid = 0
@@ -165,9 +167,8 @@
 /obj/item/paper/proc/updateinfolinks()
 	info_links = info
 	for(var/i=1,  i<=min(fields, 15), i++)
-		addtofield(i, "<font face=\"[deffont]\"><A href='?src=[text_ref(src)];write=[i]'>write</A></font>", 1)
-	info_links = info_links + "<font face=\"[deffont]\"><A href='?src=[text_ref(src)];write=end'>write</A></font>"
-
+		addtofield(i, "<font face=\"[deffont]\"><A href='byond://?src=[text_ref(src)];write=[i]'>write</A></font>", 1)
+	info_links = info_links + "<font face=\"[deffont]\"><A href='byond://?src=[text_ref(src)];write=end'>write</A></font>"
 
 /obj/item/paper/proc/clearpaper()
 	info = null
@@ -176,7 +177,6 @@
 	overlays.Cut()
 	updateinfolinks()
 	update_icon()
-
 
 /obj/item/paper/proc/parsepencode(t, obj/item/tool/pen/P, mob/user as mob, iscrayon = 0)
 	t = parse_pencode(t, P, user, iscrayon) // Wrap the global proc
@@ -191,10 +191,8 @@
 		fields = min(fields+1, 20)
 	return t
 
-
 /obj/item/paper/proc/openhelp(mob/user as mob)
-	user << browse({"<html><meta charset='UTF-8'><HEAD><TITLE>Pen Help</TITLE></HEAD>
-	<BODY>
+	var/body = {"<BODY>
 		<b><center>Crayon&Pen commands</center></b><br>
 		<br>
 		\[br\] : Creates a linebreak.<br>
@@ -213,8 +211,8 @@
 		\[small\] - \[/small\] : Decreases the <font size = \"1\">size</font> of the text.<br>
 		\[list\] - \[/list\] : A list.<br>
 		\[*\] : A dot used for lists.<br>
-		\[hr\] : Adds a horizontal rule.
-	</BODY></HTML>"}, "window=paper_help")
+		\[hr\] : Adds a horizontal rule."}
+	user << browse(HTML_SKELETON_TITLE("Pen Help", body), "window=paper_help")
 
 /obj/item/paper/proc/burnpaper(obj/item/P, mob/user)
 	var/class = "<span class='warning'>"
@@ -273,15 +271,16 @@
 			info += t // Oh, he wants to edit to the end of the file, let him.
 			updateinfolinks()
 
-		usr << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[name]</TITLE></HEAD><BODY>[info_links][stamps]</BODY></HTML>", "window=[name]") // Update the window
+		usr << browse(HTML_SKELETON_TITLE(name, info_links+stamps), "window=[name]") // Update the window
 
 		playsound(loc, pick('sound/items/write1.ogg','sound/items/write2.ogg'), 15, 1)
 
 		update_icon()
 
-
 /obj/item/paper/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/paper) || istype(I, /obj/item/photo))
 		if(istype(I, /obj/item/paper/carbon))
@@ -304,7 +303,9 @@
 		user.put_in_hands(B)
 
 	else if(istype(I, /obj/item/tool/pen) || istype(I, /obj/item/toy/crayon))
-		user << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[name]</TITLE></HEAD><BODY>[info_links][stamps]</BODY></HTML>", "window=[name]")
+		var/datum/browser/browser = new(usr, "goals", name)
+		browser.set_content(info_links + stamps)
+		browser.open()
 
 	else if(istype(I, /obj/item/tool/stamp))
 		if((!in_range(src, user) && loc != user && !(istype(loc, /obj/item/clipboard)) && loc.loc != user && user.get_active_held_item() != I))
@@ -342,11 +343,9 @@
 	else if(I.heat >= 400)
 		burnpaper(I, user)
 
-
 /*
 * Premade paper
 */
-
 
 /obj/item/paper/commendation
 	name = "Commendation"
@@ -385,7 +384,7 @@ then, for every time you included a field, increment fields. */
 
 /obj/item/paper/flag
 	icon_state = "flag_neutral"
-	item_state = "paper"
+	worn_icon_state = "paper"
 	anchored = TRUE
 
 /obj/item/paper/jobs
@@ -395,8 +394,8 @@ then, for every time you included a field, increment fields. */
 /obj/item/paper/photograph
 	name = "photo"
 	icon_state = "photo"
+	worn_icon_state = "paper"
 	var/photo_id = 0
-	item_state = "paper"
 
 /obj/item/paper/sop
 	name = "paper- 'Standard Operating Procedure'"

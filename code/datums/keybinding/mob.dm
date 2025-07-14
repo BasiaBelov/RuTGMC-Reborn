@@ -2,69 +2,6 @@
 	category = CATEGORY_MOB
 	weight = WEIGHT_MOB
 
-
-/datum/keybinding/mob/face_north
-	hotkey_keys = list("CtrlW", "CtrlNorth")
-	name = "face_north"
-	full_name = "Face North"
-	description = ""
-	keybind_signal = COMSIG_KB_MOB_FACENORTH_DOWN
-
-/datum/keybinding/mob/face_north/down(client/user)
-	. = ..()
-	if(.)
-		return
-	var/mob/M = user.mob
-	M.northface()
-	return TRUE
-
-
-/datum/keybinding/mob/face_east
-	hotkey_keys = list("CtrlD", "CtrlEast")
-	name = "face_east"
-	full_name = "Face East"
-	description = ""
-	keybind_signal = COMSIG_KB_MOB_FACEEAST_DOWN
-
-/datum/keybinding/mob/face_east/down(client/user)
-	. = ..()
-	if(.)
-		return
-	var/mob/M = user.mob
-	M.eastface()
-	return TRUE
-
-
-/datum/keybinding/mob/face_south
-	hotkey_keys = list("CtrlS", "CtrlSouth")
-	name = "face_south"
-	full_name = "Face South"
-	description = ""
-	keybind_signal = COMSIG_KB_MOB_FACESOUTH_DOWN
-
-/datum/keybinding/mob/face_south/down(client/user)
-	. = ..()
-	if(.)
-		return
-	var/mob/M = user.mob
-	M.southface()
-	return TRUE
-
-/datum/keybinding/mob/face_west
-	hotkey_keys = list("CtrlA", "CtrlWest")
-	name = "face_west"
-	full_name = "Face West"
-	description = ""
-	keybind_signal = COMSIG_KB_MOB_FACEWEST_DOWN
-
-/datum/keybinding/mob/face_west/down(client/user)
-	. = ..()
-	if(.)
-		return
-	var/mob/M = user.mob
-	M.westface()
-	return TRUE
-
 /datum/keybinding/mob/stop_pulling
 	hotkey_keys = list("Delete")
 	name = "stop_pulling"
@@ -168,34 +105,6 @@
 		return
 	user.mob.drop_item_v()
 	return TRUE
-
-/datum/keybinding/mob/examine
-	hotkey_keys = list("Shift")
-	name = "examine_kb"
-	full_name = "Examine"
-	description = "Hold this hotkey_keys and click to examine things."
-	keybind_signal = COMSIG_KB_MOB_EXAMINE_DOWN
-
-
-/datum/keybinding/mob/examine/down(client/user)
-	. = ..()
-	if(.)
-		return
-	RegisterSignals(user.mob, list(COMSIG_MOB_CLICKON, COMSIG_OBSERVER_CLICKON), PROC_REF(examinate))
-	RegisterSignals(user.mob, list(COMSIG_MOB_MOUSEDOWN, COMSIG_MOB_MOUSEUP), TYPE_PROC_REF(/datum/keybinding, intercept_mouse_special))
-	return TRUE
-
-
-/datum/keybinding/mob/examine/up(client/user)
-	UnregisterSignal(user.mob, list(COMSIG_MOB_MOUSEDOWN, COMSIG_MOB_MOUSEUP, COMSIG_MOB_CLICKON, COMSIG_OBSERVER_CLICKON))
-	return TRUE
-
-
-/datum/keybinding/mob/examine/proc/examinate(datum/source, atom/A, params)
-	SIGNAL_HANDLER
-	var/mob/user = source
-	user.examinate(A)
-	return COMSIG_MOB_CLICK_HANDLED
 
 /datum/keybinding/mob/toggle_move_intent
 	hotkey_keys = list("5")
@@ -335,3 +244,22 @@
 		return
 	user.mob.do_self_harm = !user.mob.do_self_harm
 	user.mob.balloon_alert(user.mob, "You can [user.mob.do_self_harm ? "now" : "no longer"] hit yourself")
+
+/datum/keybinding/mob/prevent_movement
+	hotkey_keys = list("Ctrl")
+	name = "block_movement"
+	full_name = "Block movement"
+	description = "Prevents you from moving"
+	keybind_signal = COMSIG_KB_MOB_BLOCKMOVEMENT_DOWN
+
+/datum/keybinding/mob/prevent_movement/down(client/user)
+	. = ..()
+	if(.)
+		return
+	user.movement_locked = TRUE
+
+/datum/keybinding/mob/prevent_movement/up(client/user)
+	. = ..()
+	if(.)
+		return
+	user.movement_locked = FALSE

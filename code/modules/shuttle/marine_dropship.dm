@@ -1,6 +1,6 @@
 /obj/docking_port/stationary/marine_dropship
 	name = "dropship landing zone"
-	id = "dropship"
+	shuttle_id = "dropship"
 	dir = SOUTH
 	dwidth = 5
 	dheight = 10
@@ -13,8 +13,9 @@
 
 /obj/docking_port/stationary/marine_dropship/LateInitialize()
 	for(var/obj/machinery/landinglight/light AS in GLOB.landing_lights)
-		if(light.id == id)
-			light.linked_port = src
+		if(light.id != shuttle_id)
+			continue
+		light.linked_port = src
 
 /obj/docking_port/stationary/marine_dropship/on_crash()
 	for(var/obj/machinery/power/apc/A AS in GLOB.apcs_list) //break APCs
@@ -79,7 +80,7 @@
 
 /obj/docking_port/stationary/marine_dropship/crash_target
 	name = "dropshipcrash"
-	id = "dropshipcrash"
+	shuttle_id = "dropshipcrash"
 
 /obj/docking_port/stationary/marine_dropship/crash_target/Initialize(mapload)
 	. = ..()
@@ -87,40 +88,40 @@
 
 /obj/docking_port/stationary/marine_dropship/lz1
 	name = "Landing Zone One"
-	id = "lz1"
+	shuttle_id = "lz1"
 
 /obj/docking_port/stationary/marine_dropship/lz1/Initialize(mapload)
 	. = ..()
 	var/area/area = get_area(src)
-	area.flags_area |= MARINE_BASE
+	area.area_flags |= MARINE_BASE
 
 /obj/docking_port/stationary/marine_dropship/lz1/prison
 	name = "LZ1: Main Hangar"
 
 /obj/docking_port/stationary/marine_dropship/lz2
 	name = "Landing Zone Two"
-	id = "lz2"
+	shuttle_id = "lz2"
 
 /obj/docking_port/stationary/marine_dropship/lz2/Initialize(mapload)
 	. = ..()
 	var/area/area = get_area(src)
-	area.flags_area |= MARINE_BASE
+	area.area_flags |= MARINE_BASE
 
 /obj/docking_port/stationary/marine_dropship/lz2/prison
 	name = "LZ2: Civ Residence Hangar"
 
 /obj/docking_port/stationary/marine_dropship/lz_den
 	name = "Landing Zone Xeno Den"
-	id = "lz_xeno_den"
+	shuttle_id = "lz_xeno_den"
 
 /obj/docking_port/stationary/marine_dropship/hangar/one
 	name = "Shipside 'Normandy' Hangar Pad"
-	id = SHUTTLE_NORMANDY
+	shuttle_id = SHUTTLE_NORMANDY
 	roundstart_template = /datum/map_template/shuttle/dropship_one
 
 /obj/docking_port/stationary/marine_dropship/hangar/two
 	name = "Shipside 'Alamo' Hangar Pad"
-	id = SHUTTLE_ALAMO
+	shuttle_id = SHUTTLE_ALAMO
 	roundstart_template = /datum/map_template/shuttle/dropship_two
 	dheight = 6
 	dwidth = 4
@@ -170,7 +171,7 @@
 
 /obj/docking_port/mobile/marine_dropship/register()
 	. = ..()
-	SSshuttle.dropships += src
+	SSshuttle.dropship_list += src
 
 /obj/docking_port/mobile/marine_dropship/enterTransit()
 	. = ..()
@@ -185,7 +186,7 @@
 		for(var/mob/living/carbon/human/human AS in GLOB.alive_human_list)
 			if(human.faction != FACTION_TERRAGOV)
 				return
-			human.play_screen_text("<span class='maptext' style=font-size:24pt;text-align:left valign='top'><u>[op_name]</u></span><br>" + "[SSmapping.configs[GROUND_MAP].map_name]<br>" + "[GAME_YEAR]-[time2text(world.realtime, "MM-DD")] [stationTimestamp("hh:mm")]<br>" + "36th Marine LRPRR Platoon<br>" + "[human.job.title], [human]", /atom/movable/screen/text/screen_text/picture)
+			human.play_screen_text(HUD_ANNOUNCEMENT_FORMATTING(op_name, "[SSmapping.configs[GROUND_MAP].map_name]<br>[GAME_YEAR]-[time2text(world.realtime, "MM-DD")] [stationTimestamp("hh:mm")]<br>36th Marine LRPRR Platoon<br>[human.job.title], [human]", LEFT_ALIGN_TEXT), /atom/movable/screen/text/screen_text/picture)
 
 /obj/docking_port/mobile/marine_dropship/proc/lockdown_all()
 	lockdown_airlocks("rear")
@@ -241,7 +242,7 @@
 /obj/docking_port/mobile/marine_dropship/Destroy(force)
 	. = ..()
 	if(force)
-		SSshuttle.dropships -= src
+		SSshuttle.dropship_list -= src
 
 /obj/docking_port/mobile/marine_dropship/initiate_docking(obj/docking_port/stationary/new_dock, movement_direction, force=FALSE)
 	if(crashing)
@@ -265,16 +266,16 @@
 
 ///Send the dropship to its previous dock
 /obj/docking_port/mobile/marine_dropship/proc/go_to_previous_destination()
-	SSshuttle.moveShuttle(id, previous.id, TRUE)
+	SSshuttle.moveShuttle(shuttle_id, previous.shuttle_id, TRUE)
 
 /obj/docking_port/mobile/marine_dropship/one
 	name = "Normandy"
-	id = SHUTTLE_NORMANDY
+	shuttle_id = SHUTTLE_NORMANDY
 	control_flags = SHUTTLE_MARINE_PRIMARY_DROPSHIP
 
 /obj/docking_port/mobile/marine_dropship/two
 	name = "Alamo"
-	id = SHUTTLE_ALAMO
+	shuttle_id = SHUTTLE_ALAMO
 	control_flags = SHUTTLE_MARINE_PRIMARY_DROPSHIP
 	callTime = 28 SECONDS //smaller shuttle go whoosh
 	rechargeTime = 1.5 MINUTES
@@ -285,7 +286,7 @@
 
 // queen calldown
 
-/obj/docking_port/mobile/marine_dropship/afterShuttleMove(turf/oldT, rotation)
+/obj/docking_port/mobile/marine_dropship/after_shuttle_move(turf/oldT, rotation)
 	. = ..()
 	if(hijack_state != HIJACK_STATE_CALLED_DOWN)
 		return
@@ -392,7 +393,7 @@
 		to_chat(user, span_warning("We can't call the bird from here!"))
 		return FALSE
 	var/obj/docking_port/mobile/marine_dropship/D
-	for(var/k in SSshuttle.dropships)
+	for(var/k in SSshuttle.dropship_list)
 		var/obj/docking_port/mobile/M = k
 		if(M.control_flags & SHUTTLE_MARINE_PRIMARY_DROPSHIP)
 			D = M
@@ -451,11 +452,11 @@
 // summon dropship to closest lz to A
 /datum/game_mode/proc/summon_dropship(atom/A)
 	var/list/lzs = list()
-	for(var/i in SSshuttle.stationary)
+	for(var/i in SSshuttle.stationary_docking_ports)
 		var/obj/docking_port/stationary/S = i
 		if(S.z != A.z)
 			continue
-		if(S.id == "lz1" || S.id == "lz2")
+		if(S.shuttle_id == "lz1" || S.shuttle_id == "lz2")
 			lzs[S] = get_dist(S, A)
 	if(!length(lzs))
 		stack_trace("couldn't find any lzs to call down the dropship to")
@@ -465,7 +466,7 @@
 		if(lzs[j] < lzs[closest])
 			closest = j
 	var/obj/docking_port/mobile/marine_dropship/D
-	for(var/k in SSshuttle.dropships)
+	for(var/k in SSshuttle.dropship_list)
 		var/obj/docking_port/mobile/M = k
 		if(M.control_flags & SHUTTLE_MARINE_PRIMARY_DROPSHIP)
 			D = M
@@ -480,7 +481,7 @@
 
 // control computer
 /obj/machinery/computer/shuttle/marine_dropship
-	icon = 'icons/Marine/shuttle-parts.dmi'
+	icon = 'icons/obj/machines/shuttle_console.dmi'
 	icon_state = "console"
 	screen_overlay = "console_emissive"
 	resistance_flags = RESIST_ALL
@@ -489,44 +490,26 @@
 	opacity = FALSE
 
 /obj/machinery/computer/shuttle/marine_dropship/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount = xeno_attacker.xeno_caste.melee_damage, damage_type = BRUTE, damage_flag = MELEE, effects = TRUE, armor_penetration = 0, isrightclick = FALSE)
-	if(!(xeno_attacker.xeno_caste.caste_flags & CASTE_IS_INTELLIGENT))
+	var/datum/game_mode/infestation/infestation_mode = SSticker.mode //Minor QOL, any xeno can check the console after a leader hijacks
+	if(!(xeno_attacker.xeno_caste.caste_flags & CASTE_IS_INTELLIGENT) && (infestation_mode.round_stage != INFESTATION_MARINE_CRASHING))
 		return
 	#ifndef TESTING
 	if(SSticker.round_start_time + SHUTTLE_HIJACK_LOCK > world.time)
 		to_chat(xeno_attacker, span_xenowarning("It's too early to do this!"))
 		return
 	#endif
-	var/obj/docking_port/mobile/marine_dropship/M = SSshuttle.getShuttle(shuttleId)
-	var/dat = "Status: [M ? M.getStatusText() : "*Missing*"]<br><br>"
-	if(M)
-		dat += "<A href='?src=[REF(src)];hijack=1'>Launch to [SSmapping.configs[SHIP_MAP].map_name]</A><br>"
-		dat += "<A href='?src=[REF(src)];abduct=1'>Capture the [M]</A><br>"
-		M.unlock_all()
-		M.silicon_lock_airlocks(TRUE)
-		if(M.hijack_state != HIJACK_STATE_CALLED_DOWN)
-			to_chat(xeno_attacker, span_xenowarning("We corrupt the bird's controls, unlocking the doors[(M.mode != SHUTTLE_IGNITING) ? "and preventing it from flying." : ", but we are unable to prevent it from flying as it is already taking off!"]"))
-			SEND_GLOBAL_SIGNAL(COMSIG_GLOB_DROPSHIP_CONTROLS_CORRUPTED, src)
-			if(M.mode != SHUTTLE_IGNITING)
-				M.set_hijack_state(HIJACK_STATE_CALLED_DOWN)
-				M.do_start_hijack_timer()
+	var/obj/docking_port/mobile/marine_dropship/shuttle = SSshuttle.getShuttle(shuttleId)
+	if(shuttle.hijack_state != HIJACK_STATE_CALLED_DOWN && shuttle.hijack_state != HIJACK_STATE_CRASHING) //Process of corrupting the controls
+		to_chat(xeno_attacker, span_xenowarning("We corrupt the bird's controls, unlocking the doors and preventing it from flying."))
+		SEND_GLOBAL_SIGNAL(COMSIG_GLOB_DROPSHIP_CONTROLS_CORRUPTED, src)
+		shuttle.set_idle()
+		shuttle.set_hijack_state(HIJACK_STATE_CALLED_DOWN)
+		shuttle.do_start_hijack_timer()
+		shuttle.unlock_all()
+	interact(xeno_attacker) //Open the UI
 
-	var/datum/browser/popup = new(xeno_attacker, "computer", M ? M.name : "shuttle", 300, 200)
-	popup.set_content("<center>[dat]</center>")
-	popup.open()
-
-/obj/machinery/computer/shuttle/marine_dropship/can_interact(mob/user)
-	. = ..()
-
-	if(isxeno(user))
-		var/mob/living/carbon/xenomorph/X = user
-		if(!(X.xeno_caste.caste_flags & CASTE_IS_INTELLIGENT))
-			return FALSE
-
-
-	else if(!allowed(user))
-		return FALSE
-
-	return TRUE
+/obj/machinery/computer/shuttle/marine_dropship/ui_state(mob/user)
+	return GLOB.alamo_state
 
 /obj/machinery/computer/shuttle/marine_dropship/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
@@ -535,6 +518,14 @@
 		ui = new(user, src, "MarineDropship", name)
 		ui.open()
 
+/obj/machinery/computer/shuttle/marine_dropship/ui_static_data(mob/user)
+	var/obj/docking_port/mobile/marine_dropship/shuttle = SSshuttle.getShuttle(shuttleId)
+	var/list/static_data = list()
+	static_data["current_map"] = SSmapping.configs[SHIP_MAP].map_name
+	static_data["ship_name"] = shuttle
+
+	return static_data
+
 /obj/machinery/computer/shuttle/marine_dropship/ui_data(mob/user)
 	var/obj/docking_port/mobile/marine_dropship/shuttle = SSshuttle.getShuttle(shuttleId)
 	if(!shuttle)
@@ -542,22 +533,23 @@
 		return
 
 	var/show_hunt = FALSE
-	var/can_hunt = FALSE
 	if(ispointsdefencegamemode(SSticker.mode))
 		show_hunt = TRUE
-		var/datum/game_mode/infestation/distress/points_defence/mode = SSticker.mode
-		if(mode.can_hunt())
-			can_hunt = TRUE
 
-	. = list()
-	.["on_flyby"] = shuttle.mode == SHUTTLE_CALL
-	.["dest_select"] = !(shuttle.mode == SHUTTLE_CALL || shuttle.mode == SHUTTLE_IDLE)
-	.["hijack_state"] = shuttle.hijack_state != HIJACK_STATE_CALLED_DOWN
-	.["ship_status"] = shuttle.getStatusText()
-	.["automatic_cycle_on"] = shuttle.automatic_cycle_on
-	.["time_between_cycle"] = shuttle.time_between_cycle
-	.["can_hunt"] = can_hunt
-	.["show_hunt"] = show_hunt
+	var/list/data = list()
+	data["is_xeno"] = isxeno(user)
+	data["on_flyby"] = shuttle.mode == SHUTTLE_CALL
+	data["dest_select"] = !(shuttle.mode == SHUTTLE_CALL || shuttle.mode == SHUTTLE_IDLE)
+	data["hijack_state"] = shuttle.hijack_state != HIJACK_STATE_CALLED_DOWN
+	data["ship_status"] = shuttle.getStatusText()
+	data["automatic_cycle_on"] = shuttle.automatic_cycle_on
+	data["time_between_cycle"] = shuttle.time_between_cycle
+	data["can_hunt"] = SSticker.mode.can_hunt()
+	data["show_hunt"] = show_hunt
+
+	var/datum/game_mode/infestation/infestation_mode = SSticker.mode
+	if(istype(infestation_mode))
+		data["shuttle_hijacked"] = (infestation_mode.round_stage == INFESTATION_MARINE_CRASHING) //If we hijacked, our capture button greys out
 
 	var/locked = 0
 	var/reardoor = 0
@@ -566,12 +558,12 @@
 		if(A.locked && A.density)
 			reardoor++
 	if(!reardoor)
-		.["rear"] = 0
+		data["rear"] = 0
 	else if(reardoor==length(shuttle.rear_airlocks))
-		.["rear"] = 2
+		data["rear"] = 2
 		locked++
 	else
-		.["rear"] = 1
+		data["rear"] = 1
 
 	var/leftdoor = 0
 	for(var/i in shuttle.left_airlocks)
@@ -579,12 +571,12 @@
 		if(A.locked && A.density)
 			leftdoor++
 	if(!leftdoor)
-		.["left"] = 0
+		data["left"] = 0
 	else if(leftdoor==length(shuttle.left_airlocks))
-		.["left"] = 2
+		data["left"] = 2
 		locked++
 	else
-		.["left"] = 1
+		data["left"] = 1
 
 	var/rightdoor = 0
 	for(var/i in shuttle.right_airlocks)
@@ -592,39 +584,41 @@
 		if(A.locked && A.density)
 			rightdoor++
 	if(!rightdoor)
-		.["right"] = 0
+		data["right"] = 0
 	else if(rightdoor==length(shuttle.right_airlocks))
-		.["right"] = 2
+		data["right"] = 2
 		locked++
 	else
-		.["right"] = 1
+		data["right"] = 1
 
 	if(locked == 3)
-		.["lockdown"] = 2
+		data["lockdown"] = 2
 	else if(!locked)
-		.["lockdown"] = 0
+		data["lockdown"] = 0
 	else
-		.["lockdown"] = 1
+		data["lockdown"] = 1
 
 	var/list/options = valid_destinations()
 	var/list/valid_destinations = list()
-	for(var/obj/docking_port/stationary/S in SSshuttle.stationary)
-		if(!options.Find(S.id))
+	for(var/obj/docking_port/stationary/S in SSshuttle.stationary_docking_ports)
+		if(!options.Find(S.shuttle_id))
 			continue
 		if(!shuttle.check_dock(S, silent=TRUE))
 			continue
-		valid_destinations += list(list("name" = S.name, "id" = S.id))
-	.["destinations"] = valid_destinations
+		valid_destinations += list(list("name" = S.name, "id" = S.shuttle_id))
+	data["destinations"] = valid_destinations
 
-/obj/machinery/computer/shuttle/marine_dropship/ui_act(action, list/params)
+	return data
+
+/obj/machinery/computer/shuttle/marine_dropship/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
 	if(.)
 		return
 
-	var/obj/docking_port/mobile/marine_dropship/M = SSshuttle.getShuttle(shuttleId)
-	if(!M)
+	var/obj/docking_port/mobile/marine_dropship/shuttle = SSshuttle.getShuttle(shuttleId)
+	if(!shuttle)
 		return
-	if(M.hijack_state == HIJACK_STATE_CALLED_DOWN)
+	if(shuttle.hijack_state == HIJACK_STATE_CALLED_DOWN && ishuman(usr))
 		return
 
 	switch(action)
@@ -632,23 +626,24 @@
 			Topic(null, list("move" = params["move"]))
 			return
 		if("lockdown")
-			M.lockdown_all()
+			shuttle.lockdown_all()
 			. = TRUE
 		if("release")
-			M.unlock_all()
+			shuttle.unlock_all()
 			. = TRUE
 		if("lock")
-			M.lockdown_airlocks(params["lock"])
+			shuttle.lockdown_airlocks(params["lock"])
 			. = TRUE
 		if("unlock")
-			M.unlock_airlocks(params["unlock"])
+			shuttle.unlock_airlocks(params["unlock"])
 			. = TRUE
 		if("automation_on")
-			M.automatic_cycle_on = params["automation_on"]
-			if(!M.automatic_cycle_on)
-				deltimer(M.cycle_timer)
+			shuttle.automatic_cycle_on = params["automation_on"]
+			if(!shuttle.automatic_cycle_on)
+				deltimer(shuttle.cycle_timer)
 		if("cycle_time_change")
-			M.time_between_cycle = params["cycle_time_change"]
+			shuttle.time_between_cycle = params["cycle_time_change"]
+
 		if("hunt")
 			var/datum/game_mode/infestation/distress/points_defence/mode = SSticker.mode
 			if(mode.can_hunt())
@@ -659,82 +654,49 @@
 			if(mode.can_hunt())
 				mode.round_stage = INFESTATION_MARINE_MINOR
 
-/obj/machinery/computer/shuttle/marine_dropship/Topic(href, href_list)
-	var/obj/docking_port/mobile/marine_dropship/M = SSshuttle.getShuttle(shuttleId)
-	if(!M)
-		return
-	if(!isxeno(usr) && M.hijack_state == HIJACK_STATE_CALLED_DOWN)
-		to_chat(usr, span_warning("The shuttle isn't responding to commands."))
-		return
-	. = ..()
-	if(.)
-		return
-	if(M.hijack_state == HIJACK_STATE_CRASHING)
-		return
-
-	if(ishuman(usr) || isAI(usr))
-		if(!allowed(usr))
-			return
-		if(href_list["lockdown"])
-			EMPTY_BLOCK_GUARD
-		else if(href_list["release"])
-			EMPTY_BLOCK_GUARD
-		else if(href_list["lock"])
-			M.lockdown_airlocks(href_list["lock"])
-		else if(href_list["unlock"])
-			M.unlock_airlocks(href_list["unlock"])
-		return
-
-	if(!is_ground_level(M.z))
-		return
-
-	if(!isxeno(usr))
-		return
-
-	var/mob/living/carbon/xenomorph/X = usr
-
-	if(href_list["hijack"])
-		if(!(X.hive.hive_flags & HIVE_CAN_HIJACK))
-			to_chat(X, span_warning("Нашему улью не хватает экстрасенсорных способностей, чтобы украсть птицу."))
-			return
-		var/list/living_player_list = SSticker.mode.count_humans_and_xenos(list(X.z), COUNT_IGNORE_ALIVE_SSD)
-		if(living_player_list[1] > living_player_list[2]) // if there are more marines than xenos, we are unable to hijack
-			to_chat(X, span_xenowarning("Еще осталась добыча, на которую можно поохотиться!"))
-			return
-		switch(M.mode)
-			if(SHUTTLE_RECHARGING)
-				to_chat(X, span_xenowarning("Птица все еще остывает..."))
+		//These are actions for the Xeno dropship UI
+		if("hijack")
+			var/mob/living/carbon/xenomorph/xeno = usr
+			if(!(xeno.hive.hive_flags & HIVE_CAN_HIJACK))
+				to_chat(xeno, span_warning("Нашему улью не хватает экстрасенсорных способностей, чтобы украсть птицу."))
 				return
-			if(SHUTTLE_IDLE) //Continue.
-				EMPTY_BLOCK_GUARD
-			else
-				to_chat(X, span_xenowarning("Мы не можем сделать это сейчас."))
+			if(shuttle.mode == SHUTTLE_RECHARGING)
+				to_chat(xeno, span_xenowarning("Птица все еще остывает..."))
 				return
-		var/confirm = tgui_alert(usr, "Хотите угнать металлическую птицу?", "Угнать птицу?", list("Да", "Нет"))
-		if(confirm != "Да")
-			return
-		var/obj/docking_port/stationary/marine_dropship/crash_target/CT = pick(SSshuttle.crash_targets)
-		if(!CT)
-			return
-		do_hijack(M, CT, X)
+			if(shuttle.mode != SHUTTLE_IDLE)
+				to_chat(xeno, span_xenowarning("Мы не можем сделать это сейчас."))
+				return
+			var/confirm = tgui_alert(usr, "Хотите угнать металлическую птицу?", "Угнать птицу?", list("Да", "Нет"))
+			if(confirm != "Да")
+				return
+			var/obj/docking_port/stationary/marine_dropship/crash_target/CT = pick(SSshuttle.crash_targets)
+			if(!CT)
+				return
+			do_hijack(shuttle, CT, xeno)
+		if("abduct")
+			var/datum/game_mode/infestation/infestation_mode = SSticker.mode
+			if(infestation_mode.round_stage == INFESTATION_MARINE_CRASHING)
+				message_admins("[usr] tried to capture the shuttle after it was already hijacked, possible use of exploits.")
+				return
+			var/groundside_humans = length(GLOB.humans_by_zlevel["[z]"])
+			if(groundside_humans > 5)
+				to_chat(usr, span_xenowarning("Еще осталась добыча, на которую можно охотиться!"))
+				return
+			var/confirm = tgui_alert(usr, "Хотите захватить металлическую птицу?\n ЭТО ЗАВЕРШИТ РАУНД", "Захватить птицу?", list( "Да", "Нет"))
+			if(confirm != "Да")
+				return
+			groundside_humans = length(GLOB.humans_by_zlevel["[z]"])
+			if(groundside_humans > 5)
+				to_chat(usr, span_xenowarning("Еще осталась добыча, на которую можно охотиться!"))
+				return
 
-	if(href_list["abduct"])
-		var/list/living_player_list = SSticker.mode.count_humans_and_xenos(list(X.z), COUNT_IGNORE_ALIVE_SSD)
-		if(living_player_list[1] > 5)
-			to_chat(X, span_xenowarning("Еще осталась добыча, на которую можно поохотиться!"))
+			priority_announce("Нормандия захвачена! Потеряв главный путь к земле, морпехи вынуждены отступить.", title = "Нормандия Захвачена", color_override = "orange")
+			infestation_mode.round_stage = INFESTATION_DROPSHIP_CAPTURED_XENOS
 			return
-
-		var/confirm = tgui_alert(usr, "Хотите захватить металлическую птицу?\n ЭТО ЗАВЕРШИТ РАУНД", "Захватить птицу?", list( "Да", "Нет"))
-		if(confirm != "Да")
-			return
-		priority_announce("Нормандия захвачена! Потеряв главный путь к земле, морпехи вынуждены отступить.", title = "Нормандия Захвачена", color_override = "orange")
-		var/datum/game_mode/infestation/infestation_mode = SSticker.mode
-		infestation_mode.round_stage = INFESTATION_DROPSHIP_CAPTURED_XENOS
-		return
 
 /obj/machinery/computer/shuttle/marine_dropship/proc/do_hijack(obj/docking_port/mobile/marine_dropship/crashing_dropship, obj/docking_port/stationary/marine_dropship/crash_target/crash_target, mob/living/carbon/xenomorph/user)
 	crashing_dropship.set_hijack_state(HIJACK_STATE_CRASHING)
-	if(SSticker.mode?.flags_round_type & MODE_HIJACK_POSSIBLE)
+	if(SSticker.mode?.round_type_flags & MODE_HIJACK_POSSIBLE)
 		var/datum/game_mode/infestation/infestation_mode = SSticker.mode
 		infestation_mode.round_stage = INFESTATION_MARINE_CRASHING
 	crashing_dropship.callTime = 120 * (GLOB.current_orbit/3) SECONDS
@@ -746,7 +708,7 @@
 	user.hive.on_shuttle_hijack(crashing_dropship)
 	playsound(src, 'sound/misc/queen_alarm.ogg')
 	crashing_dropship.silicon_lock_airlocks(TRUE)
-	SSevacuation.flags_scuttle &= ~FLAGS_SDEVAC_TIMELOCK
+	SSevacuation.scuttle_flags &= ~SDEVAC_TIMELOCK_flags
 	switch(SSshuttle.moveShuttleToDock(shuttleId, crash_target, TRUE))
 		if(0)
 			visible_message("Отправление шаттла. Осторожно, двери закрываются.")
@@ -774,7 +736,7 @@
 	icon_state = "console2"
 	possible_destinations = "lz1;lz2;alamo;normandy"
 
-/obj/machinery/door/poddoor/shutters/transit/afterShuttleMove(turf/oldT, list/movement_force, shuttle_dir, shuttle_preferred_direction, move_dir, rotation)
+/obj/machinery/door/poddoor/shutters/transit/after_shuttle_move(turf/oldT, list/movement_force, shuttle_dir, shuttle_preferred_direction, move_dir, rotation)
 	. = ..()
 	if(SSmapping.level_has_any_trait(z, list(ZTRAIT_MARINE_MAIN_SHIP, ZTRAIT_GROUND)))
 		open()
@@ -796,21 +758,21 @@
 /turf/open/shuttle/dropship/floor/out
 	icon_state = "rasputin17"
 
-/obj/machinery/door/airlock/multi_tile/mainship/dropshiprear/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock, idnum, override)
+/obj/machinery/door/airlock/multi_tile/mainship/dropshiprear/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	. = ..()
 	if(!istype(port, /obj/docking_port/mobile/marine_dropship))
 		return
 	var/obj/docking_port/mobile/marine_dropship/D = port
 	D.rear_airlocks += src
 
-/obj/machinery/door/airlock/dropship_hatch/left/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock, idnum, override)
+/obj/machinery/door/airlock/dropship_hatch/left/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	. = ..()
 	if(!istype(port, /obj/docking_port/mobile/marine_dropship))
 		return
 	var/obj/docking_port/mobile/marine_dropship/D = port
 	D.left_airlocks += src
 
-/obj/machinery/door/airlock/dropship_hatch/right/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock, idnum, override)
+/obj/machinery/door/airlock/dropship_hatch/right/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	. = ..()
 	if(!istype(port, /obj/docking_port/mobile/marine_dropship))
 		return
@@ -823,7 +785,7 @@
 	name = "Dropship Lockdown"
 	var/obj/docking_port/mobile/marine_dropship/D
 
-/obj/machinery/door_control/dropship/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock, idnum, override)
+/obj/machinery/door_control/dropship/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	. = ..()
 	D = port
 
@@ -840,12 +802,12 @@
 	layer = BELOW_OBJ_LAYER
 
 /obj/structure/dropship_piece/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_SPARKS, -15, 8, 1)
+	AddElement(/datum/element/debris, DEBRIS_SPARKS, -40, 8, 1)
 
 /obj/structure/dropship_piece/ex_act(severity)
 	return
 
-/obj/structure/dropship_piece/beforeShuttleMove(turf/newT, rotation, move_mode, obj/docking_port/mobile/moving_dock)
+/obj/structure/dropship_piece/before_shuttle_move(turf/newT, rotation, move_mode, obj/docking_port/mobile/moving_dock)
 	. = ..()
 	if(. & MOVE_AREA)
 		ENABLE_BITFIELD(., MOVE_CONTENTS)
@@ -983,13 +945,21 @@
 /obj/structure/dropship_piece/tadpole/rearright
 	icon_state = "blue_rear_rc"
 
+/obj/structure/dropship_piece/tadpole/weapon/rightright
+	icon = 'icons/turf/tadpole.dmi'
+	icon_state = "blue_weapon_rr"
+
+/obj/structure/dropship_piece/tadpole/weapon/leftleft
+	icon = 'icons/turf/tadpole.dmi'
+	icon_state = "blue_weapon_ll"
+
 /obj/structure/dropship_piece/glassone
 	icon = 'icons/turf/dropship2.dmi'
 	icon_state = "shuttle_glass1"
 
 /obj/structure/dropship_piece/glassone/tadpole
-	icon_state = "shuttle_glass1"
-	resistance_flags = NONE
+	icon = 'icons/turf/tadpole.dmi'
+	resistance_flags = XENO_DAMAGEABLE|DROPSHIP_IMMUNE
 	opacity = FALSE
 	allow_pass_flags = PASS_GLASS
 
@@ -998,17 +968,16 @@
 	icon_state = "shuttle_glass2"
 
 /obj/structure/dropship_piece/glasstwo/tadpole
-	icon = 'icons/turf/dropship2.dmi'
-	icon_state = "shuttle_glass2"
-	resistance_flags = NONE
+	icon = 'icons/turf/tadpole.dmi'
+	resistance_flags = XENO_DAMAGEABLE|DROPSHIP_IMMUNE
 	opacity = FALSE
 	allow_pass_flags = PASS_GLASS
 
 /obj/structure/dropship_piece/singlewindow/tadpole
-	icon = 'icons/turf/dropship2.dmi'
+	icon = 'icons/turf/tadpole.dmi'
 	icon_state = "shuttle_single_window"
 	allow_pass_flags = PASS_GLASS
-	resistance_flags = NONE
+	resistance_flags = XENO_DAMAGEABLE|DROPSHIP_IMMUNE
 	opacity = FALSE
 
 /obj/structure/dropship_piece/tadpole/cockpit
@@ -1020,9 +989,11 @@
 	allow_pass_flags = NONE
 
 /obj/structure/dropship_piece/tadpole/cockpit/left
+	icon = 'icons/turf/tadpole.dmi'
 	icon_state = "blue_cockpit_fl"
 
 /obj/structure/dropship_piece/tadpole/cockpit/right
+	icon = 'icons/turf/tadpole.dmi'
 	icon_state = "blue_cockpit_fr"
 
 /obj/structure/dropship_piece/tadpole/cockpit/window
@@ -1036,6 +1007,7 @@
 
 /obj/structure/dropship_piece/tadpole/tadpole_nose
 	icon_state = "blue_front"
+	icon = 'icons/turf/tadpole.dmi'
 	opacity = FALSE
 	density = FALSE
 
@@ -1284,13 +1256,13 @@
 	if(action != "selectDestination")
 		return FALSE
 
-	var/obj/docking_port/mobile/M = SSshuttle.getShuttle(shuttleId)
+	var/obj/docking_port/mobile/shuttle = SSshuttle.getShuttle(shuttleId)
 	#ifndef TESTING
-	if(!(M.shuttle_flags & GAMEMODE_IMMUNE) && world.time < SSticker.round_start_time + SSticker.mode.deploy_time_lock)
+	if(!(shuttle.shuttle_flags & GAMEMODE_IMMUNE) && world.time < SSticker.round_start_time + SSticker.mode.deploy_time_lock)
 		to_chat(usr, span_warning("The engines are still refueling."))
 		return TRUE
 	#endif
-	if(!M.can_move_topic(usr))
+	if(!shuttle.can_move_topic(usr))
 		return TRUE
 
 	if(!params["destination"])
@@ -1301,8 +1273,8 @@
 		message_admins("[ADMIN_TPMONTY(usr)] may be attempting a href dock exploit on [src] with target location \"[html_encode(params["destination"])]\"")
 		return TRUE
 
-	var/previous_status = M.mode
-	log_game("[key_name(usr)] has sent the shuttle [M] to [params["destination"]]")
+	var/previous_status = shuttle.mode
+	log_game("[key_name(usr)] has sent the shuttle [shuttle] to [params["destination"]]")
 
 	switch(SSshuttle.moveShuttle(shuttleId, params["destination"], 1))
 		if(0)
@@ -1325,20 +1297,20 @@
 /obj/machinery/computer/shuttle/shuttle_control/ui_data(mob/user)
 	var/list/data = list()
 	var/list/options = valid_destinations()
-	var/obj/docking_port/mobile/M = SSshuttle.getShuttle(shuttleId)
-	if(!M)
+	var/obj/docking_port/mobile/shuttle = SSshuttle.getShuttle(shuttleId)
+	if(!shuttle)
 		return data //empty but oh well
 
-	data["linked_shuttle_name"] = M.name
-	data["shuttle_status"] = M.getStatusText()
+	data["linked_shuttle_name"] = shuttle.name
+	data["shuttle_status"] = shuttle.getStatusText()
 	for(var/option in options)
-		for(var/obj/docking_port/stationary/S AS in SSshuttle.stationary)
-			if(option != S.id)
+		for(var/obj/docking_port/stationary/S AS in SSshuttle.stationary_docking_ports)
+			if(option != S.shuttle_id)
 				continue
 			var/list/dataset = list()
-			dataset["id"] = S.id
+			dataset["id"] = S.shuttle_id
 			dataset["name"] = S.name
-			dataset["locked"] = !M.check_dock(S, silent=TRUE)
+			dataset["locked"] = !shuttle.check_dock(S, silent=TRUE)
 			data["destinations"] += list(dataset)
 	return data
 
@@ -1351,8 +1323,8 @@
 	// Getting all valid destinations into an assoc list with "name" = "portid"
 	var/list/port_assoc = list()
 	for(var/destination in all_destinations)
-		for(var/obj/docking_port/port AS in SSshuttle.stationary)
-			if(destination != port.id)
+		for(var/obj/docking_port/port AS in SSshuttle.stationary_docking_ports)
+			if(destination != port.shuttle_id)
 				continue
 			port_assoc["[port.name]"] = destination
 
@@ -1379,16 +1351,16 @@
 		M = SSshuttle.getShuttle(forcedId)
 		if(!M)
 			return FALSE
-		newId = M.id
+		newId = M.shuttle_id
 		shuttleName = M.name
 	else
 		M = null
-		for(M AS in SSshuttle.mobile)
+		for(M AS in SSshuttle.mobile_docking_ports)
 			if(!(M.control_flags & compatible_control_flags)) //Need at least one matching control flag
 				continue
-			newId = M.id
+			newId = M.shuttle_id
 			shuttleName = M.name
-			if(M.id == preferredId) //Lock selection in if we get the initial shuttleId of this console.
+			if(M.shuttle_id == preferredId) //Lock selection in if we get the initial shuttleId of this console.
 				break
 	if(!newId)
 		return FALSE //Did not relink
@@ -1437,7 +1409,7 @@
 	var/obj/docking_port/mobile/M = SSshuttle.getShuttle(shuttleId)
 	var/dat = "Status: [M ? M.getStatusText() : "*Missing*"]<br><br>"
 	if(M)
-		dat += "<A href='?src=[REF(src)];move=crash-infinite-transit'>Initiate Evacuation</A><br>"
+		dat += "<A href='byond://?src=[REF(src)];move=crash-infinite-transit'>Initiate Evacuation</A><br>"
 
 	var/datum/browser/popup = new(user, "computer", M ? M.name : "shuttle", 300, 200)
 	popup.set_content("<center>[dat]</center>")

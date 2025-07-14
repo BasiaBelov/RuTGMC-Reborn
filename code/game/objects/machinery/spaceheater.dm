@@ -15,13 +15,14 @@
 	/// Is the panel on the heater open?
 	var/open = FALSE
 
-
 /obj/machinery/space_heater/Initialize(mapload)
 	. = ..()
 	cell = new(src)
 	update_icon()
 	var/static/list/connections = list(
 		COMSIG_OBJ_TRY_ALLOW_THROUGH = PROC_REF(can_climb_over),
+		COMSIG_FIND_FOOTSTEP_SOUND = TYPE_PROC_REF(/atom/movable, footstep_override),
+		COMSIG_TURF_CHECK_COVERED = TYPE_PROC_REF(/atom/movable, turf_cover_check),
 	)
 	AddElement(/datum/element/connect_loc, connections)
 
@@ -42,7 +43,6 @@
 		. += "The power cell is [cell ? "installed" : "missing"]."
 	else
 		. += "The charge meter reads [cell ? round(cell.percent(),1) : 0]%"
-
 
 /obj/machinery/space_heater/emp_act(severity)
 	if(machine_stat & (BROKEN|NOPOWER))
@@ -74,6 +74,8 @@
 
 /obj/machinery/space_heater/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(!istype(I, /obj/item/cell))
 		return
 	if(!open)
@@ -109,7 +111,6 @@
 	balloon_alert_to_viewers("[user] switches [src] [on ? "on" : "off"]")
 	update_icon()
 
-
 /obj/machinery/space_heater/process()
 	if(!on || !cell || !cell.charge)
 		balloon_alert_to_viewers("[src] shuts off")
@@ -119,6 +120,4 @@
 
 	for(var/mob/living/carbon/human/H in range(2, src))
 		H.adjust_bodytemperature(min(round(T20C - H.bodytemperature)*0.7, 25), 0, T20C)
-
-
-	cell.use(50*GLOB.CELLRATE)
+	cell.use(50 * GLOB.CELLRATE)

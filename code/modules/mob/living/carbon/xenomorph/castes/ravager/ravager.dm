@@ -14,7 +14,6 @@
 	tier = XENO_TIER_THREE
 	upgrade = XENO_UPGRADE_NORMAL
 	pixel_x = -16
-	old_x = -16
 	bubble_icon = "alienroyal"
 	skins = list(
 		/datum/xenomorph_skin/ravager/bonehead,
@@ -30,7 +29,7 @@
 	ADD_TRAIT(src, TRAIT_LIGHT_STEP, XENO_TRAIT)
 	RegisterSignal(src, COMSIG_XENOMORPH_TAKING_DAMAGE, PROC_REF(update_rage))
 
-/mob/living/carbon/xenomorph/ravager/Life()
+/mob/living/carbon/xenomorph/ravager/Life(seconds_per_tick, times_fired)
 	. = ..()
 	update_rage()
 
@@ -92,19 +91,19 @@
 
 /mob/living/carbon/xenomorph/ravager/proc/drain_slash(datum/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
 	SIGNAL_HANDLER
-	var/brute_damage = getBruteLoss()
-	var/burn_damage = getFireLoss()
+	var/brute_damage = get_brute_loss()
+	var/burn_damage = get_fire_loss()
 	if(!brute_damage && !burn_damage)
 		return
 	var/health_recovery = RAVAGER_RAGE_HEALTH_RECOVERY_PER_SLASH + (RAVAGER_RAGE_HEALTH_RECOVERY_PER_SLASH * rage_power)
 	var/health_modifier
 	if(brute_damage)
 		health_modifier = -min(brute_damage, health_recovery)
-		adjustBruteLoss(health_modifier, TRUE)
+		adjust_brute_loss(health_modifier, TRUE)
 		health_recovery += health_modifier
 	if(burn_damage)
 		health_modifier = -min(burn_damage, health_recovery)
-		adjustFireLoss(health_modifier, TRUE)
+		adjust_fire_loss(health_modifier, TRUE)
 
 	var/datum/action/ability/xeno_action/endure/endure_ability = actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(endure_ability.endure_duration) //Check if Endure is active
@@ -122,8 +121,8 @@
 	. = ..()
 	if(stat)
 		return
-	if(pass_flags & PASS_FIRE) // RUTGMC ADDITION START
-		return FALSE // RUTGMC ADDITION END
+	if(pass_flags & PASS_FIRE)
+		return FALSE
 	if(TIMER_COOLDOWN_CHECK(src, COOLDOWN_RAVAGER_FLAMER_ACT))
 		return FALSE
 	gain_plasma(50)
@@ -150,6 +149,16 @@
 	return endure_ability.endure_threshold
 
 /mob/living/carbon/xenomorph/ravager/med_hud_set_health()
+	if(hud_used?.healths)
+		if(stat != DEAD)
+			if(health < 0)
+				hud_used.healths.icon_state = "health0"
+			else
+				var/amount = round(health * 100 / maxHealth, 5)
+				hud_used.healths.icon_state = "health[amount]"
+		else
+			hud_used.healths.icon_state = "health_dead"
+
 	var/image/holder = hud_list[HEALTH_HUD_XENO]
 	if(!holder)
 		return

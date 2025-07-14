@@ -3,7 +3,7 @@
 	shell_speed = 2
 	bullet_color = COLOR_STRONG_VIOLET
 	damage_type = BURN
-	flags_ammo_behavior = NONE
+	ammo_behavior_flags = NONE
 
 	hud_state = "plasma"
 	hud_state_empty = "electrothermal_empty"
@@ -45,25 +45,25 @@
 
 	bullet_color = COLOR_VIOLET
 	damage = 0
-	flags_ammo_behavior = AMMO_ENERGY
+	ammo_behavior_flags = AMMO_ENERGY
 	var/stun_time = 2.5 SECONDS
 
-/datum/ammo/energy/yautja/caster/stun/on_hit_mob(mob/M, obj/projectile/P)
-	var/mob/living/carbon/C = M
+/datum/ammo/energy/yautja/caster/stun/on_hit_mob(mob/target_mob, obj/projectile/proj)
+	var/mob/living/carbon/C = target_mob
 	if(istype(C))
 		if(isyautja(C) || ispredalien(C))
 			return
 		to_chat(C, span_danger("An electric shock ripples through your body, freezing you in place!"))
-		log_attack("[key_name(C)] was stunned by a high power stun bolt from [key_name(P.firer)] at [get_area(P)]")
+		log_attack("[key_name(C)] was stunned by a high power stun bolt from [key_name(proj.firer)] at [get_area(proj)]")
 
 		if(ishuman(C))
 			var/mob/living/carbon/human/H = C
-			H.apply_effect(stun_time, WEAKEN)
+			H.apply_effect(stun_time, EFFECT_PARALYZE)
 		else
-			C.apply_effect(stun_time, WEAKEN)
+			C.apply_effect(stun_time, EFFECT_PARALYZE)
 
-		C.apply_effect(stun_time, STUN)
-	..()
+		C.apply_effect(stun_time, EFFECT_STUN)
+	return ..()
 
 /datum/ammo/energy/yautja/caster/bolt
 	name = "plasma bolt"
@@ -81,65 +81,65 @@
 	hud_state = "plasma_rifle"
 
 	damage = 0
-	flags_ammo_behavior = AMMO_ENERGY
+	ammo_behavior_flags = AMMO_ENERGY
 
-/datum/ammo/energy/yautja/caster/bolt/stun/on_hit_mob(mob/M, obj/projectile/P)
-	var/mob/living/carbon/C = M
+/datum/ammo/energy/yautja/caster/bolt/stun/on_hit_mob(mob/target_mob, obj/projectile/proj)
+	var/mob/living/carbon/C = target_mob
 	if(istype(C))
 		if(isyautja(C) || ispredalien(C))
 			return
 		to_chat(C, span_danger("An electric shock ripples through your body, freezing you in place!"))
-		log_attack("[key_name(C)] was stunned by a high power stun bolt from [key_name(P.firer)] at [get_area(P)]")
+		log_attack("[key_name(C)] was stunned by a high power stun bolt from [key_name(proj.firer)] at [get_area(proj)]")
 
 		if(ishuman(C))
 			var/mob/living/carbon/human/H = C
-			H.apply_effect(stun_time, WEAKEN)
+			H.apply_effect(stun_time, EFFECT_PARALYZE)
 		else
-			C.apply_effect(stun_time, WEAKEN)
+			C.apply_effect(stun_time, EFFECT_PARALYZE)
 
-		C.apply_effect(stun_time, STUN)
-	..()
+		C.apply_effect(stun_time, EFFECT_STUN)
+	return ..()
 
 /datum/ammo/energy/yautja/caster/sphere/stun
 	name = "plasma immobilizer"
 	bullet_color = COLOR_MAGENTA
 	damage = 0
-	flags_ammo_behavior = AMMO_ENERGY
+	ammo_behavior_flags = AMMO_ENERGY
 	hud_state = "plasma_rifle_blast"
 	accurate_range = 20
 	max_range = 20
 	var/stun_range = 4
 	var/stun_time = 3 SECONDS
 
-/datum/ammo/energy/yautja/caster/sphere/stun/on_hit_mob(mob/M, obj/projectile/P)
-	do_area_stun(P)
+/datum/ammo/energy/yautja/caster/sphere/stun/on_hit_mob(mob/target_mob, obj/projectile/proj)
+	do_area_stun(proj)
 
-/datum/ammo/energy/yautja/caster/sphere/stun/on_hit_turf(turf/T, obj/projectile/P)
-	do_area_stun(P)
+/datum/ammo/energy/yautja/caster/sphere/stun/on_hit_turf(turf/target_turf, obj/projectile/proj)
+	do_area_stun(proj)
 
-/datum/ammo/energy/yautja/caster/sphere/stun/on_hit_obj(obj/O, obj/projectile/P)
-	do_area_stun(P)
+/datum/ammo/energy/yautja/caster/sphere/stun/on_hit_obj(obj/target_object, obj/projectile/proj)
+	do_area_stun(proj)
 
-/datum/ammo/energy/yautja/caster/sphere/stun/do_at_max_range(obj/projectile/P)
-	do_area_stun(P)
+/datum/ammo/energy/yautja/caster/sphere/stun/do_at_max_range(obj/projectile/proj)
+	do_area_stun(proj)
 
-/datum/ammo/energy/yautja/caster/sphere/stun/proc/do_area_stun(obj/projectile/P)
-	playsound(P, 'sound/weapons/wave.ogg', 75, 1, 25)
-	for(var/mob/living/carbon/M in view(stun_range, get_turf(P)))
+/datum/ammo/energy/yautja/caster/sphere/stun/proc/do_area_stun(obj/projectile/proj)
+	playsound(proj, 'sound/weapons/wave.ogg', 75, 1, 25)
+	for(var/mob/living/carbon/target_mob in view(stun_range, get_turf(proj)))
 		var/f_stun_time = stun_time
-		log_attack("[key_name(M)] was stunned by a plasma immobilizer from [key_name(P.firer)] at [get_area(P)]")
-		if(isyautja(M))
+		log_attack("[key_name(target_mob)] was stunned by a plasma immobilizer from [key_name(proj.firer)] at [get_area(proj)]")
+		if(isyautja(target_mob))
 			f_stun_time -= 2 SECONDS
-		if(ispredalien(M))
+		if(ispredalien(target_mob))
 			continue
-		to_chat(M, span_danger("A powerful electric shock ripples through your body, freezing you in place!"))
-		M.apply_effect(f_stun_time, STUN)
+		to_chat(target_mob, span_danger("A powerful electric shock ripples through your body, freezing you in place!"))
+		target_mob.apply_effect(f_stun_time, EFFECT_STUN)
 
-		if(ishuman(M))
-			var/mob/living/carbon/human/H = M
-			H.apply_effect(f_stun_time, WEAKEN)
+		if(ishuman(target_mob))
+			var/mob/living/carbon/human/H = target_mob
+			H.apply_effect(f_stun_time, EFFECT_PARALYZE)
 		else
-			M.apply_effect(f_stun_time, WEAKEN)
+			target_mob.apply_effect(f_stun_time, EFFECT_PARALYZE)
 
 /datum/ammo/energy/yautja/rifle/bolt
 	name = "plasma rifle bolt"

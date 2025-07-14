@@ -1,7 +1,7 @@
 /datum/ammo/bullet/machinegun //Adding this for the MG Nests (~Art)
 	name = "machinegun bullet"
 	icon_state = "bullet" // Keeping it bog standard with the turret but allows it to be changed.
-	flags_ammo_behavior = AMMO_BALLISTIC
+	ammo_behavior_flags = AMMO_BALLISTIC
 	hud_state = "minigun"
 	hud_state_empty = "smartgun_empty"
 	accurate_range = 12
@@ -15,7 +15,7 @@
 	name = "minigun bullet"
 	hud_state = "minigun"
 	hud_state_empty = "smartgun_empty"
-	flags_ammo_behavior = AMMO_BALLISTIC
+	ammo_behavior_flags = AMMO_BALLISTIC
 	accuracy_var_low = 3
 	accuracy_var_high = 3
 	accurate_range = 5
@@ -29,15 +29,17 @@
 	damage = 30
 	penetration = 10
 	sundering = 0
-	flags_ammo_behavior = AMMO_BALLISTIC|AMMO_IFF
+	ammo_behavior_flags = AMMO_BALLISTIC|AMMO_IFF|AMMO_SNIPER
 	damage_falloff = 2
-	accuracy = 80
+	accurate_range = 7
+	accuracy = 10
+	barricade_clear_distance = 4
 
 /datum/ammo/bullet/auto_cannon
 	name = "autocannon high-velocity bullet"
 	hud_state = "minigun"
 	hud_state_empty = "smartgun_empty"
-	flags_ammo_behavior = AMMO_BALLISTIC|AMMO_PASS_THROUGH_TURF|AMMO_PASS_THROUGH_MOVABLE
+	ammo_behavior_flags = AMMO_BALLISTIC|AMMO_PASS_THROUGH_TURF|AMMO_PASS_THROUGH_MOVABLE
 	accurate_range_min = 6
 	accuracy_var_low = 3
 	accuracy_var_high = 3
@@ -48,24 +50,24 @@
 	///Bonus flat damage to walls, balanced around resin walls.
 	var/autocannon_wall_bonus = 20
 
-/datum/ammo/bullet/auto_cannon/on_hit_turf(turf/T, obj/projectile/P)
-	P.proj_max_range -= 20
+/datum/ammo/bullet/auto_cannon/on_hit_turf(turf/target_turf, obj/projectile/proj)
+	proj.proj_max_range -= 20
 
-	if(istype(T, /turf/closed/wall))
-		var/turf/closed/wall/wall_victim = T
-		wall_victim.take_damage(autocannon_wall_bonus, P.damtype, P.armor_type)
+	if(istype(target_turf, /turf/closed/wall))
+		var/turf/closed/wall/wall_victim = target_turf
+		wall_victim.take_damage(autocannon_wall_bonus, proj.damtype, proj.armor_type)
 
-/datum/ammo/bullet/auto_cannon/on_hit_mob(mob/M, obj/projectile/P)
-	P.proj_max_range -= 5
-	staggerstun(M, P, max_range = 20, slowdown = 1)
+/datum/ammo/bullet/auto_cannon/on_hit_mob(mob/target_mob, obj/projectile/proj)
+	proj.proj_max_range -= 5
+	staggerstun(target_mob, proj, max_range = 20, slowdown = 1)
 
-/datum/ammo/bullet/auto_cannon/on_hit_obj(obj/O, obj/projectile/P)
-	P.proj_max_range -= 5
+/datum/ammo/bullet/auto_cannon/on_hit_obj(obj/target_object, obj/projectile/proj)
+	proj.proj_max_range -= 5
 
 /datum/ammo/bullet/auto_cannon/flak
 	name = "autocannon smart-detonating bullet"
 	hud_state = "sniper_flak"
-	flags_ammo_behavior = AMMO_BALLISTIC|AMMO_TARGET_TURF
+	ammo_behavior_flags = AMMO_BALLISTIC|AMMO_TARGET_TURF
 	damage = 50
 	penetration = 30
 	sundering = 5
@@ -76,15 +78,15 @@
 /datum/ammo/bullet/auto_cannon/flak/on_hit_mob(mob/victim, obj/projectile/proj)
 	airburst(victim, proj)
 
-/datum/ammo/bullet/auto_cannon/do_at_max_range(turf/T, obj/projectile/proj)
-	airburst(T, proj)
+/datum/ammo/bullet/auto_cannon/do_at_max_range(turf/target_turf, obj/projectile/proj)
+	airburst(target_turf, proj)
 
 /datum/ammo/bullet/cupola
 	name = "cupola bullet"
 	bullet_color = COLOR_SOFT_RED //Red bullets to indicate friendly fire restriction
 	hud_state = "smartgun"
 	hud_state_empty = "smartgun_empty"
-	flags_ammo_behavior = AMMO_BALLISTIC|AMMO_IFF
+	ammo_behavior_flags = AMMO_BALLISTIC|AMMO_IFF
 	accurate_range = 12
 	damage = 30
 	penetration = 10
@@ -95,16 +97,16 @@
 	bullet_color = COLOR_SOFT_RED //Red bullets to indicate friendly fire restriction
 	hud_state = "smartgun_minigun"
 	hud_state_empty = "smartgun_empty"
-	flags_ammo_behavior = AMMO_BALLISTIC
+	ammo_behavior_flags = AMMO_BALLISTIC
 	accurate_range = 12
 	damage = 12
 	penetration = 20
 	damage_falloff = 0.1
 	var/shatter_duration = 3 SECONDS
 
-/datum/ammo/bullet/smart_minigun/on_hit_mob(mob/M, obj/projectile/proj)
-	if(!isliving(M))
+/datum/ammo/bullet/smart_minigun/on_hit_mob(mob/target_mob, obj/projectile/proj)
+	if(!isliving(target_mob))
 		return
 
-	var/mob/living/living_victim = M
+	var/mob/living/living_victim = target_mob
 	living_victim.apply_status_effect(STATUS_EFFECT_SHATTER, shatter_duration)

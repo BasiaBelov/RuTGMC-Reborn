@@ -4,12 +4,12 @@
 	gender = PLURAL
 	icon = 'icons/obj/det.dmi'
 	icon_state = "detpack_off"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/weapons/explosives_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/weapons/explosives_right.dmi',
 		)
-	item_state = "plasticx"
-	flags_item = NOBLUDGEON
+	worn_icon_state = "plasticx"
+	item_flags = NOBLUDGEON
 	w_class = WEIGHT_CLASS_SMALL
 	layer = MOB_LAYER - 0.1
 	var/frequency = 1457
@@ -17,19 +17,22 @@
 	var/armed = FALSE
 	var/timer = 5
 	var/code = 2
-	var/det_mode = FALSE //FALSE for breach, TRUE for demolition.
-	var/atom/plant_target = null //which atom the detpack is planted on
-	var/target_drag_delay = null //store this for restoration later
-	var/boom = FALSE //confirms whether we actually detted.
+	///FALSE for breach, TRUE for demolition.
+	var/det_mode = FALSE
+	///which atom the detpack is planted on
+	var/atom/plant_target = null
+	///store this for restoration later
+	var/target_drag_delay = null
+	///confirms whether we actually detted.
+	var/boom = FALSE
 	var/detonation_pending
 	var/sound_timer
 	var/datum/radio_frequency/radio_connection
 
-
 /obj/item/detpack/Initialize(mapload)
 	. = ..()
 	set_frequency(frequency)
-
+	code = rand(1, 100)
 
 /obj/item/detpack/examine(mob/user)
 	. = ..()
@@ -44,7 +47,6 @@
 
 	if(armed)
 		. += "<b>It is armed!</b>"
-
 
 /obj/item/detpack/Destroy()
 	if(sound_timer)
@@ -68,7 +70,6 @@
 	frequency = new_frequency
 	radio_connection = SSradio.add_object(src, frequency, RADIO_SIGNALER)
 
-
 /obj/item/detpack/update_icon_state()
 	. = ..()
 	icon_state = "detpack_[plant_target ? "set_" : ""]"
@@ -76,7 +77,6 @@
 		icon_state = "[icon_state][armed ? "armed" : "on"]"
 	else
 		icon_state = "[icon_state]off"
-
 
 /obj/item/detpack/attackby(obj/item/I, mob/user, params)
 	. = ..()
@@ -114,7 +114,7 @@
 			return
 
 		if(prob((SKILL_ENGINEER_METAL - user.skills.getRating(SKILL_ENGINEER)) * 20))
-			to_chat(user, span_highdanger("After several seconds of your clumsy meddling the [src] buzzes angrily as if offended. You have a <b>very</b> bad feeling about this."))
+			to_chat(user, span_userdanger("After several seconds of your clumsy meddling the [src] buzzes angrily as if offended. You have a <b>very</b> bad feeling about this."))
 			timer = 0 //Oops. Now you fucked up. Immediate detonation.
 
 	user.visible_message(span_notice("[user] begins disarming [src] with [I]."),
@@ -168,7 +168,6 @@
 		armed = FALSE
 		disarm()
 
-
 /obj/item/detpack/Topic(href, href_list)
 	. = ..()
 	if(.)
@@ -196,8 +195,6 @@
 
 	updateUsrDialog()
 
-
-
 /obj/item/detpack/can_interact(mob/user)
 	. = ..()
 	if(!.)
@@ -209,41 +206,39 @@
 
 	return TRUE
 
-
 /obj/item/detpack/interact(mob/user)
 	. = ..()
 	if(.)
 		return
 
 	var/dat = {"
-<A href='?src=[text_ref(src)];power=1'>Turn [on ? "Off" : "On"]</A><BR>
-<B>Current Detonation Mode:</B> [det_mode ? "Demolition" : "Breach"]<BR>
-<A href='?src=[text_ref(src)];det_mode=1'><B>Set Detonation Mode:</B> [det_mode ? "Breach" : "Demolition"]</A><BR>
-<B>Frequency/Code for Detpack:</B><BR>
-<A href='byond://?src=[text_ref(src)];freq=-10'>-</A>
-<A href='byond://?src=[text_ref(src)];freq=-2'>-</A>
-[format_frequency(src.frequency)]
-<A href='byond://?src=[text_ref(src)];freq=2'>+</A>
-<A href='byond://?src=[text_ref(src)];freq=10'>+</A><BR>
-<B>Signal Code:</B><BR>
-<A href='byond://?src=[text_ref(src)];code=-5'>-</A>
-<A href='byond://?src=[text_ref(src)];code=-1'>-</A> [code]
-<A href='byond://?src=[text_ref(src)];code=1'>+</A>
-<A href='byond://?src=[text_ref(src)];code=5'>+</A><BR>
-<B>Timer (Max 300 seconds, Min 5 seconds):</B><BR>
-<A href='byond://?src=[text_ref(src)];timer=-50'>-</A>
-<A href='byond://?src=[text_ref(src)];timer=-10'>-</A>
-<A href='byond://?src=[text_ref(src)];timer=-5'>-</A>
-<A href='byond://?src=[text_ref(src)];timer=-1'>-</A> [timer]
-<A href='byond://?src=[text_ref(src)];timer=1'>+</A>
-<A href='byond://?src=[text_ref(src)];timer=5'>+</A>
-<A href='byond://?src=[text_ref(src)];timer=10'>+</A>
-<A href='byond://?src=[text_ref(src)];timer=50'>+</A><BR>"}
+		<A href='byond://?src=[text_ref(src)];power=1'>Turn [on ? "Off" : "On"]</A><BR>
+		<B>Current Detonation Mode:</B> [det_mode ? "Demolition" : "Breach"]<BR>
+		<A href='byond://?src=[text_ref(src)];det_mode=1'><B>Set Detonation Mode:</B> [det_mode ? "Breach" : "Demolition"]</A><BR>
+		<B>Frequency/Code for Detpack:</B><BR>
+		<A href='byond://?src=[text_ref(src)];freq=-10'>-</A>
+		<A href='byond://?src=[text_ref(src)];freq=-2'>-</A>
+		[format_frequency(src.frequency)]
+		<A href='byond://?src=[text_ref(src)];freq=2'>+</A>
+		<A href='byond://?src=[text_ref(src)];freq=10'>+</A><BR>
+		<B>Signal Code:</B><BR>
+		<A href='byond://?src=[text_ref(src)];code=-5'>-</A>
+		<A href='byond://?src=[text_ref(src)];code=-1'>-</A> [code]
+		<A href='byond://?src=[text_ref(src)];code=1'>+</A>
+		<A href='byond://?src=[text_ref(src)];code=5'>+</A><BR>
+		<B>Timer (Max 300 seconds, Min 5 seconds):</B><BR>
+		<A href='byond://?src=[text_ref(src)];timer=-50'>-</A>
+		<A href='byond://?src=[text_ref(src)];timer=-10'>-</A>
+		<A href='byond://?src=[text_ref(src)];timer=-5'>-</A>
+		<A href='byond://?src=[text_ref(src)];timer=-1'>-</A> [timer]
+		<A href='byond://?src=[text_ref(src)];timer=1'>+</A>
+		<A href='byond://?src=[text_ref(src)];timer=5'>+</A>
+		<A href='byond://?src=[text_ref(src)];timer=10'>+</A>
+		<A href='byond://?src=[text_ref(src)];timer=50'>+</A><BR>"}
 
 	var/datum/browser/popup = new(user, "detpack")
 	popup.set_content(dat)
 	popup.open()
-
 
 /obj/item/detpack/afterattack(atom/target, mob/user, flag)
 	if(!flag)
@@ -258,6 +253,11 @@
 		return FALSE
 	if(target.resistance_flags & INDESTRUCTIBLE)
 		return FALSE
+	if(istype(target, /obj/vehicle/unmanned))
+		var/obj/vehicle/unmanned/unmanned_target = target
+		if(!unmanned_target.allow_explosives)
+			to_chat(user, "[span_warning("[src] doesnt fit on [unmanned_target]")]!")
+			return FALSE
 	if(istype(target, /obj/structure/window))
 		var/obj/structure/window/W = target
 		if(!W.damageable)
@@ -361,7 +361,6 @@
 		cell_explosion(plant_target, 450, 200, EXPLOSION_FALLOFF_SHAPE_EXPONENTIAL)
 	plant_target.plastique_act()
 	qdel(src)
-
 
 /obj/item/detpack/attack(mob/M as mob, mob/user as mob, def_zone)
 	return

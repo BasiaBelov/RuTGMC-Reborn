@@ -101,7 +101,7 @@
 
 /datum/ai_behavior/xeno/deal_with_obstacle(datum/source, direction)
 	var/turf/obstacle_turf = get_step(mob_parent, direction)
-	if(obstacle_turf.flags_atom & AI_BLOCKED)
+	if(obstacle_turf.atom_flags & AI_BLOCKED)
 		return
 	for(var/thing in obstacle_turf.contents)
 		if(istype(thing, /obj/structure/window_frame))
@@ -242,6 +242,8 @@
 
 ///Move the ai mob on top of the window_frame
 /datum/ai_behavior/xeno/proc/climb_window_frame(turf/window_turf)
+	if(!mob_parent) // why does this happen in the first place
+		return
 	mob_parent.loc = window_turf
 	mob_parent.last_move_time = world.time
 	LAZYDECREMENT(mob_parent.do_actions, window_turf)

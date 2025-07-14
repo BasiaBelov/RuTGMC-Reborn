@@ -10,14 +10,15 @@
 	resistance_flags = XENO_DAMAGEABLE
 	max_integrity = 100
 	//copypaste sorry
-	var/amount_per_transfer_from_this = 5 //shit I dunno, adding this so syringes stop runtime erroring. --NeoFite
+	///shit I dunno, adding this so syringes stop runtime erroring. --NeoFite
+	var/amount_per_transfer_from_this = 5
 	var/obj/item/storage/bag/trash/mybag
 	var/obj/item/tool/mop/mymop
 	var/obj/item/reagent_containers/spray/myspray
 	var/obj/item/lightreplacer/myreplacer
 	var/obj/item/reagent_containers/glass/bucket/janibucket/mybucket
-	var/signs = 0	//maximum capacity hardcoded below
-
+	///maximum capacity hardcoded below
+	var/signs = 0
 
 /obj/structure/janitorialcart/Initialize(mapload)
 	. = ..()
@@ -31,9 +32,10 @@
 	else
 		. += "It has no bucket."
 
-
 /obj/structure/janitorialcart/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/storage/bag/trash) && !mybag)
 		user.drop_held_item()
@@ -101,31 +103,26 @@
 	else if(mybag)
 		mybag.attackby(I, user, params)
 
-
-
-
-
 /obj/structure/janitorialcart/interact(mob/user)
 	. = ..()
 	if(.)
 		return
 	var/dat
 	if(mybag)
-		dat += "<a href='?src=[text_ref(src)];garbage=1'>[mybag.name]</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];garbage=1'>[mybag.name]</a><br>"
 	if(mymop)
-		dat += "<a href='?src=[text_ref(src)];mop=1'>[mymop.name]</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];mop=1'>[mymop.name]</a><br>"
 	if(myspray)
-		dat += "<a href='?src=[text_ref(src)];spray=1'>[myspray.name]</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];spray=1'>[myspray.name]</a><br>"
 	if(myreplacer)
-		dat += "<a href='?src=[text_ref(src)];replacer=1'>[myreplacer.name]</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];replacer=1'>[myreplacer.name]</a><br>"
 	if(mybucket)
-		dat += "<a href='?src=[text_ref(src)];bucket=1'>[mybucket.name]</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];bucket=1'>[mybucket.name]</a><br>"
 	if(signs)
-		dat += "<a href='?src=[text_ref(src)];sign=1'>[signs] sign\s</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];sign=1'>[signs] sign\s</a><br>"
 	var/datum/browser/popup = new(user, "janicart", name, 240, 160)
 	popup.set_content(dat)
 	popup.open()
-
 
 /obj/structure/janitorialcart/Topic(href, href_list)
 	if(!in_range(src, usr))
@@ -168,10 +165,8 @@
 			else
 				warning("[src] signs ([signs]) didn't match contents")
 				signs = 0
-
 	update_icon()
 	updateUsrDialog()
-
 
 /obj/structure/janitorialcart/update_overlays()
 	. = ..()

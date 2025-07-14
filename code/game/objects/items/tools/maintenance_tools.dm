@@ -2,28 +2,27 @@
 	name = "wrench"
 	desc = "A wrench with many common uses. Can be usually found in your hand."
 	icon_state = "wrench"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BELT
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BELT
 	force = 5
 	throwforce = 7
 	w_class = WEIGHT_CLASS_SMALL
 	usesound = 'sound/items/ratchet.ogg'
-	attack_verb = list("bashed", "battered", "bludgeoned", "whacked")
+	attack_verb = list("bashes", "batters", "bludgeons", "whacks")
 	tool_behaviour = TOOL_WRENCH
-
 
 /obj/item/tool/screwdriver
 	name = "screwdriver"
 	desc = "You can be totally screwwy with this."
 	icon_state = "screwdriver_map"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BELT
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BELT
 	force = 5
 	w_class = WEIGHT_CLASS_TINY
 	throwforce = 5
 	throw_speed = 3
 	throw_range = 5
-	attack_verb = list("stabbed")
+	attack_verb = list("stabs")
 	tool_behaviour = TOOL_SCREWDRIVER
 	/// If the item should be assigned a random color
 	var/random_color = TRUE
@@ -43,11 +42,11 @@
 		set_greyscale_config(/datum/greyscale_config/screwdriver)
 		var/our_color = pick(screwdriver_colors)
 		set_greyscale_colors(list(screwdriver_colors[our_color]))
-		item_icons = list(
+		worn_icon_list = list(
 			slot_l_hand_str = SSgreyscale.GetColoredIconByType(/datum/greyscale_config/screwdriver_inhand_left, greyscale_colors),
 			slot_r_hand_str = SSgreyscale.GetColoredIconByType(/datum/greyscale_config/screwdriver_inhand_right, greyscale_colors),
 		)
-		item_state_slots = list(
+		worn_worn_icon_state_slots = list(
 			slot_l_hand_str = null,
 			slot_r_hand_str = null,
 		)
@@ -59,24 +58,22 @@
 	name = "wirecutters"
 	desc = "This cuts wires."
 	icon_state = "cutters"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BELT
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BELT
 	force = 6
 	throw_speed = 2
 	throw_range = 9
 	w_class = WEIGHT_CLASS_SMALL
-	attack_verb = list("pinched", "nipped")
+	attack_verb = list("pinches", "nips")
 	sharp = IS_SHARP_ITEM_SIMPLE
 	edge = 1
 	tool_behaviour = TOOL_WIRECUTTER
-
 
 /obj/item/tool/wirecutters/Initialize(mapload)
 	. = ..()
 	if(prob(50) && !istype(src, /obj/item/tool/wirecutters/yautja)) //RU TGMC EDIT
 		icon_state = "cutters-y"
-		item_state = "cutters_yellow"
-
+		worn_icon_state = "cutters_yellow"
 
 /obj/item/tool/wirecutters/attack(mob/living/carbon/C, mob/user)
 	if((C.handcuffed) && (istype(C.handcuffed, /obj/item/restraints/handcuffs/cable)))
@@ -85,16 +82,14 @@
 		"You hear cable being cut.")
 		C.update_handcuffed(null)
 		return
-	else
-		..()
-
+	return ..()
 
 /obj/item/tool/weldingtool
 	name = "blowtorch"
 	desc = "Used for welding and repairing various things."
 	icon_state = "welder"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BELT
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BELT
 
 	//Amount of OUCH when it's thrown
 	force = 3
@@ -104,21 +99,20 @@
 	throw_range = 5
 	w_class = WEIGHT_CLASS_SMALL
 	tool_behaviour = TOOL_WELDER
-
-	//blowtorch specific stuff
-	var/welding = 0 	//Whether or not the blowtorch is off(0), on(1) or currently welding(2)
-	var/max_fuel = 20 	//The max amount of fuel the welder can hold
-	var/weld_tick = 0	//Used to slowly deplete the fuel when the tool is left on.
-	var/status = TRUE //When welder is secured on unsecured
-
+	///Whether or not the blowtorch is off(0), on(1) or currently welding(2)
+	var/welding = 0
+	///The max amount of fuel the welder can hold
+	var/max_fuel = 20
+	///Used to slowly deplete the fuel when the tool is left on.
+	var/weld_tick = 0
+	///When welder is secured on unsecured
+	var/status = TRUE
 	var/datum/looping_sound/weldingtool/soundloop
-
 
 /obj/item/tool/weldingtool/Initialize(mapload)
 	. = ..()
 	create_reagents(max_fuel, null, list(/datum/reagent/fuel = max_fuel))
 	soundloop = new(list(src), active)
-
 
 /obj/item/tool/weldingtool/Destroy()
 	if(welding)
@@ -131,7 +125,6 @@
 	. += EXAMINE_SECTION_BREAK
 	. +=  "It contains [get_fuel()]/[max_fuel] units of fuel!"
 
-
 /obj/item/tool/weldingtool/use(used = 0)
 	if(!isOn() || !check_fuel())
 		return FALSE
@@ -143,13 +136,11 @@
 	check_fuel()
 	return TRUE
 
-
 // When welding is about to start, run a normal tool_use_check, then flash a mob if it succeeds.
 /obj/item/tool/weldingtool/tool_start_check(mob/living/user, amount = 0)
 	. = tool_use_check(user, amount)
 	if(. && user)
 		eyecheck(user)
-
 
 // If welding tool ran out of fuel during a construction task, construction fails.
 /obj/item/tool/weldingtool/tool_use_check(mob/living/user, amount)
@@ -160,9 +151,7 @@
 	if(get_fuel() < amount)
 		balloon_alert(user, "low fuel")
 		return FALSE
-
 	return TRUE
-
 
 /obj/item/tool/weldingtool/process()
 	if(gc_destroyed)
@@ -175,18 +164,25 @@
 	else //should never be happening, but just in case
 		toggle(TRUE)
 
-/obj/item/tool/weldingtool/attackby(obj/item/I, mob/user, params)
+/obj/item/tool/weldingtool/screwdriver_act(mob/living/user, obj/item/I)
 	. = ..()
-
-	if(istype(I, /obj/item/tool/screwdriver))
-		flamethrower_screwdriver(src, user)
+	if(welding)
+		balloon_alert(user, "Turn it off first")
+		return
+	status = !status
+	if(status)
+		balloon_alert(user, "Resecures and closes")
+		DISABLE_BITFIELD(reagents.reagent_flags, OPENCONTAINER)
+	else
+		balloon_alert(user, "Ready to be refueled")
+		ENABLE_BITFIELD(reagents.reagent_flags, OPENCONTAINER)
 
 /obj/item/tool/weldingtool/afterattack(obj/O, mob/user, proximity)
 	if(!proximity)
 		return
 	if(!status && O.is_refillable())
 		reagents.trans_to(O, reagents.total_volume)
-	if (welding)
+	if(welding)
 		remove_fuel(1)
 
 		if(isliving(O))
@@ -205,8 +201,8 @@
 		O.handle_weldingtool_overlay()
 		. = ..()
 		O.handle_weldingtool_overlay(TRUE)
-	else
-		. = ..()
+		return
+	return ..()
 
 /obj/item/tool/weldingtool/attack_self(mob/user as mob)
 	if(!status)
@@ -214,26 +210,24 @@
 		return
 	toggle()
 
-
 //Returns the amount of fuel in the welder
 /obj/item/tool/weldingtool/proc/get_fuel()
 	return reagents.get_reagent_amount(/datum/reagent/fuel)
 
-
 //Removes fuel from the blowtorch. If a mob is passed, it will perform an eyecheck on the mob. This should probably be renamed to use()
 /obj/item/tool/weldingtool/proc/remove_fuel(amount = 1, mob/M = null)
 	if(!welding || !check_fuel())
-		return 0
+		return FALSE
 	if(get_fuel() >= amount)
 		reagents.remove_reagent(/datum/reagent/fuel, amount)
 		check_fuel()
 		if(M)
 			eyecheck(M)
-		return 1
+		return TRUE
 	else
 		if(M)
 			balloon_alert(M, "Out of welding fuel")
-		return 0
+		return FALSE
 
 //Returns whether or not the blowtorch is currently on.
 /obj/item/tool/weldingtool/proc/isOn()
@@ -243,8 +237,8 @@
 /obj/item/tool/weldingtool/proc/check_fuel()
 	if((get_fuel() <= 0) && welding)
 		toggle(TRUE)
-		return 0
-	return 1
+		return FALSE
+	return TRUE
 
 /obj/item/tool/weldingtool/proc/toggle(message = 0)
 	var/mob/M
@@ -288,18 +282,6 @@
 		set_light(0)
 		STOP_PROCESSING(SSobj, src)
 
-/obj/item/tool/weldingtool/proc/flamethrower_screwdriver(obj/item/I, mob/user)
-	if(welding)
-		balloon_alert(user, "Turn it off first")
-		return
-	status = !status
-	if(status)
-		balloon_alert(user, "Resecures and closes")
-		DISABLE_BITFIELD(reagents.reagent_flags, OPENCONTAINER)
-	else
-		balloon_alert(user, "Ready to be refueled")
-		ENABLE_BITFIELD(reagents.reagent_flags, OPENCONTAINER)
-
 /obj/item/tool/weldingtool/largetank
 	name = "industrial blowtorch"
 	max_fuel = 40
@@ -325,28 +307,25 @@
 	name = "crowbar"
 	desc = "Used to remove floors and to pry open doors."
 	icon_state = "crowbar"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BELT
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BELT
 	force = 5
 	throwforce = 7
-	item_state = "crowbar"
+	worn_icon_state = "crowbar"
 	w_class = WEIGHT_CLASS_SMALL
-	attack_verb = list("attacked", "bashed", "battered", "bludgeoned", "whacked")
+	attack_verb = list("attacks", "bashes", "batters", "bludgeons", "whacks")
 	pry_capable = IS_PRY_CAPABLE_CROWBAR
 	tool_behaviour = TOOL_CROWBAR
 	usesound = 'sound/items/crowbar.ogg'
 
-
 /obj/item/tool/crowbar/red
 	icon_state = "red_crowbar"
-	item_state = "crowbar_red"
-
-
+	worn_icon_state = "crowbar_red"
 
 /obj/item/tool/weldpack
 	name = "Welding kit"
 	desc = "A heavy-duty, portable fuel carrier. Welder and flamer compatible."
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	icon = 'icons/obj/items/tank.dmi'
 	icon_state = "welderpack"
 	w_class = WEIGHT_CLASS_BULKY
@@ -361,6 +340,8 @@
 
 /obj/item/tool/weldpack/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(reagents.total_volume == 0)
 		balloon_alert(user, "Out of fuel")
 		return
@@ -420,9 +401,20 @@
 		balloon_alert(user, "Refills")
 		RS.update_icon()
 
+	else if(istype(I, /obj/item/weapon/twohanded/chainsaw))
+		var/obj/item/weapon/twohanded/chainsaw/saw = I
+		if(saw.reagents.get_reagent_amount(/datum/reagent/fuel) == saw.max_fuel || !reagents.total_volume)
+			return ..()
+
+		var/fuel_transfer_amount = min(reagents.total_volume, (saw.max_fuel - saw.reagents.get_reagent_amount(/datum/reagent/fuel)))
+		reagents.remove_reagent(/datum/reagent/fuel, fuel_transfer_amount)
+		saw.reagents.add_reagent(/datum/reagent/fuel, fuel_transfer_amount)
+		playsound(loc, 'sound/effects/refill.ogg', 25, 1, 3)
+		to_chat(user, span_notice("You refill [saw] with fuel."))
+		saw.update_icon()
+
 	else
 		balloon_alert(user, "Only works with welders and flamethrowers")
-
 
 /obj/item/tool/weldpack/afterattack(obj/O as obj, mob/user as mob, proximity)
 	if(!proximity) // this replaces and improves the get_dist(src,O) <= 1 checks used previously
@@ -443,7 +435,7 @@
 /obj/item/tool/weldpack/marinestandard
 	name = "M-22 welding kit"
 	desc = "A heavy-duty, portable fuel carrier. Mainly used in flamethrowers. Welder and flamer compatible."
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	icon_state = "marine_flamerpack"
 	w_class = WEIGHT_CLASS_BULKY
 	max_fuel = 500 //Because the marine backpack can carry 260, and still allows you to take items, there should be a reason to still use this one.
@@ -453,13 +445,13 @@
 	desc = "A hand-held, lightweight cell charger. It isn't going to give you tons of power, but it can help in a pinch."
 	icon = 'icons/obj/items/tools.dmi'
 	icon_state = "handheldcharger_black"
-	item_state = "handheldcharger_black"
+	worn_icon_state = "handheldcharger_black"
 	w_class = WEIGHT_CLASS_SMALL
-	flags_atom = CONDUCT
+	atom_flags = CONDUCT
 	force = 6
 	throw_speed = 2
 	throw_range = 9
-	flags_equip_slot = ITEM_SLOT_BELT
+	equip_slot_flags = ITEM_SLOT_BELT
 	/// This is the cell we ar charging
 	var/obj/item/cell/cell
 	///Are we currently recharging something.
@@ -499,13 +491,18 @@
 			return
 	balloon_alert(user, "Stops charging")
 
-
 /obj/item/tool/handheld_charger/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(!istype(I, /obj/item/cell))
 		return
-	if(I.w_class > WEIGHT_CLASS_NORMAL)
+	var/obj/item/cell/our_cell = I
+	if(!our_cell.rechargable)
+		balloon_alert(user, "Not rechargeable")
+		return
+	if(our_cell.w_class > WEIGHT_CLASS_NORMAL)
 		balloon_alert(user, "Too large")
 		return
 	if(!user.drop_held_item())
@@ -516,8 +513,8 @@
 		user.put_in_hands(cell)
 		cell = null
 
-	I.forceMove(src)
-	cell = I
+	our_cell.forceMove(src)
+	cell = our_cell
 	cell.update_icon()
 	balloon_alert(user, "Charge Remaining: [cell.charge]/[cell.maxcharge]")
 	playsound(user, 'sound/weapons/guns/interact/rifle_reload.ogg', 20, 1, 5)

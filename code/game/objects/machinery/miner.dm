@@ -14,6 +14,7 @@
 #define PLATINUM_CRATE_SELL_AMOUNT 300
 #define PHORON_DROPSHIP_BONUS_AMOUNT 15
 #define PLATINUM_DROPSHIP_BONUS_AMOUNT 30
+
 ///Resource generator that produces a certain material that can be repaired by marines and attacked by xenos, Intended as an objective for marines to play towards to get more req gear
 /obj/machinery/miner
 	name = "\improper Nanotrasen phoron Mining Well"
@@ -26,6 +27,7 @@
 	layer = ABOVE_MOB_LAYER
 	resistance_flags = RESIST_ALL | DROPSHIP_IMMUNE
 	allow_pass_flags = PASS_PROJECTILE|PASS_AIR
+	faction = FACTION_TERRAGOV
 	///How many sheets of material we have stored
 	var/stored_mineral = 0
 	///Current status of the miner
@@ -44,9 +46,6 @@
 	var/max_miner_integrity = 100
 	///What type of upgrade it has installed , used to change the icon of the miner.
 	var/miner_upgrade_type
-	///What faction secured that miner
-	var/faction = FACTION_TERRAGOV
-
 	var/obj/machinery/camera/miner/camera
 
 /obj/machinery/miner/damaged	//mapping and all that shebang
@@ -138,6 +137,8 @@
 
 /obj/machinery/miner/attackby(obj/item/I,mob/user,params)
 	. = ..()
+	if(.)
+		return
 	if(istype(I, /obj/item/minerupgrade))
 		var/obj/item/minerupgrade/upgrade = I
 		if(!(miner_status == MINER_RUNNING))
@@ -148,13 +149,14 @@
 /obj/machinery/miner/welder_act(mob/living/user, obj/item/I)
 	. = ..()
 	var/obj/item/tool/weldingtool/weldingtool = I
-	if((miner_status == MINER_RUNNING) && miner_upgrade_type)
-		if(!weldingtool.remove_fuel(2,user))
+	if(miner_status == MINER_RUNNING && miner_upgrade_type)
+		if(!weldingtool.remove_fuel(2, user))
 			to_chat(user, span_info("You need more welding fuel to complete this task!"))
 			return FALSE
 		to_chat(user, span_info("You begin uninstalling the [miner_upgrade_type] from the miner!"))
 		user.visible_message(span_notice("[user] begins dismantling the [miner_upgrade_type] from the miner."))
-		if(!do_after(user, 30 SECONDS, NONE, src, BUSY_ICON_BUILD))
+		var/fumbling_time = 30 SECONDS - 5 SECONDS * user.skills.getRating(SKILL_ENGINEER)
+		if(!do_after(user, fumbling_time, NONE, src, BUSY_ICON_BUILD, extra_checks = CALLBACK(weldingtool, /obj/item/tool/weldingtool/proc/isOn)))
 			return FALSE
 		user.visible_message(span_notice("[user] dismantles the [miner_upgrade_type] from the miner!"))
 		var/obj/item/upgrade
@@ -184,13 +186,13 @@
 		user.visible_message(span_notice("[user] fumbles around figuring out [src]'s internals."),
 		span_notice("You fumble around figuring out [src]'s internals."))
 		var/fumbling_time = 10 SECONDS - 2 SECONDS * user.skills.getRating(SKILL_ENGINEER)
-		if(!do_after(user, fumbling_time, NONE, src, BUSY_ICON_UNSKILLED, extra_checks = CALLBACK(weldingtool, /obj/item/tool/weldingtool/proc/isOn)))
+		if(!do_after(user, fumbling_time, NONE, src, BUSY_ICON_UNSKILLED, extra_checks = CALLBACK(weldingtool, TYPE_PROC_REF(/obj/item/tool/weldingtool, isOn))))
 			return FALSE
 	playsound(loc, 'sound/items/weldingtool_weld.ogg', 25)
 	user.visible_message(span_notice("[user] starts welding [src]'s internal damage."),
 	span_notice("You start welding [src]'s internal damage."))
 	add_overlay(GLOB.welding_sparks)
-	if(!do_after(user, 200, NONE, src, BUSY_ICON_BUILD, extra_checks = CALLBACK(weldingtool, /obj/item/tool/weldingtool/proc/isOn)))
+	if(!do_after(user, 200, NONE, src, BUSY_ICON_BUILD, extra_checks = CALLBACK(weldingtool, TYPE_PROC_REF(/obj/item/tool/weldingtool, isOn))))
 		cut_overlay(GLOB.welding_sparks)
 		return FALSE
 	if(miner_status != MINER_DESTROYED )
@@ -257,7 +259,7 @@
 
 /obj/machinery/miner/examine(mob/user)
 	. = ..()
-	if(!ishuman(user))
+	if(!ishuman(user) && !isobserver(user))
 		return
 	if(!miner_upgrade_type)
 		. += span_info("[src]'s module sockets seem empty, an upgrade could be installed.")
@@ -342,9 +344,20 @@
 		playsound(loc, SFX_ALIEN_CLAW_METAL, 25, TRUE)
 		miner_integrity -= 25
 		set_miner_status()
-		if(miner_status == MINER_DESTROYED && xeno_attacker.client)
-			var/datum/personal_statistics/personal_statistics = GLOB.personal_statistics_list[xeno_attacker.ckey]
-			personal_statistics.miner_sabotages_performed++
+		if(miner_status == MINER_DESTROYED)
+			if(miner_upgrade_type)
+				switch(miner_upgrade_type)
+					if(MINER_RESISTANT)
+						max_miner_integrity = initial(max_miner_integrity)
+					if(MINER_OVERCLOCKED)
+						required_ticks = initial(required_ticks)
+				xeno_attacker.visible_message(span_danger("[xeno_attacker] destroys \the [miner_upgrade_type] upgrade in the process!"), \
+				span_danger("We destroy \the [miner_upgrade_type] upgrade in the process!"), null, 5)
+				miner_upgrade_type = null
+				update_icon()
+			if(xeno_attacker.client)
+				var/datum/personal_statistics/personal_statistics = GLOB.personal_statistics_list[xeno_attacker.ckey]
+				personal_statistics.miner_sabotages_performed++
 
 /obj/machinery/miner/proc/set_miner_status()
 	var/health_percent = round((miner_integrity / max_miner_integrity) * 100)

@@ -38,8 +38,6 @@
 		creator.tunnels -= src
 	creator = null
 
-	for(var/datum/atom_hud/xeno_tactical/xeno_tac_hud in GLOB.huds) //HUD clean up
-		xeno_tac_hud.remove_from_hud(src)
 	SSminimaps.remove_marker(src)
 
 	return ..()
@@ -58,7 +56,7 @@
 	if(tunnel_desc)
 		. += span_info("The Hivelord scent reads: \'[tunnel_desc]\'")
 
-/obj/structure/xeno/tunnel/deconstruct(disassembled = TRUE)
+/obj/structure/xeno/tunnel/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	visible_message(span_danger("[src] suddenly collapses!") )
 	return ..()
 
@@ -85,7 +83,7 @@
 		balloon_alert(xeno_attacker, "No exit tunnel")
 		return FALSE
 
-	if(isrightclick && SSticker.mode?.flags_round_type & MODE_XENO_DEN && (z == 6 || z == 2))
+	if(isrightclick && SSticker.mode?.round_type_flags & MODE_XENO_DEN && (z == 6 || z == 2))
 		pick_a_tunnel(xeno_attacker, z == 6 ? 2 : 6) //hardcoded
 		return
 

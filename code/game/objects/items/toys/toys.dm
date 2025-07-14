@@ -1,6 +1,6 @@
 /obj/item/toy
 	icon = 'icons/obj/items/toy.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/toys_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/toys_right.dmi',
 	)
@@ -20,7 +20,7 @@
 	name = "water balloon"
 	desc = "A translucent balloon. There's nothing in it."
 	icon_state = "waterballoon-e"
-	item_state = "balloon-empty"
+	worn_icon_state = "balloon-empty"
 
 /obj/item/toy/balloon/Initialize(mapload)
 	. = ..()
@@ -42,6 +42,8 @@
 
 /obj/item/toy/balloon/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/reagent_containers/glass))
 		if(!I.reagents)
@@ -78,10 +80,10 @@
 	. = ..()
 	if(reagents.total_volume)
 		icon_state = "waterballoon"
-		item_state = "balloon"
+		worn_icon_state = "balloon"
 	else
 		icon_state = "waterballoon-e"
-		item_state = "balloon-empty"
+		worn_icon_state = "balloon-empty"
 
 /obj/item/toy/syndicateballoon
 	name = "syndicate balloon"
@@ -91,7 +93,7 @@
 	force = 0
 	icon = 'icons/obj/items/weapons.dmi'
 	icon_state = "syndballoon"
-	item_state = "syndballoon"
+	worn_icon_state = "syndballoon"
 	w_class = WEIGHT_CLASS_BULKY
 
 /*
@@ -102,11 +104,11 @@
 	desc = "Blink.  Blink.  Blink. Ages 8 and up."
 	icon = 'icons/obj/items/radio.dmi'
 	icon_state = "beacon"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/tools_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/tools_right.dmi',
 	)
-	item_state = "signaler"
+	worn_icon_state = "signaler"
 
 /*
 * Fake singularity
@@ -120,19 +122,22 @@
 /*
 * Crayons
 */
-
 /obj/item/toy/crayon
 	name = "crayon"
 	desc = "A colourful crayon. Please refrain from eating it or putting it in your nose."
 	icon = 'icons/obj/items/crayons.dmi'
 	icon_state = "crayonred"
 	w_class = WEIGHT_CLASS_TINY
-	attack_verb = list("attacked", "coloured")
-	var/colour = "#FF0000" //RGB
-	var/shadeColour = "#220000" //RGB
-	var/uses = 30 //0 for unlimited uses
+	attack_verb = list("attacks", "colours")
+	///RGB
+	var/colour = "#FF0000"
+	///RGB
+	var/shadeColour = "#220000"
+	///0 for unlimited uses
+	var/uses = 30
 	var/instant = 0
-	var/colourName = "red" //for updateIcon purposes
+	///for updateIcon purposes
+	var/colourName = "red"
 
 /*
 * Snap pops
@@ -187,7 +192,7 @@
 	desc = "A seemingly innocent sunflower...with a twist."
 	icon = 'icons/obj/items/harvest.dmi'
 	icon_state = "sunflower"
-	item_state = "sunflower"
+	worn_icon_state = "sunflower"
 	var/empty = 0
 	flags
 
@@ -331,21 +336,21 @@
 	name = "inflatable duck"
 	desc = "No bother to sink or swim when you can just float!"
 	icon_state = "inflatable"
-	item_state = "inflatable"
+	worn_icon_state = "inflatable"
 	icon = 'icons/obj/clothing/belts.dmi'
-	flags_equip_slot = ITEM_SLOT_BELT
+	equip_slot_flags = ITEM_SLOT_BELT
 
 /obj/item/toy/beach_ball
 	name = "beach ball"
 	icon_state = "beachball"
-	item_state = "beachball"
+	worn_icon_state = "beachball"
 	density = FALSE
 	anchored = FALSE
 	w_class = WEIGHT_CLASS_SMALL
 	throw_speed = 1
 	throw_range = 20
 
-/obj/item/toy/beach_ball/afterattack(atom/target as mob|obj|turf|area, mob/user as mob)
+/obj/item/toy/beach_ball/afterattack(atom/target, mob/user)
 	user.drop_held_item()
 	throw_at(target, throw_range, throw_speed, user)
 
@@ -356,7 +361,7 @@
 	icon_state = "d66"
 	w_class = WEIGHT_CLASS_TINY
 	var/sides = 6
-	attack_verb = list("diced")
+	attack_verb = list("dices")
 
 /obj/item/toy/dice/Initialize(mapload)
 	. = ..()
@@ -376,7 +381,7 @@
 	else if(sides == 20 && result == 1)
 		comment = "Ouch, bad luck."
 	icon_state = "[name][result]"
-	user.visible_message(span_notice("[user] has thrown [src]. It lands on [result]. [comment]"), \
+	user.visible_message(span_notice("[user] throws [src]. It lands on [result]. [comment]"), \
 						span_notice("You throw [src]. It lands on a [result]. [comment]"), \
 						span_notice("You hear [src] landing on a [result]. [comment]"))
 
@@ -385,12 +390,12 @@
 	desc = "A horn off of a bicycle."
 	icon = 'icons/obj/items/items.dmi'
 	icon_state = "bike_horn"
-	item_state = "bike_horn"
+	worn_icon_state = "bike_horn"
 	throwforce = 3
 	w_class = WEIGHT_CLASS_TINY
 	throw_speed = 3
 	throw_range = 15
-	attack_verb = list("HONKED")
+	attack_verb = list("HONKS")
 
 /obj/item/toy/bikehorn/Initialize(mapload)
 	. = ..()
@@ -402,8 +407,12 @@
 	w_class = WEIGHT_CLASS_TINY
 	icon_state = "debug"
 	attack_verb = list("thumps", "whomps", "bumps")
+	/// What was the last time we touch it?
 	var/last_hug_time
+	/// What sound should we play as squeak?
 	var/squeak_sound = 'sound/items/dollsqueak.ogg'
+	/// How loud is the squeak?
+	var/squeak_volume = 50
 
 /obj/item/toy/plush/attack_self(mob/user)
 	if(world.time > last_hug_time)
@@ -414,97 +423,111 @@
 
 /obj/item/toy/plush/Initialize(mapload)
 	. = ..()
-	AddComponent(/datum/component/squeak, squeak_sound, 50)
+	AddComponent(/datum/component/squeak, squeak_sound, squeak_volume)
 
 /obj/item/toy/plush/farwa
 	name = "Farwa plush doll"
 	desc = "A Farwa plush doll. It's soft and comforting!"
-	w_class = WEIGHT_CLASS_TINY
 	icon_state = "farwaplush"
 
 /obj/item/toy/plush/therapy_red
 	name = "red therapy doll"
 	desc = "A toy for therapeutic and recreational purposes. This one is red."
 	icon_state = "therapyred"
-	w_class = WEIGHT_CLASS_TINY
 
 /obj/item/toy/plush/therapy_purple
 	name = "purple therapy doll"
 	desc = "A toy for therapeutic and recreational purposes. This one is purple."
 	icon_state = "therapypurple"
-	w_class = WEIGHT_CLASS_TINY
 
 /obj/item/toy/plush/therapy_blue
 	name = "blue therapy doll"
 	desc = "A toy for therapeutic and recreational purposes. This one is blue."
 	icon_state = "therapyblue"
-	w_class = WEIGHT_CLASS_TINY
 
 /obj/item/toy/plush/therapy_yellow
 	name = "yellow therapy doll"
 	desc = "A toy for therapeutic and recreational purposes. This one is yellow."
 	icon_state = "therapyyellow"
-	w_class = WEIGHT_CLASS_TINY
 
 /obj/item/toy/plush/therapy_orange
 	name = "orange therapy doll"
 	desc = "A toy for therapeutic and recreational purposes. This one is orange."
 	icon_state = "therapyorange"
-	w_class = WEIGHT_CLASS_TINY
-
+	
 /obj/item/toy/plush/therapy_green
 	name = "green therapy doll"
 	desc = "A toy for therapeutic and recreational purposes. This one is green."
 	icon_state = "therapygreen"
-	w_class = WEIGHT_CLASS_TINY
 
 /obj/item/toy/plush/carp
 	name = "carp plushie"
 	desc = "An adorable stuffed toy that resembles a carp."
 	icon_state = "carpplush"
-	item_state = "carp_plushie"
+	worn_icon_state = "carp_plushie"
 	attack_verb = list("bites", "eats", "fin slaps")
 
 /obj/item/toy/plush/lizard
 	name = "lizard plushie"
 	desc = "An adorable stuffed toy that resembles a lizard."
 	icon_state = "lizplush"
-	item_state = "lizplush"
+	worn_icon_state = "lizplush"
 	attack_verb = list("claws", "hisses", "tail slaps")
 
 /obj/item/toy/plush/snake
 	name = "snake plushie"
 	desc = "An adorable stuffed toy that resembles a snake. Not to be mistaken for the real thing."
 	icon_state = "snakeplush"
-	item_state = "snakeplush"
+	worn_icon_state = "snakeplush"
 	attack_verb = list("bites", "hisses", "tail slaps")
 
 /obj/item/toy/plush/slime
 	name = "slime plushie"
 	desc = "An adorable stuffed toy that resembles a slime. It is practically just a hacky sack."
 	icon_state = "slimeplush"
-	item_state = "slimeplush"
+	worn_icon_state = "slimeplush"
 	attack_verb = list("blorbles", "slimes", "absorbs")
 
 /obj/item/toy/plush/moth
 	name = "moth plushie"
 	desc = "A plushie depicting an adorable mothperson. It's a huggable bug!"
 	icon_state = "moffplush"
-	item_state = "moffplush"
+	worn_icon_state = "moffplush"
 	attack_verb = list("flutters", "flaps")
 
 /obj/item/toy/plush/rouny
 	name = "rouny plushie"
 	desc = "A plushie depicting a rouny, made to commemorate the centenary of the battle of LV-426. Much cuddlier and soft than the real thing."
 	icon_state = "rounyplush"
-	item_state = "rounyplush"
+	worn_icon_state = "rounyplush"
 	attack_verb = list("slashes", "bites", "pounces")
+
+/obj/item/toy/plush/witch
+	name = "witch plushie"
+	desc = "A plushie depicting an adorable witch. It likes to steal books."
+	icon_state = "marisa"
+	worn_icon_state = "marisa"
+
+/obj/item/toy/plush/fairy
+	name = "fairy plushie"
+	desc = "A plushie depicting an adorable fairy. It's cold to the touch."
+	icon_state = "cirno"
+	worn_icon_state = "cirno"
+
+/obj/item/toy/plush/royalqueen
+	name = "royal queen plushie"
+	desc = "A plushie depicting a royal xenomorph queen. Smells faintly of stardust and baguettes, with a tag that has Wee! written on it."
+	icon_state = "queenplushie"
+	worn_icon_state = "queenplushie"
+	attack_verb = list("nuzzles", "bops", "pats")
+	squeak_sound = 'sound/items/wee.ogg'
+	squeak_volume = 20
 
 /obj/item/toy/plush/gnome
 	name = "gnome"
 	desc = "A mythological creature that guarded Terra's garden. You wonder why it is here."
 	icon_state = "gnome"
-	item_state = "gnome"
+	worn_icon_state = "gnome"
 	attack_verb = list("kickes", "punches", "pounces")
 	squeak_sound = 'sound/items/gnome.ogg'
 
@@ -512,7 +535,7 @@
 	name = "pig toy"
 	desc = "Captain Dementy! Bring the pigs! Marines demand pigs!."
 	icon_state = "pig"
-	item_state = "pig"
+	worn_icon_state = "pig"
 	attack_verb = list("oinks", "grunts")
 	squeak_sound = 'sound/items/khryu.ogg'
 
@@ -526,7 +549,7 @@
 /obj/item/toy/beach_ball/basketball
 	name = "basketball"
 	icon_state = "basketball"
-	item_state = "basketball"
+	worn_icon_state = "basketball"
 	desc = "Here's your chance, do your dance at the Space Jam."
 	w_class = WEIGHT_CLASS_BULKY
 
@@ -537,37 +560,40 @@
 	icon_state = "hoop"
 	anchored = TRUE
 	density = TRUE
+	resistance_flags = XENO_DAMAGEABLE
 	var/side = ""
 	var/id = ""
 
+/obj/structure/hoop/grab_interact(obj/item/grab/grab, mob/user, base_damage = BASE_OBJ_SLAM_DAMAGE, is_sharp = FALSE)
+	. = ..()
+	if(.)
+		return
+	if(!isliving(grab.grabbed_thing))
+		return
+	if(user.a_intent == INTENT_HARM)
+		return
+	var/mob/living/grabbed_mob = grab.grabbed_thing
+	if(user.grab_state <= GRAB_AGGRESSIVE)
+		to_chat(user, span_warning("You need a better grip to do that!"))
+		return
+	grabbed_mob.forceMove(loc)
+	grabbed_mob.Paralyze(4 SECONDS)
+	for(var/obj/machinery/scoreboard/X in GLOB.machines)
+		if(X.id == id)
+			X.score(side, 3)// 3 points for dunking a mob
+	visible_message(span_danger("[user] dunks [grabbed_mob] into the [src]!"))
 
 /obj/structure/hoop/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
-	if(istype(I, /obj/item/grab) && get_dist(src, user) <= 1)
-		var/obj/item/grab/G = I
-		if(!isliving(G.grabbed_thing))
-			return
-
-		var/mob/living/L = G.grabbed_thing
-		if(user.grab_state < GRAB_AGGRESSIVE)
-			to_chat(user, span_warning("You need a better grip to do that!"))
-			return
-		L.forceMove(loc)
-		L.Paralyze(10 SECONDS)
-		for(var/obj/machinery/scoreboard/X in GLOB.machines)
-			if(X.id == id)
-				X.score(side, 3)// 3 points for dunking a mob
-				// no break, to update multiple scoreboards
-		visible_message(span_danger("[user] dunks [L] into the [src]!"))
-
-	else if(get_dist(src, user) < 2)
+	if(get_dist(src, user) < 2)
 		user.transferItemToLoc(I, loc)
 		for(var/obj/machinery/scoreboard/X in GLOB.machines)
 			if(X.id == id)
 				X.score(side)
 		visible_message(span_notice("[user] dunks [I] into the [src]!"))
-
 
 /obj/structure/hoop/CanAllowThrough(atom/movable/mover, turf/target)
 	if(istype(mover,/obj/item) && mover.throwing)
@@ -578,9 +604,8 @@
 				if(X.id == id)
 					X.score(side)
 					// no break, to update multiple scoreboards
-			visible_message(span_notice(" Swish! \the [I] lands in \the [src]."), 3)
-		else
-			visible_message(span_warning(" \the [I] bounces off of \the [src]'s rim!"), 3)
+			visible_message(span_notice("Swish! \the [I] lands in \the [src]."), 3)
+			return TRUE
+		visible_message(span_warning("\the [I] bounces off of \the [src]'s rim!"), 3)
 		return FALSE
-	else
-		return ..()
+	return ..()

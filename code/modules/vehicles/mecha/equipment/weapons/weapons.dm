@@ -3,7 +3,6 @@
 	range = MECHA_RANGED
 	equipment_slot = MECHA_WEAPON
 	destroy_sound = 'sound/mecha/weapdestr.ogg'
-	mech_flags = EXOSUIT_MODULE_COMBAT
 	/// ammo datum/object typepath
 	var/datum/ammo/ammotype
 	///sound file to play when this weapon you know, fires
@@ -142,8 +141,8 @@
 ///does any effects and changes to the projectile when it is fired
 /obj/item/mecha_parts/mecha_equipment/weapon/proc/apply_weapon_modifiers(obj/projectile/projectile_to_fire, mob/firer)
 	projectile_to_fire.shot_from = src
-	if(istype(chassis, /obj/vehicle/sealed/mecha/combat/greyscale))
-		var/obj/vehicle/sealed/mecha/combat/greyscale/grey = chassis
+	if(istype(chassis, /obj/vehicle/sealed/mecha/greyscale))
+		var/obj/vehicle/sealed/mecha/greyscale/grey = chassis
 		var/datum/mech_limb/head/head = grey.limbs[MECH_GREY_HEAD]
 		if(head)
 			projectile_to_fire.accuracy *= head.accuracy_mod //todo: we can probably just make the accuracy_mod apply directly to the gun like attachments do
@@ -153,7 +152,7 @@
 	var/mob/living/living_firer = firer
 	if(living_firer.has_status_effect(STATUS_EFFECT_STAGGER))
 		projectile_to_fire.damage *= STAGGER_DAMAGE_MULTIPLIER
-	if((projectile_to_fire.ammo.flags_ammo_behavior & AMMO_IFF) && ishuman(firer))
+	if((projectile_to_fire.ammo.ammo_behavior_flags & AMMO_IFF) && ishuman(firer))
 		var/mob/living/carbon/human/human_firer = firer
 		var/obj/item/card/id/id = human_firer.get_idcard()
 		projectile_to_fire.iff_signal = id?.iff_signal
@@ -168,14 +167,14 @@
 	if(dir_target_diff > (MECH_FIRE_CONE_ALLOWED * 0.5))
 		return AUTOFIRE_CONTINUE
 
-	var/type_to_spawn = CHECK_BITFIELD(initial(ammotype.flags_ammo_behavior), AMMO_HITSCAN) ? /obj/projectile/hitscan : /obj/projectile
+	var/type_to_spawn = CHECK_BITFIELD(initial(ammotype.ammo_behavior_flags), AMMO_HITSCAN) ? /obj/projectile/hitscan : /obj/projectile
 	var/obj/projectile/projectile_to_fire = new type_to_spawn(get_turf(src), initial(ammotype.hitscan_effect_icon))
 	projectile_to_fire.generate_bullet(GLOB.ammo_list[ammotype])
 
 	apply_weapon_modifiers(projectile_to_fire, current_firer)
 	var/proj_scatter = variance
-	if(istype(chassis, /obj/vehicle/sealed/mecha/combat/greyscale))
-		var/obj/vehicle/sealed/mecha/combat/greyscale/grey = chassis
+	if(istype(chassis, /obj/vehicle/sealed/mecha/greyscale))
+		var/obj/vehicle/sealed/mecha/greyscale/grey = chassis
 		var/datum/mech_limb/arm/holding
 		if(grey.equip_by_category[MECHA_R_ARM] == src)
 			holding = grey.limbs[MECH_GREY_R_ARM]
@@ -280,11 +279,16 @@
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
 	if(action == "reload")
-		var/mob/occupant = usr
-		if(occupant && !do_after(occupant, rearm_time, IGNORE_HELD_ITEM, chassis, BUSY_ICON_GENERIC))
-			return FALSE
-		rearm()
-		return TRUE
+		return attempt_rearm(usr)
+
+/obj/item/mecha_parts/mecha_equipment/weapon/ballistic/attempt_rearm(mob/living/user)
+	if(!needs_rearm())
+		return FALSE
+	if(!projectiles_cache)
+		return FALSE
+	if(user && !do_after(user, rearm_time, IGNORE_HELD_ITEM, chassis, BUSY_ICON_GENERIC))
+		return FALSE
+	return rearm()
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/rearm()
 	if(projectiles >= initial(projectiles))
@@ -304,7 +308,7 @@
 	return TRUE
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/needs_rearm()
-	return projectiles <= 0
+	return projectiles < initial(projectiles)
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/fire()
 	. = ..()
@@ -316,11 +320,7 @@
 	if(projectiles > 0)
 		return
 	playsound(src, 'sound/weapons/guns/misc/empty_alarm.ogg', 25, 1)
-	if(LAZYACCESS(current_firer.do_actions, src) || projectiles_cache < 1)
-		return
-	if(!do_after(current_firer, rearm_time, IGNORE_HELD_ITEM, chassis, BUSY_ICON_GENERIC))
-		return
-	rearm()
+	attempt_rearm(current_firer)
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/carbine
 	name = "\improper FNX-99 \"Hades\" Carbine"
@@ -331,7 +331,6 @@
 	projectiles = 24
 	projectiles_cache = 24
 	projectiles_cache_max = 96
-	harmful = TRUE
 	ammo_type = MECHA_AMMO_INCENDIARY
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/scattershot
@@ -344,7 +343,6 @@
 	projectiles_cache = 40
 	projectiles_cache_max = 160
 	variance = 25
-	harmful = TRUE
 	ammo_type = MECHA_AMMO_BUCKSHOT
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/lmg
@@ -358,7 +356,6 @@
 	projectiles_cache_max = 1200
 	variance = 6
 	projectile_delay = 2
-	harmful = TRUE
 	ammo_type = MECHA_AMMO_LMG
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/missile_rack
@@ -372,7 +369,6 @@
 	projectiles_cache_max = 0
 	disabledreload = TRUE
 	equip_cooldown = 60
-	harmful = TRUE
 	ammo_type = MECHA_AMMO_MISSILE_HE
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/missile_rack/breaching
@@ -386,9 +382,7 @@
 	projectiles_cache_max = 0
 	disabledreload = TRUE
 	equip_cooldown = 60
-	harmful = TRUE
 	ammo_type = MECHA_AMMO_MISSILE_AP
-
 
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/launcher
 	var/missile_speed = 2

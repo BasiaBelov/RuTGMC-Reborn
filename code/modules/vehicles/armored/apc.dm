@@ -5,8 +5,8 @@
 	icon_state = "apc"
 	damage_icon_path = 'icons/obj/armored/3x3/apc_damage_overlay.dmi'
 	interior = /datum/interior/armored/transport
-	flags_armored = ARMORED_HAS_HEADLIGHTS|ARMORED_PURCHASABLE_TRANSPORT
-	permitted_weapons = list(/obj/item/armored_weapon/secondary_weapon)
+	armored_flags = ARMORED_HAS_HEADLIGHTS|ARMORED_PURCHASABLE_TRANSPORT
+	permitted_weapons = list(/obj/item/armored_weapon/secondary_weapon, /obj/item/armored_weapon/secondary_flamer, /obj/item/armored_weapon/tow, /obj/item/armored_weapon/microrocket_pod)
 	permitted_mods = list(/obj/item/tank_module/overdrive, /obj/item/tank_module/ability/zoom, /obj/item/tank_module/interior/medical, /obj/item/tank_module/interior/clone_bay)
 	required_entry_skill = SKILL_LARGE_VEHICLE_DEFAULT
 	minimap_icon_state = "apc"
@@ -16,6 +16,7 @@
 	max_integrity = 600
 	soft_armor = list(MELEE = 60, BULLET = 99 , LASER = 99, ENERGY = 60, BOMB = 60, BIO = 60, FIRE = 40, ACID = 40)
 	max_occupants = 20 //Clown car? Clown car.
+	enter_delay = 0.5 SECONDS
 	ram_damage = 25
 	move_delay = 0.5 SECONDS
 	easy_load_list = list(

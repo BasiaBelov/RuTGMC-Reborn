@@ -1,19 +1,18 @@
 /mob/living/silicon/ai/examine(mob/user)
 	SHOULD_CALL_PARENT(FALSE) // TODO ai and human examine dont send examine signal
 	var/msg = "<span class='info'><br>"
-	msg += "This is [icon2html(src, user)] <b>[src]</b>!<br>"
 
 	if(stat == DEAD)
 		msg += "[span_deadsay("It appears to be powered-down.")]<br>"
 	else
 		msg += "<span class='warning'>"
-		if(getBruteLoss())
-			if(getBruteLoss() < 30)
+		if(get_brute_loss())
+			if(get_brute_loss() < 30)
 				msg += "It looks slightly dented.<br>"
 			else
 				msg += "<B>It looks severely dented!</B><br>"
-		if(getFireLoss())
-			if(getFireLoss() < 30)
+		if(get_fire_loss())
+			if(get_fire_loss() < 30)
 				msg += "It looks slightly charred.<br>"
 			else
 				msg += "<B>Its casing is melted and heat-warped!</B><br>"
@@ -29,7 +28,3 @@
 	msg += "</span>"
 
 	return list(msg)
-
-/mob/living/silicon/ai/get_examine_string(mob/user, thats)
-	return null
-

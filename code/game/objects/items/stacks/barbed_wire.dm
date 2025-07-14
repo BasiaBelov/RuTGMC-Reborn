@@ -1,17 +1,15 @@
-
 /obj/item/stack/barbed_wire
 	name = "barbed wire"
 	desc = "A spiky length of wire."
-	icon = 'icons/Marine/marine-items.dmi'
 	icon_state = "barbed_wire"
-	flags_item = NOBLUDGEON
+	item_flags = NOBLUDGEON
 	singular_name = "length"
 	w_class = WEIGHT_CLASS_SMALL
 	force = 0
 	throwforce = 5
 	throw_speed = 5
 	throw_range = 20
-	attack_verb = list("hit", "whacked", "sliced")
+	attack_verb = list("hits", "whacks", "slices")
 	max_amount = 20
 	merge_type = /obj/item/stack/barbed_wire
 
@@ -29,6 +27,8 @@
 
 /obj/item/stack/barbed_wire/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(!istype(I, /obj/item/stack/rods))
 		return
@@ -56,11 +56,10 @@
 	force = 15
 	throwforce = 10
 	throw_range = 5
-	attack_verb = list("hit", "whacked", "sliced")
+	attack_verb = list("hits", "whacks", "slices")
 	singular_name = "bundle"
 	max_amount = 10
 	merge_type = /obj/item/stack/razorwire
-
 
 //small stack
 /obj/item/stack/razorwire/small_stack

@@ -3,14 +3,13 @@
 	plane = FLOOR_PLANE
 	use_power = NO_POWER_USE
 	can_unwrench = FALSE
-	flags_atom = SHUTTLE_IMMUNE
-	var/datum/pipeline/parent = null
-
+	atom_flags = SHUTTLE_IMMUNE
 	buckle_lying = -1
+	var/datum/pipeline/parent = null
 
 /obj/machinery/atmospherics/pipe/New()
 	. = ..()
-	add_atom_colour(pipe_color, FIXED_COLOUR_PRIORITY)
+	add_atom_colour(pipe_color, FIXED_COLOR_PRIORITY)
 
 /obj/machinery/atmospherics/pipe/Initialize(mapload)
 	. = ..()
@@ -18,7 +17,7 @@
 
 /obj/machinery/atmospherics/pipe/nullifyNode(i)
 	var/obj/machinery/atmospherics/oldN = nodes[i]
-	..()
+	. = ..()
 	if(oldN)
 		oldN.build_network()
 
@@ -33,7 +32,7 @@
 /obj/machinery/atmospherics/pipe/atmosinit()
 	var/turf/T = loc			// hide if turf is not intact
 	hide(T.intact_tile)
-	..()
+	return ..()
 
 /obj/machinery/atmospherics/pipe/hide(i)
 	if(level == 1 && isturf(loc))
@@ -42,6 +41,8 @@
 
 /obj/machinery/atmospherics/pipe/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(istype(I, /obj/item/pipe_meter))
 		var/obj/item/pipe_meter/meter = I
 		user.dropItemToGround(meter)
@@ -68,7 +69,7 @@
 	update_alpha()
 
 /obj/machinery/atmospherics/pipe/proc/update_alpha()
-	alpha = invisibility ? 64 : 255
+	alpha = 255
 
 /obj/machinery/atmospherics/pipe/proc/update_node_icon()
 	for(var/i in 1 to device_type)
@@ -79,9 +80,8 @@
 /obj/machinery/atmospherics/pipe/returnPipenets()
 	. = list(parent)
 
-
 /obj/machinery/atmospherics/pipe/proc/paint(paint_color)
-	add_atom_colour(paint_color, FIXED_COLOUR_PRIORITY)
+	add_atom_colour(paint_color, FIXED_COLOR_PRIORITY)
 	pipe_color = paint_color
 	update_node_icon()
 	return TRUE

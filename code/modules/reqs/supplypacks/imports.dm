@@ -112,11 +112,6 @@
 	contains = list(/obj/item/ammo_magazine/smg/ppsh/extended)
 	cost = 3
 
-/datum/supply_packs/imports/sawnoff
-	name = "Sawn Off Shotgun"
-	contains = list(/obj/item/weapon/gun/shotgun/double/sawn)
-	cost = 150
-
 /datum/supply_packs/imports/leveraction
 	name = "Lever Action Rifle"
 	contains = list(/obj/item/weapon/gun/shotgun/pump/lever)
@@ -308,7 +303,7 @@
 	cost = 500
 
 /datum/supply_packs/imports/loot_pack
-	name = "TGMC Loot Pack"
+	name = "TGMC loot pack"
 	notes = "Contains a random, but curated set of items, these packs are valued around 150 to 200 points. Some items can only be acquired from these. Spend responsibly."
 	contains = list(/obj/item/loot_box/tgmclootbox)
 	cost = 1000

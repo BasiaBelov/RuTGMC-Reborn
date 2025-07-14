@@ -4,7 +4,7 @@
 
 /obj/item/weapon/yautja
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_back_str = 'icons/mob/hunter/pred_gear.dmi',
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi',
@@ -43,10 +43,10 @@
 	name = "chainwhip"
 	desc = "A segmented, lightweight whip made of durable, acid-resistant metal. Not very common among Yautja Hunters, but still a dangerous weapon capable of shredding prey."
 	icon_state = "whip"
-	item_state = "whip"
-	flags_atom = CONDUCT
-	flags_item = ITEM_PREDATOR
-	flags_equip_slot = ITEM_SLOT_BELT
+	worn_icon_state = "whip"
+	atom_flags = CONDUCT
+	item_flags = ITEM_PREDATOR
+	equip_slot_flags = ITEM_SLOT_BELT
 	w_class = WEIGHT_CLASS_BULKY
 	resistance_flags = UNACIDABLE
 	force = 37
@@ -70,9 +70,9 @@
 	name = "clan sword"
 	desc = "An expertly crafted Yautja blade carried by hunters who wish to fight up close. Razor sharp and capable of cutting flesh into ribbons. Commonly carried by aggressive and lethal hunters."
 	icon_state = "clansword"
-	flags_atom = CONDUCT
-	flags_item = ITEM_PREDATOR
-	flags_equip_slot = ITEM_SLOT_BACK
+	atom_flags = CONDUCT
+	item_flags = ITEM_PREDATOR
+	equip_slot_flags = ITEM_SLOT_BACK
 	force = 40
 	throwforce = 25
 	penetration = 20
@@ -96,10 +96,10 @@
 	name = "dual war scythe"
 	desc = "A huge, incredibly sharp dual blade used for hunting dangerous prey. This weapon is commonly carried by Yautja who wish to disable and slice apart their foes."
 	icon_state = "predscythe"
-	item_state = "scythe_dual"
-	flags_atom = CONDUCT
-	flags_item = ITEM_PREDATOR
-	flags_equip_slot = ITEM_SLOT_BELT
+	worn_icon_state = "scythe_dual"
+	atom_flags = CONDUCT
+	item_flags = ITEM_PREDATOR
+	equip_slot_flags = ITEM_SLOT_BELT
 	force = 35
 	throwforce = 25
 	penetration = 20
@@ -115,7 +115,7 @@
 	ability_charge_rate = 1
 
 /obj/item/weapon/yautja/scythe/verb/use_unique_action()
-	set category = "Weapons"
+	set category = "IC.Weapons"
 	set name = "Unique Action"
 	set desc = "Activate or deactivate the scythe."
 	set src in usr
@@ -163,10 +163,10 @@
 		if(!line_of_sight(user, target))
 			continue
 
-		user.visible_message(span_highdanger("[user] slices open the guts of [target]!"), span_highdanger("You slice open the guts of [target]!"))
+		user.visible_message(span_userdanger("[user] slices open the guts of [target]!"), span_userdanger("You slice open the guts of [target]!"))
 		target.spawn_gibs()
 		playsound(get_turf(target), 'sound/effects/gibbed.ogg', 30, 1)
-		target.apply_effect(1, WEAKEN)
+		target.apply_effect(1, EFFECT_PARALYZE)
 		target.apply_damage(force * 3, BRUTE, "chest", MELEE, FALSE, FALSE, TRUE, 65)
 
 		log_attack("[key_name(target)] was sliced by [key_name(user)] whirling their scythe.")
@@ -181,16 +181,16 @@
 	name = "double war scythe"
 	desc = "A huge, incredibly sharp double blade used for hunting dangerous prey. This weapon is commonly carried by Yautja who wish to disable and slice apart their foes."
 	icon_state = "predscythe_alt"
-	item_state = "scythe_double"
+	worn_icon_state = "scythe_double"
 
 //Combistick
 /obj/item/weapon/yautja/combistick
 	name = "combi-stick"
 	desc = "A compact yet deadly personal weapon. Can be concealed when folded. Functions well as a throwing weapon or defensive tool. A common sight in Yautja packs due to its versatility."
 	icon_state = "combistick"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BACK
-	flags_item = TWOHANDED|ITEM_PREDATOR
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BACK
+	item_flags = TWOHANDED|ITEM_PREDATOR
 	w_class = WEIGHT_CLASS_HUGE
 	throw_speed = 10
 	throw_range = 4
@@ -259,7 +259,7 @@
 	unwield(handler) //Otherwise stays wielded even when thrown
 
 /obj/item/weapon/yautja/combistick/verb/use_unique_action()
-	set category = "Weapons"
+	set category = "IC.Weapons"
 	set name = "Unique Action"
 	set desc = "Activate or deactivate the combistick."
 	set src in usr
@@ -268,7 +268,7 @@
 /obj/item/weapon/yautja/combistick/attack_self(mob/user)
 	..()
 	if(on)
-		if(flags_item & WIELDED)
+		if(item_flags & WIELDED)
 			unwield(user)
 		else
 			wield(user)
@@ -292,12 +292,12 @@
 
 /obj/item/weapon/yautja/combistick/update_icon()
 	. = ..()
-	if(flags_item & WIELDED)
-		item_state = "combistick_w"
+	if(item_flags & WIELDED)
+		worn_icon_state = "combistick_w"
 	else if(!on)
-		item_state = "combistick_f"
+		worn_icon_state = "combistick_f"
 	else
-		item_state = "combistick"
+		worn_icon_state = "combistick"
 
 /obj/item/weapon/yautja/combistick/unique_action(mob/living/user)
 	if(user.get_active_held_item() != src)
@@ -308,8 +308,8 @@
 		"You hear blades extending.")
 		playsound(src,'sound/items/combistick_open.ogg', 50, TRUE, 3)
 		icon_state = initial(icon_state)
-		flags_equip_slot = initial(flags_equip_slot)
-		flags_item |= TWOHANDED
+		equip_slot_flags = initial(equip_slot_flags)
+		item_flags |= TWOHANDED
 		w_class = WEIGHT_CLASS_HUGE
 		force = force_unwielded
 		throwforce = throwforce_base
@@ -325,8 +325,8 @@
 		to_chat(user, span_notice("You collapse [src] for storage."))
 		playsound(src, 'sound/items/combistick_close.ogg', 50, TRUE, 3)
 		icon_state = initial(icon_state) + "_f"
-		flags_equip_slot = ITEM_SLOT_BACK
-		flags_item &= ~TWOHANDED
+		equip_slot_flags = ITEM_SLOT_BACK
+		item_flags &= ~TWOHANDED
 		w_class = WEIGHT_CLASS_TINY
 		force = force_storage
 		throwforce = throwforce_storage
@@ -388,10 +388,10 @@
 	name = "ceremonial dagger"
 	desc = "A viciously sharp dagger inscribed with ancient Yautja markings. Smells thickly of blood. Carried by some hunters."
 	icon_state = "predknife"
-	item_state = "knife"
-	flags_atom = CONDUCT
-	flags_item = ITEM_PREDATOR
-	flags_equip_slot = ITEM_SLOT_BACK
+	worn_icon_state = "knife"
+	atom_flags = CONDUCT
+	item_flags = ITEM_PREDATOR
+	equip_slot_flags = ITEM_SLOT_BACK
 	sharp = IS_SHARP_ITEM_ACCURATE
 	force = 20
 	penetration = 10
@@ -422,7 +422,7 @@
 		return TRUE
 
 	if(user.species.name == victim.species.name)
-		to_chat(user, span_highdanger("ARE YOU OUT OF YOUR MIND!?"))
+		to_chat(user, span_userdanger("ARE YOU OUT OF YOUR MIND!?"))
 		return
 
 	if(issynth(victim) || isrobot(victim) || victim.species.species_flags & ROBOTIC_LIMBS)

@@ -1,4 +1,3 @@
-
 ///Default override for echo
 /sound
 	echo = list(
@@ -78,7 +77,6 @@ A good representation is: 'byond applies a volume reduction to the sound every X
 			continue
 		listener.playsound_local(turf_source, soundin, vol, vary, frequency, falloff, is_global, channel, S)
 
-
 	//We do tanks separately, since they are not actually on the source z, and we need some other stuff to get accurate directional sound
 	for(var/obj/vehicle/sealed/armored/armor AS in GLOB.tank_list)
 		if(!armor.interior || armor.z != turf_source.z || get_dist(armor.loc, turf_source) > sound_range)
@@ -110,12 +108,9 @@ A good representation is: 'byond applies a volume reduction to the sound every X
  * * channel - Optional: Picks a random available channel if not set
  * * sound_to_use - Optional: Will default to soundin
  * * distance_multiplier - Affects x and z hearing
- * * sound_reciever - Defaults to src, the thing that is hearing this sound
  */
-/mob/proc/playsound_local(turf/turf_source, soundin, vol, vary, frequency, falloff, is_global, channel = 0, sound/sound_to_use, distance_multiplier = 1, mob/sound_reciever)
-	if(!sound_reciever)
-		sound_reciever = src
-	if(!sound_reciever.client)
+/mob/proc/playsound_local(turf/turf_source, soundin, vol, vary, frequency, falloff, is_global, channel = 0, sound/sound_to_use, distance_multiplier = 1)
+	if(!client)
 		return FALSE
 
 	if(!sound_to_use)
@@ -150,10 +145,9 @@ A good representation is: 'byond applies a volume reduction to the sound every X
 	if(!is_global)
 		sound_to_use.environment = SOUND_ENVIRONMENT_ROOM
 
-	SEND_SOUND(sound_reciever, sound_to_use)
+	SEND_SOUND(src, sound_to_use)
 
-
-/mob/living/playsound_local(turf/turf_source, soundin, vol, vary, frequency, falloff, is_global, channel = 0, sound/sound_to_use, distance_multiplier = 1, mob/sound_reciever)
+/mob/living/playsound_local(turf/turf_source, soundin, vol, vary, frequency, falloff, is_global, channel = 0, sound/sound_to_use, distance_multiplier = 1)
 	if(ear_deaf > 0)
 		return FALSE
 	return ..()
@@ -297,6 +291,8 @@ A good representation is: 'byond applies a volume reduction to the sound every X
 			soundin = pick('sound/weapons/guns/fire/fal1.ogg', 'sound/weapons/guns/fire/fal2.ogg')
 		if(SFX_MP38_FIRE)
 			soundin = pick('sound/weapons/guns/fire/mp38_1.ogg', 'sound/weapons/guns/fire/mp38_2.ogg')
+		if(SFX_SLAM)
+			soundin = pick('sound/effects/slam1.ogg', 'sound/effects/slam2.ogg', 'sound/effects/slam3.ogg')
 
 		// Xeno
 		if(SFX_ACID_HIT)
@@ -370,25 +366,25 @@ A good representation is: 'byond applies a volume reduction to the sound every X
 		if(SFX_FEMALE_GORED)
 			soundin = pick('sound/voice/human/female/gored_1.ogg','sound/voice/human/female/gored_2.ogg')
 		if(SFX_FEMALE_FRAGOUT)
-			soundin = pick("sound/voice/human/female/grenadethrow_1.ogg", 'sound/voice/human/female/grenadethrow_2.ogg', 'sound/voice/human/female/grenadethrow_3.ogg')
+			soundin = pick('sound/voice/human/female/grenadethrow_1.ogg', 'sound/voice/human/female/grenadethrow_2.ogg', 'sound/voice/human/female/grenadethrow_3.ogg')
 		if(SFX_FEMALE_WARCRY)
 			soundin = pick('sound/voice/human/female/warcry_1.ogg','sound/voice/human/female/warcry_2.ogg','sound/voice/human/female/warcry_3.ogg','sound/voice/human/female/warcry_4.ogg','sound/voice/human/female/warcry_5.ogg','sound/voice/human/female/warcry_6.ogg','sound/voice/human/female/warcry_7.ogg','sound/voice/human/female/warcry_8.ogg','sound/voice/human/female/warcry_9.ogg','sound/voice/human/female/warcry_10.ogg','sound/voice/human/female/warcry_11.ogg','sound/voice/human/female/warcry_12.ogg','sound/voice/human/female/warcry_13.ogg','sound/voice/human/female/warcry_14.ogg','sound/voice/human/female/warcry_15.ogg','sound/voice/human/female/warcry_16.ogg','sound/voice/human/female/warcry_17.ogg','sound/voice/human/female/warcry_18.ogg','sound/voice/human/female/warcry_19.ogg')
 		if(SFX_MALE_HUGGED)
-			soundin = pick("sound/voice/human/male/facehugged1.ogg", 'sound/voice/human/male/facehugged2.ogg', 'sound/voice/human/male/facehugged3.ogg')
+			soundin = pick('sound/voice/human/male/facehugged1.ogg', 'sound/voice/human/male/facehugged2.ogg', 'sound/voice/human/male/facehugged3.ogg')
 		if(SFX_FEMALE_HUGGED)
-			soundin = pick("sound/voice/human/female/facehugged1.ogg", 'sound/voice/human/female/facehugged2.ogg')
+			soundin = pick('sound/voice/human/female/facehugged1.ogg', 'sound/voice/human/female/facehugged2.ogg')
 		if(SFX_MALE_GASP)
-			soundin = pick("sound/voice/human/male/gasp1.ogg", 'sound/voice/human/male/gasp2.ogg', 'sound/voice/human/male/gasp3.ogg')
+			soundin = pick('sound/voice/human/male/gasp1.ogg', 'sound/voice/human/male/gasp2.ogg', 'sound/voice/human/male/gasp3.ogg')
 		if(SFX_FEMALE_GASP)
-			soundin = pick("sound/voice/human/female/gasp1.ogg", 'sound/voice/human/female/gasp2.ogg')
+			soundin = pick('sound/voice/human/female/gasp1.ogg', 'sound/voice/human/female/gasp2.ogg')
 		if(SFX_MALE_COUGH)
-			soundin = pick("sound/voice/human/male/cough1.ogg", 'sound/voice/human/male/cough2.ogg')
+			soundin = pick('sound/voice/human/male/cough1.ogg', 'sound/voice/human/male/cough2.ogg')
 		if(SFX_FEMALE_COUGH)
-			soundin = pick("sound/voice/human/female/cough1.ogg", 'sound/voice/human/female/cough2.ogg')
+			soundin = pick('sound/voice/human/female/cough1.ogg', 'sound/voice/human/female/cough2.ogg')
 		if(SFX_MALE_PREBURST)
-			soundin = pick("sound/voice/human/male/preburst1.ogg", 'sound/voice/human/male/preburst2.ogg', 'sound/voice/human/male/preburst3.ogg', 'sound/voice/human/male/preburst4.ogg', 'sound/voice/human/male/preburst5.ogg', 'sound/voice/human/male/preburst6.ogg', 'sound/voice/human/male/preburst7.ogg', 'sound/voice/human/male/preburst8.ogg', 'sound/voice/human/male/preburst9.ogg', 'sound/voice/human/male/preburst10.ogg')
+			soundin = pick('sound/voice/human/male/preburst1.ogg', 'sound/voice/human/male/preburst2.ogg', 'sound/voice/human/male/preburst3.ogg', 'sound/voice/human/male/preburst4.ogg', 'sound/voice/human/male/preburst5.ogg', 'sound/voice/human/male/preburst6.ogg', 'sound/voice/human/male/preburst7.ogg', 'sound/voice/human/male/preburst8.ogg', 'sound/voice/human/male/preburst9.ogg', 'sound/voice/human/male/preburst10.ogg')
 		if(SFX_FEMALE_PREBURST)
-			soundin = pick("sound/voice/human/female/preburst1.ogg", 'sound/voice/human/female/preburst2.ogg', 'sound/voice/human/female/preburst3.ogg')
+			soundin = pick('sound/voice/human/female/preburst1.ogg', 'sound/voice/human/female/preburst2.ogg', 'sound/voice/human/female/preburst3.ogg')
 		if(SFX_MALE_LAUGH)
 			soundin = pick('sound/voice/human/male/laugh_1.ogg', 'sound/voice/human/male/laugh_2.ogg', 'sound/voice/human/male/laugh_3.ogg', 'sound/voice/human/male/laugh_4.ogg', 'sound/voice/human/male/laugh_5.ogg', 'sound/voice/human/male/laugh_6.ogg', 'sound/voice/human/male/laugh_7.ogg', 'sound/voice/human/male/laugh_8.ogg', 'sound/voice/human/male/laugh_9.ogg')
 		if(SFX_FEMALE_LAUGH)
@@ -422,9 +418,14 @@ A good representation is: 'byond applies a volume reduction to the sound every X
 		if(SFX_PRED_LAUGH)
 			soundin = pick('sound/voice/predator/laugh1.ogg', 'sound/voice/predator/laugh2.ogg', 'sound/voice/predator/laugh3.ogg', 'sound/voice/predator/laugh4.ogg')
 
-		//pred items
 		if(SFX_CLAN_SWORD_HIT)
 			soundin = pick('sound/weapons/clan_sword_hit_1.ogg', 'sound/weapons/clan_sword_hit_2.ogg')
 		if(SFX_CHAIN_SWING)
 			soundin = pick('sound/items/chain_swing1.ogg', 'sound/items/chain_swing2.ogg', 'sound/items/chain_swing3.ogg')
+
+		if(SFX_HOVER_TANK)
+			soundin = pick('sound/vehicles/hover_1.ogg', 'sound/vehicles/hover_2.ogg', 'sound/vehicles/hover_3.ogg', 'sound/vehicles/hover_4.ogg')
+
+		if(SFX_REVOLVER_SPIN)
+			soundin = pick('sound/weapons/guns/interact/revolver_spin1.ogg', 'sound/weapons/guns/interact/revolver_spin2.ogg', 'sound/weapons/guns/interact/revolver_spin3.ogg')
 	return soundin

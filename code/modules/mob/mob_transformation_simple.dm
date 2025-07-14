@@ -54,8 +54,12 @@
 	if(subspecies)
 		set_species(subspecies)
 	if(client)
-		name = client.prefs.real_name
-		real_name = client.prefs.real_name
+		if(issynth(src))
+			name = client.prefs.synthetic_name
+			real_name = client.prefs.synthetic_name
+		else
+			name = client.prefs.real_name
+			real_name = client.prefs.real_name
 		gender = client.prefs.gender
 		h_style = client.prefs.h_style
 		f_style = client.prefs.f_style
@@ -87,11 +91,6 @@
 
 /mob/living/carbon/human/species/yautja/on_transformation(subspecies)
 	var/final_name = "Le'pro"
-	ethnicity = "Tan"
-	gender = MALE
-	age = 100
-	flavor_text = ""
-
 	if(client)
 		h_style = client.prefs.predator_h_style
 		ethnicity = client.prefs.predator_skin_color
@@ -108,6 +107,7 @@
 		update_body()
 		update_hair()
 		regenerate_icons()
+		hud_set_hunter()
 
 	real_name = final_name
 	name = final_name

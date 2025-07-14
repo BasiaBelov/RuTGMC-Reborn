@@ -60,8 +60,10 @@ GLOBAL_PROTECT(exp_specialmap)
 	var/multiple_outfits = FALSE
 	///list of outfit variants
 	var/list/datum/outfit/job/outfits = list()
-
+	///Skills for this job
 	var/skills_type = /datum/skills
+	///Any special traits that are assigned for this job
+	var/list/job_traits
 
 	var/display_order = JOB_DISPLAY_ORDER_DEFAULT
 	var/job_flags = NONE
@@ -159,40 +161,17 @@ GLOBAL_PROTECT(exp_specialmap)
 /datum/job/proc/map_check()
 	return TRUE
 
-/datum/job/proc/radio_help_message(mob/M)
-	to_chat(M, {"
-[span_role_header("You are the [title].")]
-[span_role_body("As the <b>[title]</b> you answer to [supervisors]. Special circumstances may change this.")]
-"})
+/// The message you get when spawning in as this job, called by [/datum/job/proc/after_spawn]
+/datum/job/proc/radio_help_message(mob/new_player)
+	var/list/message = list()
+	message += span_role_body("As the <b>[title]</b> you answer to [supervisors]. Special circumstances may change this.")
 	if(!(job_flags & JOB_FLAG_NOHEADSET))
-		to_chat(M, "<span class='role_body'>Prefix your message with ; to speak on the default radio channel. To see other prefixes, look closely at your headset.</span>")
+		message += separator_hr("[span_role_body("<b>Radio</b>")]")
+		message += span_role_body("Prefix your message with <b>;</b> to speak on the default radio channel, in most cases this is your squad radio. For additional prefixes, examine your headset.")
 	if(req_admin_notify)
-		to_chat(M, "<span class='role_body'>You are playing a job that is important for game progression. If you have to disconnect, please head to hypersleep, if you can't make it there, notify the admins via adminhelp.</span>")
-
-/datum/outfit/job
-	var/jobtype
-
-/datum/outfit/job/pre_equip(mob/living/carbon/human/H, visualsOnly = FALSE)
-	return
-
-/datum/outfit/job/post_equip(mob/living/carbon/human/H, visualsOnly = FALSE)
-	return
-
-/datum/outfit/job/proc/handle_id(mob/living/carbon/human/H, client/override_client)
-	var/datum/job/job = H.job ? H.job : SSjob.GetJobType(jobtype)
-	var/obj/item/card/id/id = H.wear_id
-	if(!istype(id))
-		return
-	id.access = job.get_access()
-	id.iff_signal = GLOB.faction_to_iff[job.faction]
-	shuffle_inplace(id.access) // Shuffle access list to make NTNet passkeys less predictable
-	id.registered_name = H.real_name
-	id.assignment = job.title
-	id.rank = job.title
-	id.paygrade = job.paygrade
-	id.update_label()
-	if(H.mind?.initial_account) // In most cases they won't have a mind at this point.
-		id.associated_account_number = H.mind.initial_account.account_number
+		message += separator_hr("[span_role_header("This is an important job.")]")
+		message += span_role_body("If you have to disconnect, please take a hypersleep pod. If you can't make it there, <b><u>adminhelp</u></b> using F1 or the Adminhelp verb.")
+	to_chat(new_player, fieldset_block("[span_role_header("You are the [title].")]", jointext(message, ""), "examine_block"))
 
 /datum/job/proc/get_special_name(client/preference_source)
 	return
@@ -201,15 +180,16 @@ GLOBAL_PROTECT(exp_specialmap)
 	if(amount <= 0)
 		CRASH("occupy_job_positions() called with amount: [amount]")
 	current_positions += amount
-	for(var/index in jobworth)
+	var/adjusted_jobworth_list = SSticker.mode?.get_adjusted_jobworth_list(jobworth) || jobworth
+	for(var/index in adjusted_jobworth_list)
 		var/datum/job/scaled_job = SSjob.GetJobType(index)
 		if(!(index in SSticker.mode.valid_job_types))
 			continue
 		if(isxenosjob(scaled_job))
-			if(respawn && (SSticker.mode?.flags_round_type & MODE_SILO_RESPAWN))
+			if(respawn && (SSticker.mode?.round_type_flags & MODE_SILO_RESPAWN))
 				continue
-			GLOB.round_statistics.larva_from_marine_spawning += jobworth[index] / scaled_job.job_points_needed
-		scaled_job.add_job_points(jobworth[index])
+			GLOB.round_statistics.larva_from_marine_spawning += adjusted_jobworth_list[index] / scaled_job.job_points_needed
+		scaled_job.add_job_points(adjusted_jobworth_list[index])
 	var/datum/hive_status/normal_hive = GLOB.hive_datums[XENO_HIVE_NORMAL]
 	normal_hive.update_tier_limits()
 	return TRUE
@@ -312,14 +292,16 @@ GLOBAL_PROTECT(exp_specialmap)
 					new_backpack = new /obj/item/storage/backpack/marine(src)
 				if(BACK_SATCHEL)
 					new_backpack = new /obj/item/storage/backpack/marine/satchel(src)
-				if(BACK_GREEN_SATCHEL) // RUTGMC ADDITION START
+				if(BACK_GREEN_SATCHEL)
 					new_backpack = new /obj/item/storage/backpack/marine/satchel/green(src)
 				if(BACK_MOLLE_BACKPACK)
 					new_backpack = new /obj/item/storage/backpack/marine/standard/molle(src)
 				if(BACK_MOLLE_SATCHEL)
 					new_backpack = new /obj/item/storage/backpack/marine/satchel/molle(src)
 				if(BACK_SCAV_BACKPACK)
-					new_backpack = new /obj/item/storage/backpack/marine/standard/scav(src) // RUTGMC ADDITION END
+					new_backpack = new /obj/item/storage/backpack/marine/standard/scav(src)
+				if(BACK_DUFFELBAG)
+					new_backpack = new /obj/item/storage/backpack/marine/duffelbag(src)
 			equip_to_slot_or_del(new_backpack, SLOT_BACK)
 
 		job.outfit.handle_id(src, player)
@@ -331,12 +313,14 @@ GLOBAL_PROTECT(exp_specialmap)
 			job_whitelist = "[job_whitelist][whitelist_status]"
 
 		if(job.gear_preset_whitelist[job_whitelist])
-			job.gear_preset_whitelist[job_whitelist].equip(src, override_client = player)
+			job.gear_preset_whitelist[job_whitelist].equip(src)
 		else
 			equip_role_outfit(job)
 
+	#ifndef TESTING
 	if(SSdiscord.get_boosty_tier(player?.ckey) >= BOOSTY_TIER_2)
 		equip_to_slot_or_del(new /obj/item/facepaint/premium, SLOT_IN_BACKPACK)
+	#endif
 
 	if((job.job_flags & JOB_FLAG_ALLOWS_PREFS_GEAR) && player)
 		equip_preference_gear(player)

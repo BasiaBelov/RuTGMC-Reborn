@@ -51,10 +51,8 @@
 /mob/living/silicon/med_hud_set_status()
 	return
 
-/mob/living/silicon/contents_explosion(severity)
-	return
-
 /mob/living/silicon/emp_act(severity)
+	. = ..()
 	switch(severity)
 		if(1)
 			Stun(rand(10 SECONDS, 20 SECONDS))
@@ -66,27 +64,26 @@
 
 	to_chat(src, span_danger("*BZZZT*"))
 	to_chat(src, span_warning("Warning: Electromagnetic pulse detected."))
-	return ..()
 
-/mob/living/silicon/apply_effect(effect = 0, effecttype = STUN, updating_health = FALSE)
+/mob/living/silicon/apply_effect(effect = 0, effect_type = EFFECT_STUN, updating_health = FALSE)
 	return FALSE
 
-/mob/living/silicon/adjustToxLoss(amount)
+/mob/living/silicon/adjust_tox_loss(amount)
 	return FALSE
 
-/mob/living/silicon/setToxLoss(amount)
+/mob/living/silicon/set_tox_loss(amount)
 	return FALSE
 
-/mob/living/silicon/adjustCloneLoss(amount)
+/mob/living/silicon/adjust_clone_loss(amount)
 	return FALSE
 
-/mob/living/silicon/setCloneLoss(amount)
+/mob/living/silicon/set_clone_loss(amount)
 	return FALSE
 
-/mob/living/silicon/adjustBrainLoss(amount)
+/mob/living/silicon/adjust_brain_loss(amount)
 	return FALSE
 
-/mob/living/silicon/setBrainLoss(amount)
+/mob/living/silicon/set_brain_loss(amount)
 	return FALSE
 
 //can't inject synths
@@ -107,9 +104,6 @@
 	switch(hud_choice)
 		if("Medical HUD")
 			H = GLOB.huds[DATA_HUD_MEDICAL_OBSERVER]
-		if("Security HUD")
-			H = GLOB.huds[DATA_HUD_SECURITY_ADVANCED]
-			HUD_nbr = 2
 		if("Squad HUD")
 			if(GLOB.huds[faction] == FACTION_TERRAGOV)
 				H = DATA_HUD_SQUAD_TERRAGOV
@@ -135,7 +129,7 @@
 		gib()
 		return
 
-	adjustBruteLoss(severity)
+	adjust_brute_loss(severity)
 	UPDATEHEALTH(src)
 
 /mob/living/silicon/update_transform()

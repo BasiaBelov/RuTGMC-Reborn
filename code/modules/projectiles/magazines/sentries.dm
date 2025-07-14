@@ -4,7 +4,7 @@
 	w_class = WEIGHT_CLASS_NORMAL
 	icon = 'icons/obj/items/ammo/stationary.dmi'
 	icon_state = "sentry"
-	flags_magazine = NONE //can't be refilled or emptied by hand
+	magazine_flags = NONE //can't be refilled or emptied by hand
 	caliber = CALIBER_10X28
 	max_rounds = 200
 	default_ammo = /datum/ammo/bullet/turret
@@ -15,7 +15,7 @@
 	w_class = WEIGHT_CLASS_NORMAL
 	icon = 'icons/obj/items/ammo/stationary.dmi'
 	icon_state = "minisentry"
-	flags_magazine = NONE //can't be refilled or emptied by hand
+	magazine_flags = NONE //can't be refilled or emptied by hand
 	caliber = CALIBER_10X20
 	max_rounds = 300
 	default_ammo = /datum/ammo/bullet/turret/mini
@@ -24,7 +24,7 @@
 	name = "M30 box magazine (10x28mm Caseless)"
 	desc = "A box of 50 10x28mm caseless rounds for the ST-571 Sentry Gun. Just feed it into the sentry gun's ammo port when its ammo is depleted."
 	w_class = WEIGHT_CLASS_NORMAL
-	flags_magazine = NONE //can't be refilled or emptied by hand
+	magazine_flags = NONE //can't be refilled or emptied by hand
 	caliber = CALIBER_10X28
 	max_rounds = 500
 	default_ammo = /datum/ammo/bullet/turret/dumb
@@ -55,6 +55,7 @@
 	name = "\improper Малый бак TUR-F (Горючее)"
 	desc = "Малый бак на 5 литров горючего для турели \"Феникс\". Вставьте в порт турели в случае отстутсвия горючего."
 	icon_state = "sentry_flamer"
+	icon = 'icons/obj/items/ammo/stationary.dmi'
 	w_class = WEIGHT_CLASS_NORMAL
 	max_rounds = 75
 	current_rounds = 75

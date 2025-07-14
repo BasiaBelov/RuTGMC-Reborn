@@ -1,8 +1,9 @@
 /datum/game_mode/infestation/crash
 	name = "Crash"
 	config_tag = "Crash"
-	flags_round_type = MODE_INFESTATION|MODE_XENO_SPAWN_PROTECT|MODE_DEAD_GRAB_FORBIDDEN|MODE_DISALLOW_RAILGUN|MODE_PSY_POINTS|MODE_PSY_POINTS_ADVANCED|MODE_SILOS_SPAWN_MINIONS
-	flags_xeno_abilities = ABILITY_NUCLEARWAR
+	required_players = 2
+	round_type_flags = MODE_INFESTATION|MODE_XENO_SPAWN_PROTECT|MODE_DEAD_GRAB_FORBIDDEN|MODE_DISALLOW_RAILGUN|MODE_PSY_POINTS|MODE_PSY_POINTS_ADVANCED|MODE_SILOS_SPAWN_MINIONS
+	xeno_abilities_flags = ABILITY_NUCLEARWAR
 	valid_job_types = list(
 		/datum/job/terragov/squad/standard = -1,
 		/datum/job/terragov/squad/robot = -1,
@@ -24,6 +25,10 @@
 	)
 	blacklist_ground_maps = list(MAP_BIG_RED, MAP_DELTA_STATION, MAP_PRISON_STATION, MAP_LV_624, MAP_WHISKEY_OUTPOST, MAP_OSCAR_OUTPOST, MAP_LAST_STAND)
 
+	tier_three_penalty = 1
+	restricted_castes = list(/datum/xeno_caste/ravager, /datum/xeno_caste/hivemind)
+
+	bioscan_interval = 0
 	// Round end conditions
 	var/shuttle_landed = FALSE
 	var/marines_evac = CRASH_EVAC_NONE
@@ -32,13 +37,10 @@
 	var/shuttle_id = SHUTTLE_CANTERBURY
 	var/obj/docking_port/mobile/crashmode/shuttle
 
-	// Round start info
-	var/starting_squad = "Alpha"
 	///How long between two larva check
 	var/larva_check_interval = 2 MINUTES
 	///Last time larva balance was checked
 	var/last_larva_check
-	bioscan_interval = 0
 
 /datum/game_mode/infestation/crash/pre_setup()
 	. = ..()
@@ -65,7 +67,7 @@
 	GLOB.latejoin_gateway = shuttle.latejoins
 	// Launch shuttle
 	var/list/valid_docks = list()
-	for(var/obj/docking_port/stationary/crashmode/potential_crash_site in SSshuttle.stationary)
+	for(var/obj/docking_port/stationary/crashmode/potential_crash_site in SSshuttle.stationary_docking_ports)
 		if(!shuttle.check_dock(potential_crash_site, silent = TRUE))
 			continue
 		valid_docks += potential_crash_site
@@ -75,20 +77,18 @@
 	var/obj/docking_port/stationary/crashmode/actual_crash_site = pick(valid_docks)
 
 	shuttle.crashing = TRUE
-	SSshuttle.moveShuttleToDock(shuttle.id, actual_crash_site, TRUE) // FALSE = instant arrival
+	SSshuttle.moveShuttleToDock(shuttle.shuttle_id, actual_crash_site, TRUE) // FALSE = instant arrival
 	addtimer(CALLBACK(src, PROC_REF(crash_shuttle), actual_crash_site), 10 MINUTES)
 
 	GLOB.start_squad_landmarks_list = null
 
+	GLOB.all_supply_groups -= "Factory" // In ideal world, we just balance factories out
+
+	for(var/obj/machinery/telecomms/relay/preset/telecomms/relay AS in GLOB.ground_telecomms_relay)
+		qdel(relay) // so there's no double intercomms, hacky, but i don't know a better way.
 
 /datum/game_mode/infestation/crash/post_setup()
 	. = ..()
-	for(var/i in GLOB.xeno_resin_silo_turfs)
-		new /obj/structure/xeno/silo/crash(i)
-
-	for(var/obj/effect/landmark/corpsespawner/corpse AS in GLOB.corpse_landmarks_list)
-		corpse.create_mob()
-
 
 	for(var/i in GLOB.nuke_spawn_locs)
 		new /obj/machinery/nuclearbomb(i)
@@ -104,8 +104,14 @@
 	RegisterSignal(SSdcs, COMSIG_GLOB_NUKE_DIFFUSED, PROC_REF(on_nuclear_diffuse))
 	RegisterSignal(SSdcs, COMSIG_GLOB_NUKE_START, PROC_REF(on_nuke_started))
 
-	if(!(flags_round_type & MODE_INFESTATION))
+	if(!(round_type_flags & MODE_INFESTATION))
 		return
+
+	for(var/i in GLOB.xeno_resin_silo_turfs)
+		new /obj/structure/xeno/silo/crash(i)
+
+	for(var/obj/effect/landmark/corpsespawner/corpse AS in GLOB.corpse_landmarks_list)
+		corpse.create_mob()
 
 	for(var/i in GLOB.alive_xeno_list_hive[XENO_HIVE_NORMAL])
 		if(isxenolarva(i)) // Larva
@@ -126,7 +132,7 @@
 /datum/game_mode/infestation/crash/proc/crash_shuttle(obj/docking_port/stationary/target)
 	shuttle_landed = TRUE
 	shuttle.crashing = FALSE
-
+	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_CANTERBURRY_LANDING)
 	generate_nuke_disk_spawners()
 
 /datum/game_mode/infestation/crash/check_finished(force_end)
@@ -167,9 +173,7 @@
 			message_admins("Round finished: [MODE_INFESTATION_X_MAJOR]") //marines nuked themselves somehow
 			round_finished = MODE_INFESTATION_X_MAJOR
 			return TRUE
-
 	return FALSE
-
 
 /datum/game_mode/infestation/crash/on_nuclear_diffuse(obj/machinery/nuclearbomb/bomb, mob/living/carbon/xenomorph/X)
 	var/list/living_player_list = count_humans_and_xenos(count_flags = COUNT_IGNORE_HUMAN_SSD)
@@ -181,21 +185,28 @@
 	to_chat(src, span_warning("This power doesn't work in this gamemode."))
 	return FALSE
 
+/// Adds more xeno job slots if needed.
 /datum/game_mode/infestation/crash/proc/balance_scales()
 	var/datum/hive_status/normal/xeno_hive = GLOB.hive_datums[XENO_HIVE_NORMAL]
 	var/datum/job/xeno_job = SSjob.GetJobType(/datum/job/xenomorph)
-	var/stored_larva = xeno_job.total_positions - xeno_job.current_positions
-	if(stored_larva)
-		return //No need for respawns
-	var/num_xenos = xeno_hive.get_total_xeno_number() + stored_larva
-	if(!num_xenos)
+	// Spawn more xenos to help maintain the ratio.
+	var/xenomorphs_below_ratio = get_jobpoint_difference() / xeno_job.job_points_needed
+	if(xenomorphs_below_ratio >= 1)
 		xeno_job.add_job_positions(1)
+		xeno_hive.update_tier_limits()
 		return
-	var/larva_surplus = (get_total_joblarvaworth() - (num_xenos * xeno_job.job_points_needed )) / xeno_job.job_points_needed
-	if(larva_surplus < 1)
-		return //Things are balanced, no burrowed needed
-	xeno_job.add_job_positions(1)
-	xeno_hive.update_tier_limits()
+	// Make sure there is at least one xeno regardless of ratio.
+	var/total_xenos = xeno_hive.get_total_xeno_number() + (xeno_job.total_positions - xeno_job.current_positions)
+	if(!total_xenos)
+		xeno_job.add_job_positions(1)
+		xeno_hive.update_tier_limits()
+
+/// Gets the difference of job points between humans and xenos. Negative means too many xenos. Positive means too many humans.
+/datum/game_mode/infestation/crash/proc/get_jobpoint_difference()
+	var/datum/hive_status/normal/xeno_hive = GLOB.hive_datums[XENO_HIVE_NORMAL]
+	var/datum/job/xeno_job = SSjob.GetJobType(/datum/job/xenomorph)
+	var/total_xenos = xeno_hive.get_total_xeno_number() + (xeno_job.total_positions - xeno_job.current_positions)
+	return get_total_joblarvaworth() - (total_xenos * xeno_job.job_points_needed)
 
 /datum/game_mode/infestation/crash/get_total_joblarvaworth(list/z_levels, count_flags)
 	. = 0
@@ -207,3 +218,15 @@
 			continue
 		. += H.job.jobworth[/datum/job/xenomorph]
 
+/datum/game_mode/infestation/crash/get_adjusted_jobworth_list(list/jobworth_list)
+	var/list/adjusted_jobworth_list = deep_copy_list(jobworth_list)
+	for(var/index in jobworth_list)
+		var/datum/job/scaled_job = SSjob.GetJobType(index)
+		if(!(index in SSticker.mode.valid_job_types))
+			continue
+		if(!isxenosjob(scaled_job))
+			continue
+		var/amount = jobworth_list[index]
+		var/jobpoint_difference = get_jobpoint_difference() + amount
+		adjusted_jobworth_list[index] = clamp(jobpoint_difference, 0, amount)
+	return adjusted_jobworth_list

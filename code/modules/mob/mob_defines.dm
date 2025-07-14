@@ -6,8 +6,9 @@
 	animate_movement = SLIDE_STEPS
 	datum_flags = DF_USE_TAG
 	mouse_drag_pointer = MOUSE_ACTIVE_POINTER
-	flags_atom = PREVENT_CONTENTS_EXPLOSION
+	atom_flags = PREVENT_CONTENTS_EXPLOSION
 	resistance_flags = NONE
+	faction = FACTION_NEUTRAL
 
 	//Mob
 	///Whether a mob is alive or dead. TODO: Move this to living - Nodrak
@@ -50,8 +51,6 @@
 	var/next_move_modifier = 1
 	var/last_move_intent
 	var/area/lastarea
-	var/old_x = 0
-	var/old_y = 0
 	var/inertia_dir = 0
 	///Can move on the shuttle.
 	var/move_on_shuttle = TRUE
@@ -93,7 +92,8 @@
 	var/atom/movable/remote_control
 	var/obj/item/l_hand //Living
 	var/obj/item/r_hand //Living
-	var/obj/item/storage/s_active //Carbon
+	///Our mobs currently active storage
+	var/datum/storage/active_storage //Carbon
 	var/obj/item/clothing/mask/wear_mask //Carbon
 	///the current turf being examined in the stat panel
 	var/turf/listed_turf
@@ -112,8 +112,6 @@
 
 	/// Can they interact with station electronics
 	var/has_unlimited_silicon_privilege = 0
-	///The faction this mob belongs to
-	var/faction = FACTION_NEUTRAL
 
 	/// what icon the mob uses for speechbubbles
 	var/bubble_icon = "default"
@@ -141,6 +139,7 @@
 	var/life_value = 1
 	var/default_honor_value = 1
 	var/life_kills_total = 0
+	var/max_bonus_life_kills
 
 	///Tracks open UIs for a user.
 	var/list/tgui_open_uis = list()

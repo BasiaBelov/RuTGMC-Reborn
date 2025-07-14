@@ -17,7 +17,7 @@
 	var/sheet_type = /obj/item/stack/barbed_wire
 	var/sheet_type2 = /obj/item/stack/rods
 
-/obj/structure/razorwire/deconstruct(disassembled = TRUE)
+/obj/structure/razorwire/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	if(obj_integrity > max_integrity * 0.5)
 		new sheet_type(loc)
 	else
@@ -44,7 +44,7 @@
 	if(CHECK_BITFIELD(O.pass_flags, PASS_DEFENSIVE_STRUCTURE))
 		return
 	var/mob/living/M = O
-	if(M.status_flags & INCORPOREAL)
+	if(M.status_flags & (INCORPOREAL|GODMODE))
 		return
 	if(CHECK_BITFIELD(M.restrained_flags, RESTRAINED_RAZORWIRE))
 		return
@@ -112,6 +112,8 @@
 
 /obj/structure/razorwire/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/stack/sheet/metal))
 		if(obj_integrity >= max_integrity)
@@ -180,10 +182,7 @@
 	return ..()
 
 /obj/structure/razorwire/update_icon_state()
-	. = ..()
-	var/health_percent = round(obj_integrity/max_integrity * 100)
-	var/remaining = CEILING(health_percent, 25)
-	icon_state = "[base_icon_state]_[remaining]"
+	icon_state = "[base_icon_state]_[CEILING(ROUND_UP(obj_integrity/max_integrity * 100), 25)]"
 
 /obj/structure/razorwire/effect_smoke(obj/effect/particle_effect/smoke/S)
 	. = ..()
@@ -207,7 +206,7 @@
 /obj/structure/razorwire/post_crush_act(mob/living/carbon/xenomorph/charger, datum/action/ability/xeno_action/ready_charge/charge_datum)
 	if(!anchored)
 		return ..()
-	razorwire_tangle(charger, RAZORWIRE_ENTANGLE_DELAY * 0.10) //entangled for only 10% as long or 0.5 seconds
+	razorwire_tangle(charger, 0.5 SECONDS)
 	charger.visible_message(span_danger("The barbed wire slices into [charger]!"),
 	span_danger("The barbed wire slices into you!"), null, 5)
 	charger.Paralyze(0.5 SECONDS)

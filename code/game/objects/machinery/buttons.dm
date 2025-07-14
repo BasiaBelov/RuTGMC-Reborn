@@ -145,7 +145,7 @@
 /obj/machinery/button/door/open_only/landing_zone/Initialize(mapload)
 	. = ..()
 	var/area/area = get_area(src)
-	area.flags_area |= MARINE_BASE
+	area.area_flags |= MARINE_BASE
 
 /obj/machinery/button/door/open_only/landing_zone/attack_hand(mob/living/user)
 	if((machine_stat & (NOPOWER|BROKEN)))
@@ -167,6 +167,7 @@
 
 	alarm_played = TRUE
 	playsound_z(z, 'sound/effects/shutters_alarm.ogg', 15) // woop woop, shutters opening.
+	log_game("[key_name(user)] has opened the LZ Containment Shutters.")
 	addtimer(CALLBACK(src, TYPE_PROC_REF(/atom/movable, update_icon)), 1.5 SECONDS)
 	addtimer(CALLBACK(src, PROC_REF(pulsed)), 185)
 
@@ -194,6 +195,8 @@
 
 /obj/machinery/driver_button/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/detective_scanner))
 		return
@@ -319,11 +322,16 @@
 	///The mob created by the spawner
 	var/mob/living/carbon/human/linked
 	///What spawner landmark is linked with this spawner (this has to be matching with the landmark)
-	var/link
+	var/spawn_link
 
 /obj/machinery/button/valhalla/Destroy()
 	linked = null
 	return ..()
+
+/obj/machinery/button/valhalla/proc/turf_check(mob/living/user)
+	if(!get_turf(GLOB.valhalla_button_spawn_landmark[spawn_link]))
+		to_chat(user, span_warning("An error occured, yell at the coders."))
+		CRASH("Valhalla button linked with an improper landmark: button ID: [spawn_link].")
 
 /obj/machinery/button/valhalla/marine_button
 	name = "Xeno spawner"
@@ -333,15 +341,11 @@
 	if(!xeno_wanted)
 		return
 	QDEL_NULL(linked)
-	if(!get_turf(GLOB.valhalla_button_spawn_landmark[link]))
-		to_chat(user, span_warning("An error occured, yell at the coders."))
-		CRASH("Valhalla button linked with an improper landmark: button ID: [link].")
-	linked = new xeno_wanted(get_turf(GLOB.valhalla_button_spawn_landmark[link]))
+	turf_check(user)
+	linked = new xeno_wanted(get_turf(GLOB.valhalla_button_spawn_landmark[spawn_link]))
 
 /obj/machinery/button/valhalla/xeno_button
 	name = "Marine spawner"
-	///The list of outfits we can equip on the humans we're spawning
-	var/outfit_list = list()
 
 /obj/machinery/button/valhalla/xeno_button/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount, damage_type, damage_flag, effects, armor_penetration, isrightclick)
 	var/list/job_outfits = list()
@@ -349,8 +353,7 @@
 		if(istype(type, /datum/outfit))
 			continue
 		var/datum/outfit/out = type
-		if(initial(out.can_be_admin_equipped))
-			job_outfits[initial(out.name)] = out
+		job_outfits[initial(out.name)] = out
 
 	job_outfits = sortList(job_outfits)
 	job_outfits.Insert(1, "Naked")
@@ -360,10 +363,8 @@
 		return
 
 	QDEL_NULL(linked)
-	if(!get_turf(GLOB.valhalla_button_spawn_landmark[link]))
-		to_chat(xeno_attacker, span_warning("An error occured, yell at the coders."))
-		CRASH("Valhalla button linked with an improper landmark: button ID: [link].")
-	linked = new /mob/living/carbon/human(get_turf(GLOB.valhalla_button_spawn_landmark[link]))
+	turf_check(xeno_attacker)
+	linked = new /mob/living/carbon/human(get_turf(GLOB.valhalla_button_spawn_landmark[spawn_link]))
 	if(selected_outfit == "Naked" || !selected_outfit)
 		return
 	linked.equipOutfit(job_outfits[selected_outfit], FALSE)
@@ -374,8 +375,7 @@
 		if(istype(type, /datum/outfit))
 			continue
 		var/datum/outfit/out = type
-		if(initial(out.can_be_admin_equipped))
-			job_outfits[initial(out.name)] = out
+		job_outfits[initial(out.name)] = out
 
 	job_outfits = sortList(job_outfits)
 	job_outfits.Insert(1, "Naked")
@@ -385,10 +385,8 @@
 		return
 
 	QDEL_NULL(linked)
-	if(!get_turf(GLOB.valhalla_button_spawn_landmark[link]))
-		to_chat(user, span_warning("An error occured, yell at the coders."))
-		CRASH("Valhalla button linked with an improper landmark: button ID: [link].")
-	linked = new /mob/living/carbon/human(get_turf(GLOB.valhalla_button_spawn_landmark[link]))
+	turf_check(user)
+	linked = new /mob/living/carbon/human(get_turf(GLOB.valhalla_button_spawn_landmark[spawn_link]))
 	if(selected_outfit == "Naked" || !selected_outfit)
 		return
 	linked.equipOutfit(job_outfits[selected_outfit], FALSE)
@@ -396,32 +394,29 @@
 /obj/machinery/button/valhalla/vehicle_button
 	name = "Vehicle Spawner"
 
-/obj/machinery/button/valhalla/vehicle_button/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount = xeno_attacker.xeno_caste.melee_damage, damage_type = BRUTE, armor_type = MELEE, effects = TRUE, armor_penetration = 0, isrightclick = FALSE)
-	var/list/spawnable_vehicles = list(/obj/vehicle/sealed/armored/multitile,
-	/obj/vehicle/sealed/armored/multitile/apc)
+/// Generates a list of vehicles to spawn
+/obj/machinery/button/valhalla/vehicle_button/proc/spawn_vehicles(mob/living/user)
+	var/list/spawnable_vehicles = list(
+		/obj/vehicle/sealed/armored/multitile,
+		/obj/vehicle/sealed/armored/multitile/apc,
+		/obj/vehicle/sealed/armored/multitile/som_tank,
+		/obj/vehicle/sealed/armored/multitile/campaign,
+		/obj/vehicle/sealed/armored/multitile/icc_lvrt,
+	)
 
-	var/selected_vehicle = tgui_input_list(usr, "Which vehicle do you want to spawn?", "Vehicle spawn", spawnable_vehicles)
+	var/selected_vehicle = tgui_input_list(user, "Which vehicle do you want to spawn?", "Vehicle spawn", spawnable_vehicles)
 	if(!selected_vehicle)
 		return
-
 	QDEL_NULL(linked)
-	if(!get_turf(GLOB.valhalla_button_spawn_landmark[link]))
-		to_chat(xeno_attacker, span_warning("An error occured, yell at the coders."))
-		CRASH("Valhalla button linked with an improper landmark: button ID: [link].")
-	linked = new selected_vehicle(get_turf(GLOB.valhalla_button_spawn_landmark[link]))
+	if(!get_turf(GLOB.valhalla_button_spawn_landmark[spawn_link]))
+		to_chat(user, span_warning("An error occured, yell at the coders."))
+		CRASH("Valhalla button linked with an improper landmark: button ID: [spawn_link].")
+	linked = new selected_vehicle(get_turf(GLOB.valhalla_button_spawn_landmark[spawn_link]))
+
+/obj/machinery/button/valhalla/vehicle_button/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount = xeno_attacker.xeno_caste.melee_damage, damage_type = BRUTE, armor_type = MELEE, effects = TRUE, armor_penetration = 0, isrightclick = FALSE)
+	spawn_vehicles(xeno_attacker)
 
 /obj/machinery/button/valhalla/vehicle_button/attack_hand(mob/living/user)
-	var/list/spawnable_vehicles = list(/obj/vehicle/sealed/armored/multitile,
-	/obj/vehicle/sealed/armored/multitile/apc)
-
-	var/selected_vehicle = tgui_input_list(usr, "Which vehicle do you want to spawn?", "Vehicle spawn", spawnable_vehicles)
-	if(!selected_vehicle)
-		return
-
-	QDEL_NULL(linked)
-	if(!get_turf(GLOB.valhalla_button_spawn_landmark[link]))
-		to_chat(user, span_warning("An error occured, yell at the coders."))
-		CRASH("Valhalla button linked with an improper landmark: button ID: [link].")
-	linked = new selected_vehicle(get_turf(GLOB.valhalla_button_spawn_landmark[link]))
+	spawn_vehicles(user)
 
 #undef DOOR_FLAG_OPEN_ONLY

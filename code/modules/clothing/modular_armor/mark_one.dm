@@ -3,36 +3,10 @@
 	name = "Jaeger Mk.I Pattern Infantry Helmet"
 	desc = "Usually paired with the Jaeger Combat Exoskeleton. Can mount utility functions on the helmet hard points. Has Infantry markings."
 	icon_state = "helmet"
-	item_state = "helmet"
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
-	)
-
-	attachments_allowed = list(
-		/obj/item/armor_module/module/tyr_head,
-		/obj/item/armor_module/module/tyr_head/mark2,
-		/obj/item/armor_module/module/hod_head,
-		/obj/item/armor_module/module/mimir_environment_protection/mimir_helmet,
-		/obj/item/armor_module/module/mimir_environment_protection/mimir_helmet/mark1,
-		/obj/item/armor_module/module/welding,
-		/obj/item/armor_module/module/welding/superior,
-		/obj/item/armor_module/module/binoculars,
-		/obj/item/armor_module/module/binoculars/artemis_mark_two,
-		/obj/item/armor_module/module/artemis,
-		/obj/item/armor_module/module/antenna,
-		/obj/item/armor_module/module/night_vision,
-		/obj/item/armor_module/module/fire_proof_helmet,
-		/obj/item/armor_module/module/motion_detector,
-		/obj/item/armor_module/storage/helmet,
-		/obj/item/armor_module/armor/badge,
-		/obj/item/armor_module/armor/visor/marine/old,
-		/obj/item/armor_module/armor/visor/marine/old/skirmisher,
-		/obj/item/armor_module/armor/visor/marine/old/scout,
-		/obj/item/armor_module/armor/visor/marine/old/eva,
-		/obj/item/armor_module/armor/visor/marine/old/eva/skull,
-		/obj/item/armor_module/armor/visor/marine/old/eod,
-		/obj/item/armor_module/armor/visor/marine/old/assault,
+	worn_icon_state = "helmet"
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',
 	)
 
 	greyscale_config = /datum/greyscale_config/armor_mk1/infantry

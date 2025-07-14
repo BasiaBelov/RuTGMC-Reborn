@@ -10,33 +10,38 @@ Buildable meters
 /obj/item/pipe
 	name = "pipe"
 	desc = "A pipe."
-	var/pipe_type
-	var/pipename
 	force = 7
 	throwforce = 7
 	icon = 'icons/obj/items/pipe_item.dmi'
 	icon_state = "simple"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/engineering_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/engineering_right.dmi',
 	)
-	item_state = "buildpipe"
+	worn_icon_state = "buildpipe"
 	w_class = WEIGHT_CLASS_NORMAL
 	level = 2
+	var/pipe_type
+	var/pipename
 	var/piping_layer = PIPING_LAYER_DEFAULT
 	var/RPD_type
 
 /obj/item/pipe/directional
 	RPD_type = PIPE_UNARY
+
 /obj/item/pipe/binary
 	RPD_type = PIPE_STRAIGHT
+
 /obj/item/pipe/binary/bendable
 	RPD_type = PIPE_BENDABLE
+
 /obj/item/pipe/trinary
 	RPD_type = PIPE_TRINARY
+
 /obj/item/pipe/trinary/flippable
 	RPD_type = PIPE_TRIN_M
 	var/flipped = FALSE
+
 /obj/item/pipe/quaternary
 	RPD_type = PIPE_ONEDIR
 
@@ -59,11 +64,11 @@ Buildable meters
 /obj/item/pipe/proc/make_from_existing(obj/machinery/atmospherics/make_from)
 	setDir(make_from.dir)
 	pipename = make_from.name
-	add_atom_colour(make_from.color, FIXED_COLOUR_PRIORITY)
+	add_atom_colour(make_from.color, FIXED_COLOR_PRIORITY)
 	pipe_type = make_from.type
 
 /obj/item/pipe/trinary/flippable/make_from_existing(obj/machinery/atmospherics/components/trinary/make_from)
-	..()
+	. = ..()
 	if(make_from.flipped)
 		do_a_flip()
 
@@ -88,7 +93,7 @@ Buildable meters
 	icon_state = initial(fakeA.pipe_state)
 
 /obj/item/pipe/verb/flip()
-	set category = "Object.Rotate"
+	set category = "IC.Rotate"
 	set name = "Flip Pipe"
 	set src in view(1)
 
@@ -96,8 +101,7 @@ Buildable meters
 		return
 
 	var/mob/living/L = usr
-
-	if ( L.incapacitated() )
+	if(L.incapacitated())
 		return
 
 	do_a_flip()
@@ -127,13 +131,6 @@ Buildable meters
 
 /obj/item/pipe/attack_self(mob/user)
 	setDir(turn(dir,-90))
-
-/obj/item/pipe/attackby(obj/item/I, mob/user, params)
-	. = ..()
-	if(user.incapacitated())
-		return FALSE
-	if(iswrench(I))
-		return wrench_act(user, I)
 
 /obj/item/pipe/wrench_act(mob/living/user, obj/item/tool/wrench/W)
 	if(!isturf(loc))
@@ -177,7 +174,7 @@ Buildable meters
 		A.on = FALSE
 
 /obj/item/pipe/trinary/flippable/build_pipe(obj/machinery/atmospherics/components/trinary/T)
-	..()
+	. = ..()
 	T.flipped = flipped
 
 /obj/item/pipe_meter
@@ -185,11 +182,11 @@ Buildable meters
 	desc = "A meter that can be laid on pipes."
 	icon = 'icons/obj/items/pipe_item.dmi'
 	icon_state = "meter"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/engineering_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/engineering_right.dmi',
 	)
-	item_state = "buildpipe"
+	worn_icon_state = "buildpipe"
 	w_class = WEIGHT_CLASS_BULKY
 	var/piping_layer = PIPING_LAYER_DEFAULT
 

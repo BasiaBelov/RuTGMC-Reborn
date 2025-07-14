@@ -58,7 +58,7 @@
 	check_range()
 	return ..()
 
-/datum/status_effect/mindmeld/tick()
+/datum/status_effect/mindmeld/tick(delta_time)
 	check_range()
 
 ///Checks if mob is in buff range and toggles as required
@@ -114,7 +114,7 @@
 	. = ..()
 	owner.remove_filter("[id]")
 
-/datum/status_effect/reknit_form/tick()
+/datum/status_effect/reknit_form/tick(delta_time)
 	if(ishuman(owner))
 		var/mob/living/carbon/human/human_owner = owner
 		human_owner.reagent_shock_modifier -= PAIN_REDUCTION_VERY_HEAVY //oof ow ouch
@@ -126,10 +126,10 @@
 				limb_to_fix.add_limb_flags(LIMB_REPAIRED)
 				break
 
-	owner.adjustCloneLoss(-3)
-	owner.adjustOxyLoss(-5)
+	owner.adjust_clone_loss(-3)
+	owner.adjust_oxy_loss(-5)
 	owner.heal_overall_damage(5, 5)
-	owner.adjustToxLoss(-3)
+	owner.adjust_tox_loss(-3)
 
 /atom/movable/screen/alert/status_effect/reknit_form
 	name = "Reknit form"

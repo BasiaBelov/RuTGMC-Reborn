@@ -84,7 +84,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/east)
 "aT" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /turf/open/floor,
 /area/oscar_outpost)
 "bb" = (
@@ -261,7 +261,7 @@
 /area/oscar_outpost/outside/northeast)
 "cy" = (
 /obj/structure/table/reinforced,
-/obj/structure/barricade/metal,
+/obj/structure/barricade/solid,
 /turf/open/floor/plating,
 /area/oscar_outpost/outside/north)
 "cz" = (
@@ -330,14 +330,14 @@
 /area/oscar_outpost)
 "cX" = (
 /obj/structure/table/reinforced,
-/obj/structure/barricade/metal,
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid,
+/obj/structure/barricade/solid{
 	dir = 8
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 4
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
 /turf/open/ground/coast{
@@ -348,7 +348,7 @@
 /turf/closed/wall,
 /area/oscar_outpost/outside/east)
 "da" = (
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
 /turf/open/floor/engine/cult{
@@ -515,7 +515,7 @@
 /turf/open/floor,
 /area/oscar_outpost)
 "ec" = (
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
 /obj/effect/ai_node,
@@ -772,32 +772,32 @@
 /turf/open/floor,
 /area/oscar_outpost)
 "gL" = (
-/obj/structure/table/rusticwoodentable,
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/structure/table/wood/rustic,
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -5;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -2;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 1;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 4;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 7;
 	pixel_y = 15
 	},
@@ -1066,7 +1066,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/road)
 "kk" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/item/reagent_containers/glass/bucket,
 /turf/open/floor,
 /area/oscar_outpost)
@@ -1277,7 +1277,7 @@
 /turf/open/ground/grass,
 /area/oscar_outpost)
 "nv" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/effect/spawner/random/food_or_drink/wine{
 	pixel_x = -8;
 	pixel_y = 18
@@ -1520,7 +1520,7 @@
 	},
 /area/oscar_outpost)
 "pk" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/item/reagent_containers/glass/bucket,
 /obj/item/reagent_containers/glass/bucket,
 /obj/item/reagent_containers/glass/bucket,
@@ -1546,7 +1546,7 @@
 /turf/closed/wall/mainship/research,
 /area/oscar_outpost)
 "pz" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/item/storage/box/condimentbottles{
 	pixel_x = -5;
 	pixel_y = 12
@@ -1574,32 +1574,32 @@
 /turf/open/floor,
 /area/oscar_outpost)
 "pE" = (
-/obj/structure/table/rusticwoodentable,
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/structure/table/wood/rustic,
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -5;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -2;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 1;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 4;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 7;
 	pixel_y = 15
 	},
@@ -1759,7 +1759,7 @@
 	name = "barley";
 	plantname = "barley"
 	},
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/machinery/light{
 	dir = 1
 	},
@@ -1858,7 +1858,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/northwest)
 "rG" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/item/reagent_containers/glass/bucket/janibucket,
 /turf/open/floor,
 /area/oscar_outpost)
@@ -2044,32 +2044,32 @@
 /turf/open/floor/plating/ground/dirtgrassborder,
 /area/oscar_outpost/outside/west)
 "tJ" = (
-/obj/structure/table/rusticwoodentable,
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/structure/table/wood/rustic,
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -5;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -2;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 1;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 4;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 7;
 	pixel_y = 15
 	},
@@ -2428,7 +2428,7 @@
 	},
 /area/oscar_outpost)
 "xh" = (
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
 /obj/item/weapon/gun/hsg102/hsg_nest{
@@ -2934,7 +2934,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/east)
 "Dj" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/effect/spawner/random/food_or_drink/beer/oscaroutpost{
 	pixel_x = -5;
 	pixel_y = 15
@@ -3169,7 +3169,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/road)
 "Ei" = (
-/obj/structure/barricade/plasteel{
+/obj/structure/barricade/folding{
 	dir = 1
 	},
 /turf/open/floor/plating/ground/dirt,
@@ -3374,14 +3374,14 @@
 /area/oscar_outpost/outside/northeast)
 "GQ" = (
 /obj/structure/table/reinforced,
-/obj/structure/barricade/metal,
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid,
+/obj/structure/barricade/solid{
 	dir = 8
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 4
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
 /turf/open/liquid/water/river,
@@ -3538,7 +3538,7 @@
 	name = "barley";
 	plantname = "barley"
 	},
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /turf/open/floor,
 /area/oscar_outpost)
 "Iz" = (
@@ -3731,7 +3731,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/northeast)
 "KD" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/item/reagent_containers/food/snacks/grown/grapes,
 /obj/item/reagent_containers/food/snacks/grown/grapes,
 /obj/item/reagent_containers/food/snacks/grown/grapes,
@@ -3788,7 +3788,7 @@
 	name = "barley";
 	plantname = "barley"
 	},
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/effect/spawner/random/food_or_drink/kitchen,
 /turf/open/floor,
 /area/oscar_outpost)
@@ -3920,14 +3920,14 @@
 /area/oscar_outpost)
 "Nh" = (
 /obj/structure/table/reinforced,
-/obj/structure/barricade/metal,
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid,
+/obj/structure/barricade/solid{
 	dir = 8
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 4
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
 /turf/open/floor/plating,
@@ -4119,7 +4119,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/northwest)
 "OO" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/effect/spawner/random/food_or_drink/beer/oscaroutpost{
 	pixel_x = -5;
 	pixel_y = 15
@@ -4191,7 +4191,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/northeast)
 "OY" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/effect/spawner/random/food_or_drink/beer/oscaroutpost{
 	pixel_x = -5;
 	pixel_y = 15
@@ -4541,16 +4541,16 @@
 /area/oscar_outpost)
 "QW" = (
 /obj/structure/table/reinforced,
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 1
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 8
 	},
-/obj/structure/barricade/metal{
+/obj/structure/barricade/solid{
 	dir = 4
 	},
-/obj/structure/barricade/metal,
+/obj/structure/barricade/solid,
 /turf/open/floor/plating,
 /area/oscar_outpost/outside/north)
 "QX" = (
@@ -4570,32 +4570,32 @@
 	},
 /area/oscar_outpost/outside/northeast)
 "Rj" = (
-/obj/structure/table/rusticwoodentable,
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/structure/table/wood/rustic,
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -8;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -5;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = -2;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 1;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 4;
 	pixel_y = 15
 	},
-/obj/item/reagent_containers/food/drinks/drinkingglass{
+/obj/item/reagent_containers/cup/glass/drinking_glass{
 	pixel_x = 7;
 	pixel_y = 15
 	},
@@ -5297,7 +5297,7 @@
 /turf/open/floor/plating/ground/dirt2,
 /area/oscar_outpost/outside/road)
 "Ye" = (
-/obj/structure/table/rusticwoodentable,
+/obj/structure/table/wood/rustic,
 /obj/effect/spawner/random/food_or_drink/wine{
 	pixel_x = -8;
 	pixel_y = 18

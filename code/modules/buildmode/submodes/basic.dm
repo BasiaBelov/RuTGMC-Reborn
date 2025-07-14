@@ -24,11 +24,11 @@
 	if(istype(object,/turf) && left_click && !alt_click && !ctrl_click)
 		var/turf/T = object
 		if(isspaceturf(object))
-			T.PlaceOnTop(/turf/open/floor/plating)
+			T.place_on_top(/turf/open/floor/plating)
 		else if(isfloorturf(object))
-			T.PlaceOnTop(/turf/closed/wall)
+			T.place_on_top(/turf/closed/wall)
 		else if(iswallturf(object))
-			T.PlaceOnTop(/turf/closed/wall/r_wall)
+			T.place_on_top(/turf/closed/wall/r_wall)
 		log_admin("Build Mode: [key_name(c)] built [T] at [AREACOORD(T)]")
 		to_chat(c, span_notice("Success."))
 	else if(right_click)
@@ -36,7 +36,7 @@
 		to_chat(c, span_notice("Success."))
 		if(isturf(object))
 			var/turf/T = object
-			T.ScrapeAway()
+			T.scrape_away()
 		else if(isobj(object))
 			qdel(object)
 	else if(istype(object,/turf) && alt_click && left_click)

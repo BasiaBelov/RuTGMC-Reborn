@@ -14,9 +14,11 @@
 	var/bypass_vendor_check = FALSE
 	///If the item has hair concealing changed, save it.
 	var/hair_concealing_option
+	/// The contents in the storage (If there is storage)
+	var/list/contents = list()
 
 /datum/item_representation/New(obj/item/item_to_copy)
-	if(!item_to_copy)
+	if(!item_to_copy && !isobj(item_to_copy))
 		return
 	item_type = item_to_copy.type
 	if(item_to_copy.current_variant && item_to_copy.colorable_allowed & ICON_STATE_VARIANTS_ALLOWED)
@@ -39,13 +41,13 @@
  * First, it tries to find that object in a vendor with enough supplies.
  * If it finds one vendor with that item in reserve, it sells it and instantiate that item.
  * If it fails to find a vendor, it will add that item to a list on seller to warns him that it failed
- * Seller: The datum in charge of checking for points and buying_flags
- * Master: used for modules, when the item need to be installed on master. Can be null
- * User: The human trying to equip this item
- * Return the instantatiated item if it was successfully sold, and return null otherwise
+ ** Seller: The datum in charge of checking for points and buying_flags
+ ** Master: used for modules, when the item need to be installed on master. Can be null
+ ** User: The human trying to equip this item
+ ** Return the instantatiated item if it was successfully sold, and return null otherwise
  */
 /datum/item_representation/proc/instantiate_object(datum/loadout_seller/seller, master = null, mob/living/user)
-	if(seller && !bypass_vendor_check && !buy_item_in_vendor(item_type, seller, user))
+	if(!bypass_vendor_check && seller && !buy_item_in_vendor(item_type, seller, user))
 		return
 	if(!text2path("[item_type]"))
 		to_chat(user, span_warning("[item_type] in your loadout is an invalid item, it has probably been changed or removed."))
@@ -59,6 +61,8 @@
 	if(item.colorable_allowed & HAIR_CONCEALING_CHANGE_ALLOWED)
 		item.current_hair_concealment = hair_concealing_option
 		item.switch_hair_concealment_flags(user)
+	if(item.storage_datum)
+		instantiate_current_storage_datum(seller, item, user)
 	return item
 
 /**
@@ -73,11 +77,11 @@
 	else
 		icon_to_convert = icon(initial(item_type.icon), icon_state, SOUTH)
 	tgui_data["icons"] = list(list(
-				"icon" = icon2base64(icon_to_convert),
-				"translateX" = NO_OFFSET,
-				"translateY" = NO_OFFSET,
-				"scale" = 1,
-				))
+		"icon" = icon2base64(icon_to_convert),
+		"translateX" = NO_OFFSET,
+		"translateY" = NO_OFFSET,
+		"scale" = 1,
+	))
 	tgui_data["name"] = initial(item_type.name)
 	return tgui_data
 
@@ -86,39 +90,39 @@
  * This is only able to represent /obj/item/storage
  */
 /datum/item_representation/storage
-	/// The contents in the storage
-	var/list/contents = list()
 
 /datum/item_representation/storage/New(obj/item/item_to_copy)
 	if(!item_to_copy)
 		return
-	if(!isstorage(item_to_copy))
-		CRASH("/datum/item_representation/storage created from an item that is not a storage")
-	..()
+	if(!isobj(item_to_copy))
+		CRASH("/datum/item_representation/storage called New([item_to_copy]), when [item_to_copy] is not an obj")
+	. = ..()
 	//Internal storage are not in vendors. They should always be available for the loadout vendors, because they are instantiated like any other object
 	if(istype(item_to_copy, /obj/item/storage/internal))
 		bypass_vendor_check = TRUE
-	var/item_representation_type
 	for(var/atom/thing_in_content AS in item_to_copy.contents)
 		if(!isitem(thing_in_content))
 			continue
-		item_representation_type = item2representation_type(thing_in_content.type)
+		var/item_representation_type = item2representation_type(thing_in_content.type)
 		if(item_representation_type == /datum/item_representation/storage) //Storage nested in storage tends to be erased by jatum, so just give the default content
 			item_representation_type = /datum/item_representation
 		contents += new item_representation_type(thing_in_content)
 
-/datum/item_representation/storage/instantiate_object(datum/loadout_seller/seller, master = null, mob/living/user)
-	. = ..()
-	if(!.)
+///Like instantiate_object(), but returns a /datum instead of a /item, master is REQUIRED and it must be at least an atom
+/datum/item_representation/proc/instantiate_current_storage_datum(datum/loadout_seller/seller, atom/master = null, mob/living/user)
+	if(!master)
+		CRASH("instantiate_current_storage_datum called with null master")
+	item_type = master
+	if(!isatom(item_type))
+		CRASH("[item_type] is not a /atom, it cannot have storage")
+
+	if(is_type_in_typecache(item_type, GLOB.loadout_instantiate_default_contents)) //Some storage cannot handle custom contents
 		return
-	//Some storage cannot handle custom contents
-	if(is_type_in_typecache(item_type, GLOB.bypass_storage_content_save))
-		return
-	var/obj/item/storage/storage = .
+	var/datum/storage/current_storage_datum = item_type.storage_datum
 	var/list/obj/item/starting_items = list()
-	for(var/obj/item/I AS in storage.contents)
-		starting_items[I.type] = starting_items[I.type] + get_item_stack_number(I)
-	storage.delete_contents()
+	for(var/obj/item/item_in_contents AS in current_storage_datum.parent.contents)
+		starting_items[item_in_contents.type] = starting_items[item_in_contents.type] + get_item_stack_number(item_in_contents)
+	current_storage_datum.delete_contents()
 	for(var/datum/item_representation/item_representation AS in contents)
 		if(!item_representation.bypass_vendor_check && starting_items[item_representation.item_type] > 0)
 			var/amount_to_remove = get_item_stack_representation_amount(item_representation)
@@ -128,11 +132,11 @@
 				stack_representation.amount = amount_to_remove
 			starting_items[item_representation.item_type] = starting_items[item_representation.item_type] - amount_to_remove
 			item_representation.bypass_vendor_check = TRUE
-		var/obj/item/item_to_insert = item_representation.instantiate_object(seller, null, user)
+		var/obj/item/item_to_insert = item_representation.instantiate_object(seller, item_representation.item_type, user)
 		if(!item_to_insert)
 			continue
-		if(storage.can_be_inserted(item_to_insert))
-			storage.handle_item_insertion(item_to_insert)
+		if(current_storage_datum.can_be_inserted(item_to_insert, user))
+			current_storage_datum.handle_item_insertion(item_to_insert)
 			continue
 		item_to_insert.forceMove(get_turf(user))
 
@@ -148,7 +152,7 @@
 		return
 	if(!isitemstack(item_to_copy))
 		CRASH("/datum/item_representation/stack created from an item that is not a stack of items")
-	..()
+	. = ..()
 	var/obj/item/stack/stack_to_copy = item_to_copy
 	amount = stack_to_copy.amount
 
@@ -175,7 +179,7 @@
 		return
 	if(!isidcard(item_to_copy))
 		CRASH("/datum/item_representation/id created from an item that is not an id card")
-	..()
+	. = ..()
 	var/obj/item/card/id/id_to_copy = item_to_copy
 	access = id_to_copy.access
 	iff_signal = id_to_copy.iff_signal
@@ -198,7 +202,7 @@
 		return
 	if(!istype(item_to_copy, /obj/item/clothing/shoes))
 		CRASH("/datum/item_representation/boot created from an item that is not a shoe")
-	..()
+	. = ..()
 	var/obj/item/clothing/shoes/footwear = item_to_copy
 
 	for(var/key in footwear.attachments_by_slot)

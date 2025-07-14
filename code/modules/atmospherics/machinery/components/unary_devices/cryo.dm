@@ -10,10 +10,10 @@
 	layer = ABOVE_MOB_LAYER
 	pipe_flags = PIPING_ONE_PER_TURF|PIPING_DEFAULT_LAYER_ONLY
 	interaction_flags = INTERACT_MACHINE_TGUI
-	can_see_pipes = FALSE
 	light_range = 2
 	light_power = 0.5
 	light_color = LIGHT_COLOR_EMISSIVE_GREEN
+	vent_movement = NONE
 	var/autoeject = FALSE
 	var/release_notice = FALSE
 	var/temperature = 100
@@ -45,17 +45,17 @@
 		return
 	if(occupant.stat == DEAD)
 		return
-	if(!occupant.getBruteLoss(TRUE) && !occupant.getFireLoss(TRUE) && !occupant.getCloneLoss() && autoeject) //release the patient automatically when brute and burn are handled on non-robotic limbs
+	if(!occupant.get_brute_loss(TRUE) && !occupant.get_fire_loss(TRUE) && !occupant.get_clone_loss() && autoeject) //release the patient automatically when brute and burn are handled on non-robotic limbs
 		go_out(TRUE)
 		return
 	occupant.bodytemperature = 100 //Atmos is long gone, we'll just set temp directly.
 	occupant.Sleeping(20 SECONDS)
 
 	//You'll heal slowly just from being in an active pod, but chemicals speed it up.
-	if(occupant.getOxyLoss())
-		occupant.adjustOxyLoss(-1)
-	if (occupant.getToxLoss())
-		occupant.adjustToxLoss(-1)
+	if(occupant.get_oxy_loss())
+		occupant.adjust_oxy_loss(-1)
+	if (occupant.get_tox_loss())
+		occupant.adjust_tox_loss(-1)
 	occupant.heal_overall_damage(1, 1, updating_health = TRUE)
 	var/has_cryo = occupant.reagents.get_reagent_amount(/datum/reagent/medicine/cryoxadone) >= 1
 	var/has_clonexa = occupant.reagents.get_reagent_amount(/datum/reagent/medicine/clonexadone) >= 1
@@ -65,7 +65,7 @@
 		beaker.reagents.reaction(occupant)
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/on_construction()
-	..(dir, dir)
+	return ..(dir, dir)
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/RefreshParts()
 	var/C
@@ -170,7 +170,7 @@
 	update_icon()
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/process()
-	..()
+	. = ..()
 	if(machine_stat & (NOPOWER|BROKEN))
 		turn_off()
 		return
@@ -199,7 +199,7 @@
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/verb/move_eject()
 	set name = "Eject occupant"
-	set category = "Object"
+	set category = "IC.Object"
 	set src in oview(1)
 	if(usr == occupant) //If the user is inside the tube...
 		if (usr.stat == DEAD) //and he's not dead....
@@ -213,6 +213,8 @@
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/reagent_containers/glass))
 
@@ -244,9 +246,12 @@
 		var/obj/item/healthanalyzer/J = I
 		J.attack(occupant, user)
 
-	if(!istype(I, /obj/item/grab))
+/obj/machinery/atmospherics/components/unary/cryo_cell/grab_interact(obj/item/grab/grab, mob/user, base_damage = BASE_OBJ_SLAM_DAMAGE, is_sharp = FALSE)
+	. = ..()
+	if(.)
 		return
-
+	if(isxeno(user))
+		return
 	if(machine_stat & (NOPOWER|BROKEN))
 		to_chat(user, span_notice("\ [src] is non-functional!"))
 		return
@@ -255,33 +260,31 @@
 		to_chat(user, span_notice("\ [src] is already occupied!"))
 		return
 
-	var/obj/item/grab/G = I
-	var/mob/M
+	var/mob/grabbed_mob
 
-	if(ismob(G.grabbed_thing))
-		M = G.grabbed_thing
+	if(ismob(grab.grabbed_thing))
+		grabbed_mob = grab.grabbed_thing
 
-	else if(istype(G.grabbed_thing,/obj/structure/closet/bodybag/cryobag))
-		var/obj/structure/closet/bodybag/cryobag/C = G.grabbed_thing
-		if(!C.bodybag_occupant)
+	else if(istype(grab.grabbed_thing,/obj/structure/closet/bodybag/cryobag))
+		var/obj/structure/closet/bodybag/cryobag/cryobag = grab.grabbed_thing
+		if(!cryobag.bodybag_occupant)
 			to_chat(user, span_warning("The stasis bag is empty!"))
 			return
-		M = C.bodybag_occupant
-		C.open()
-		user.start_pulling(M)
+		grabbed_mob = cryobag.bodybag_occupant
+		cryobag.open()
+		user.start_pulling(grabbed_mob)
 
-	if(!M)
-		return
-
-	if(!ishuman(M))
+	if(!ishuman(grabbed_mob))
 		to_chat(user, span_notice("\ [src] is compatible with humanoid anatomies only!"))
 		return
 
-	if(M.abiotic())
+	if(grabbed_mob.abiotic())
 		to_chat(user, span_warning("Subject cannot have abiotic items on."))
 		return
 
-	put_mob(M, TRUE)
+	put_mob(grabbed_mob, TRUE)
+
+	return TRUE
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/proc/put_mob(mob/living/carbon/M as mob, put_in = null)
 	if (machine_stat & (NOPOWER|BROKEN))
@@ -368,10 +371,10 @@
 		data["occupant"]["health"] = round(mob_occupant.health, 1)
 		data["occupant"]["maxHealth"] = mob_occupant.maxHealth
 		data["occupant"]["minHealth"] = mob_occupant.health_threshold_dead
-		data["occupant"]["bruteLoss"] = round(mob_occupant.getBruteLoss(), 1)
-		data["occupant"]["oxyLoss"] = round(mob_occupant.getOxyLoss(), 1)
-		data["occupant"]["toxLoss"] = round(mob_occupant.getToxLoss(), 1)
-		data["occupant"]["fireLoss"] = round(mob_occupant.getFireLoss(), 1)
+		data["occupant"]["bruteLoss"] = round(mob_occupant.get_brute_loss(), 1)
+		data["occupant"]["oxyLoss"] = round(mob_occupant.get_oxy_loss(), 1)
+		data["occupant"]["toxLoss"] = round(mob_occupant.get_tox_loss(), 1)
+		data["occupant"]["fireLoss"] = round(mob_occupant.get_fire_loss(), 1)
 		data["occupant"]["bodyTemperature"] = round(mob_occupant.bodytemperature, 1)
 		if(mob_occupant.bodytemperature < 255)
 			data["occupant"]["temperaturestatus"] = "good"
@@ -425,9 +428,6 @@
 	on = TRUE
 	start_processing()
 	update_icon()
-
-/obj/machinery/atmospherics/components/unary/cryo_cell/can_crawl_through()
-	return // can't ventcrawl in or out of cryo.
 
 /obj/machinery/atmospherics/components/unary/cryo_cell/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount, damage_type, damage_flag, effects, armor_penetration, isrightclick)
 	if(!occupant)

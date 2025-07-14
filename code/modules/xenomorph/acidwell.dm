@@ -1,7 +1,7 @@
 /obj/structure/xeno/acidwell
 	name = "acid well"
 	desc = "An acid well. It stores acid to put out fires."
-	icon = 'icons/Xeno/acid_pool.dmi'
+	icon = 'icons/Xeno/acid_well.dmi'
 	plane = FLOOR_PLANE
 	icon_state = "well"
 	density = FALSE
@@ -39,7 +39,7 @@
 	return ..()
 
 /obj/structure/xeno/acidwell/process()
-	if(charges >= XENO_ACID_WELL_MAX_CHARGES)
+	if(charges >= XENO_ACID_WELL_MAX_AUTOCHARGES)
 		return PROCESS_KILL
 	if(nextstage <= recharge_rate)
 		nextstage++
@@ -53,7 +53,7 @@
 	SIGNAL_HANDLER
 	creator = null
 
-/obj/structure/xeno/acidwell/obj_destruction(damage_amount, damage_type, damage_flag)
+/obj/structure/xeno/acidwell/obj_destruction(damage_amount, damage_type, damage_flag, mob/living/blame_mob)
 	if(!QDELETED(creator) && creator.stat == CONSCIOUS && creator.z == z)
 		var/area/A = get_area(src)
 		if(A)
@@ -71,7 +71,7 @@
 		return
 	. += span_xenonotice("An acid well made by [creator]. It currently has <b>[charges]/[XENO_ACID_WELL_MAX_CHARGES] charges</b>.")
 
-/obj/structure/xeno/acidwell/deconstruct(disassembled = TRUE)
+/obj/structure/xeno/acidwell/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	visible_message(span_danger("[src] suddenly collapses!") )
 	return ..()
 
@@ -192,7 +192,7 @@
 		stepper.apply_damage(charges * 10, BURN, BODY_ZONE_PRECISE_R_FOOT, ACID,  penetration = 33 - 20 * H.get_permeability_protection()) //without providing full protection against them
 		stepper.visible_message(span_danger("[stepper] is immersed in [src]'s acid!") , \
 		span_danger("We are immersed in [src]'s acid!") , null, 5)
-		playsound(stepper, "sound/bullets/acid_impact1.ogg", 10 * charges)
+		playsound(stepper, 'sound/bullets/acid_impact1.ogg', 10 * charges)
 		new /obj/effect/temp_visual/acid_bath(get_turf(stepper))
 		charges_used = charges //humans stepping on it empties it out
 

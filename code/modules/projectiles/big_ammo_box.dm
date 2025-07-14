@@ -4,8 +4,8 @@
 	w_class = WEIGHT_CLASS_HUGE
 	icon = 'icons/obj/items/ammo/box.dmi'
 	icon_state = "big_ammo_box"
-	item_state = "big_ammo_box"
-	flags_equip_slot = ITEM_SLOT_BACK
+	worn_icon_state = "big_ammo_box"
+	equip_slot_flags = ITEM_SLOT_BACK
 	base_icon_state = "big_ammo_box"
 	///Ammunition type
 	var/default_ammo = /datum/ammo/bullet/rifle
@@ -32,13 +32,15 @@
 
 /obj/item/big_ammo_box/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/ammo_magazine))
 		var/obj/item/ammo_magazine/AM = I
 		if(!isturf(loc))
 			to_chat(user, span_warning("[src] must be on the ground to be used."))
 			return
-		if(AM.flags_magazine & MAGAZINE_REFILLABLE)
+		if(AM.magazine_flags & MAGAZINE_REFILLABLE)
 			if(default_ammo != AM.default_ammo)
 				to_chat(user, span_warning("Those aren't the same rounds. Better not mix them up."))
 				return
@@ -62,7 +64,7 @@
 				to_chat(user, span_notice("You refill [AM]."))
 			else
 				to_chat(user, span_notice("You put [S] rounds in [AM]."))
-		else if(AM.flags_magazine & MAGAZINE_HANDFUL)
+		else if(AM.magazine_flags & MAGAZINE_HANDFUL)
 			if(caliber != AM.caliber)
 				to_chat(user, span_warning("The rounds don't match up. Better not mix them up."))
 				return
@@ -125,10 +127,10 @@
 	desc = "A large, deployable ammo box."
 	icon = 'icons/obj/items/ammo/box.dmi'
 	icon_state = "ammoboxslug"
-	item_state = "ammoboxslug"
+	worn_icon_state = "ammoboxslug"
 	base_icon_state = "ammoboxslug"
 	w_class = WEIGHT_CLASS_HUGE
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	///Current stored rounds
 	var/current_rounds = 200
 	///Maximum stored rounds
@@ -194,6 +196,8 @@
 
 /obj/item/shotgunbox/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(!istype(I, /obj/item/ammo_magazine/handful))
 		return
@@ -219,14 +223,14 @@
 /obj/item/shotgunbox/buckshot
 	name = "Buckshot Ammo Box"
 	icon_state = "ammoboxbuckshot"
-	item_state = "ammoboxbuckshot"
+	worn_icon_state = "ammoboxbuckshot"
 	base_icon_state = "ammoboxbuckshot"
 	ammo_type = /datum/ammo/bullet/shotgun/buckshot
 
 /obj/item/shotgunbox/flechette
 	name = "Flechette Ammo Box"
 	icon_state = "ammoboxflechette"
-	item_state = "ammoboxflechette"
+	worn_icon_state = "ammoboxflechette"
 	base_icon_state = "ammoboxflechette"
 	ammo_type = /datum/ammo/bullet/shotgun/flechette
 
@@ -234,13 +238,20 @@
 	name = "big ammo box (14.5mm API)"
 	caliber = CALIBER_14X5
 	icon_state = "ammobox_145"
-	item_state = "ammobox_145"
+	worn_icon_state = "ammobox_145"
 	base_icon_state = "ammobox_145"
 	ammo_type = /datum/ammo/bullet/sniper/clf_heavyrifle
 
 /obj/item/shotgunbox/tracker
 	name = "Tracking Ammo Box"
 	icon_state = "ammoboxtracking"
-	item_state = "ammoboxtracking"
+	worn_icon_state = "ammoboxtracking"
 	base_icon_state = "ammoboxtracking"
 	ammo_type = /datum/ammo/bullet/shotgun/tracker
+
+/obj/item/shotgunbox/blank
+	name = "blank ammo box"
+	icon_state = "ammoboxblank"
+	worn_icon_state = "ammoboxblank"
+	base_icon_state = "ammoboxblank"
+	ammo_type = /datum/ammo/bullet/shotgun/blank

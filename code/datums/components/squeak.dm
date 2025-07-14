@@ -76,8 +76,10 @@
 /datum/component/squeak/proc/play_squeak_crossed(datum/source, atom/movable/AM, oldloc, oldlocs)
 	SIGNAL_HANDLER
 	if(isitem(AM))
+		if(!AM.throwing)
+			return // cause fuck you, that's why
 		var/obj/item/I = AM
-		if(I.flags_item & ITEM_ABSTRACT)
+		if(I.item_flags & ITEM_ABSTRACT)
 			return
 
 	if(istype(AM, /obj/projectile))

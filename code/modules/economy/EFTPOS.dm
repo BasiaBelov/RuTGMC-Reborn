@@ -89,7 +89,7 @@
 	var/dat
 	dat += "<i>This terminal is</i> [machine_id]. <i>Report this code when contacting NanoTrasen IT Support</i><br>"
 	if(transaction_locked)
-		dat += "<a href='?src=[text_ref(src)];choice=toggle_lock'>Back[transaction_paid ? "" : " (authentication required)"]</a><br><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];choice=toggle_lock'>Back[transaction_paid ? "" : " (authentication required)"]</a><br><br>"
 
 		dat += "Transaction purpose: <b>[transaction_purpose]</b><br>"
 		dat += "Value: <b>$[transaction_amount]</b><br>"
@@ -98,16 +98,16 @@
 			dat += "<i>This transaction has been processed successfully.</i><hr>"
 		else
 			dat += "<i>Swipe your card below the line to finish this transaction.</i><hr>"
-			dat += "<a href='?src=[text_ref(src)];choice=scan_card'>\[------\]</a>"
+			dat += "<a href='byond://?src=[text_ref(src)];choice=scan_card'>\[------\]</a>"
 	else
-		dat += "<a href='?src=[text_ref(src)];choice=toggle_lock'>Lock in new transaction</a><br><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];choice=toggle_lock'>Lock in new transaction</a><br><br>"
 
-		dat += "Transaction purpose: <a href='?src=[text_ref(src)];choice=trans_purpose'>[transaction_purpose]</a><br>"
-		dat += "Value: <a href='?src=[text_ref(src)];choice=trans_value'>$[transaction_amount]</a><br>"
-		dat += "Linked account: <a href='?src=[text_ref(src)];choice=link_account'>[linked_account ? linked_account.owner_name : "None"]</a><hr>"
-		dat += "<a href='?src=[text_ref(src)];choice=change_code'>Change access code</a><br>"
-		dat += "<a href='?src=[text_ref(src)];choice=change_id'>Change EFTPOS ID</a><br>"
-		dat += "Scan card to reset access code <a href='?src=[text_ref(src)];choice=reset'>\[------\]</a>"
+		dat += "Transaction purpose: <a href='byond://?src=[text_ref(src)];choice=trans_purpose'>[transaction_purpose]</a><br>"
+		dat += "Value: <a href='byond://?src=[text_ref(src)];choice=trans_value'>$[transaction_amount]</a><br>"
+		dat += "Linked account: <a href='byond://?src=[text_ref(src)];choice=link_account'>[linked_account ? linked_account.owner_name : "None"]</a><hr>"
+		dat += "<a href='byond://?src=[text_ref(src)];choice=change_code'>Change access code</a><br>"
+		dat += "<a href='byond://?src=[text_ref(src)];choice=change_id'>Change EFTPOS ID</a><br>"
+		dat += "Scan card to reset access code <a href='byond://?src=[text_ref(src)];choice=reset'>\[------\]</a>"
 
 	var/datum/browser/popup = new(user, "etfpos", "<div align='center'>[eftpos_name]</div>")
 	popup.set_content(dat)
@@ -116,6 +116,8 @@
 
 /obj/item/eftpos/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/card))
 		var/obj/item/card/C = I
@@ -159,7 +161,6 @@
 		T.date = GLOB.current_date_string
 		T.time = worldtime2text()
 		linked_account.transaction_log += T
-
 
 /obj/item/eftpos/Topic(href, href_list)
 	. = ..()
@@ -228,16 +229,16 @@
 			if("reset")
 				//reset the access code - requires HoP/captain access
 				var/obj/item/I = usr.get_active_held_item()
-				if (istype(I, /obj/item/card))
+				if(istype(I, /obj/item/card))
 					var/obj/item/card/id/C = I
 					if(ACCESS_MARINE_LOGISTICS in C.access)
 						access_code = 0
 						to_chat(usr, "[icon2html(src, usr)][span_info("Access code reset to 0.")]")
 
-	src.attack_self(usr)
+	attack_self(usr)
 
 /obj/item/eftpos/proc/scan_card(obj/item/card/I)
-	if (istype(I, /obj/item/card/id))
+	if(istype(I, /obj/item/card/id))
 		var/obj/item/card/id/C = I
 		visible_message(span_info("[usr] swipes a card through [src]."))
 		if(transaction_locked && !transaction_paid)

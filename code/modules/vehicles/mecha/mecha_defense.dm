@@ -36,7 +36,7 @@
 		to_chat(occupants, "[icon2html(src, occupants)][span_danger("[gear] is critically damaged!")]")
 		playsound(src, gear.destroy_sound, 50)
 
-/obj/vehicle/sealed/mecha/take_damage(damage_amount, damage_type = BRUTE, damage_flag = 0, sound_effect = TRUE, attack_dir, armour_penetration)
+/obj/vehicle/sealed/mecha/take_damage(damage_amount, damage_type = BRUTE, damage_flag = 0, effects = TRUE, attack_dir, armour_penetration, mob/living/blame_mob)
 	var/damage_taken = ..()
 	if(damage_taken <= 0 || obj_integrity < 0)
 		return damage_taken
@@ -49,14 +49,6 @@
 	to_chat(occupants, "[icon2html(src, occupants)][span_userdanger("Taking damage!")]")
 
 	return damage_taken
-
-/obj/vehicle/sealed/mecha/modify_by_armor(damage_amount, armor_type, penetration, def_zone, attack_dir)
-	. = ..()
-	if(!.)
-		return
-	if(!attack_dir)
-		return
-	. *= get_armour_facing(abs(dir2angle(dir) - dir2angle(attack_dir)))
 
 /obj/vehicle/sealed/mecha/attack_hand(mob/living/user, list/modifiers)
 	. = ..()
@@ -81,13 +73,16 @@
 	log_message("Affected by explosion of severity: [severity].", LOG_MECHA, color="red")
 	if(CHECK_BITFIELD(resistance_flags, INDESTRUCTIBLE))
 		return
-	if(!(flags_atom & PREVENT_CONTENTS_EXPLOSION))
+	if(!(atom_flags & PREVENT_CONTENTS_EXPLOSION))
 		contents_explosion(severity)
 	if(QDELETED(src))
 		return
 	take_damage(severity * 1.5, BRUTE, BOMB, 0)
+	for(var/mob/living/living_occupant AS in occupants)
+		living_occupant.Stagger(severity * 0.1)
 
 /obj/vehicle/sealed/mecha/handle_atom_del(atom/A)
+	. = ..()
 	if(A in occupants) //todo does not work and in wrong file
 		LAZYREMOVE(occupants, A)
 		icon_state = initial(icon_state)+"-open"
@@ -95,20 +90,33 @@
 
 /obj/vehicle/sealed/mecha/emp_act(severity)
 	. = ..()
-	if(get_charge())
-		use_power((cell.charge/3)/(severity*2))
-		take_damage(30 / severity, BURN, ENERGY, 1)
+	playsound(src, 'sound/magic/lightningshock.ogg', 50, FALSE)
+	use_power((cell.maxcharge * 0.4) / (severity))
+	take_damage(600 / severity, BURN, ENERGY)
+
+	for(var/mob/living/living_occupant AS in occupants)
+		living_occupant.Stagger((8 - severity) SECONDS)
+
 	log_message("EMP detected", LOG_MECHA, color="red")
 
+	var/disable_time = (5 - severity) SECONDS
+	if(!disable_time)
+		return
 	if(!equipment_disabled && LAZYLEN(occupants)) //prevent spamming this message with back-to-back EMPs
 		to_chat(occupants, span_warning("Error -- Connection to equipment control unit has been lost."))
-	addtimer(CALLBACK(src, TYPE_PROC_REF(/obj/vehicle/sealed/mecha, restore_equipment)), 3 SECONDS, TIMER_UNIQUE | TIMER_OVERRIDE)
+	mech_emped = TRUE
+	update_appearance(UPDATE_OVERLAYS)
+	var/time_left = timeleft(emp_timer)
+	if(time_left)
+		disable_time += time_left
+		deltimer(emp_timer)
+	emp_timer = addtimer(CALLBACK(src, TYPE_PROC_REF(/obj/vehicle/sealed/mecha, restore_equipment)), disable_time, TIMER_DELETE_ME|TIMER_STOPPABLE)
 	equipment_disabled = TRUE
 	set_mouse_pointer()
 
 /obj/vehicle/sealed/mecha/fire_act(burn_level, flame_color) //Check if we should ignite the pilot of an open-canopy mech
 	. = ..()
-	if(enclosed || mecha_flags & SILICON_PILOT)
+	if(enclosed)
 		return
 	for(var/mob/living/cookedalive AS in occupants)
 		if(cookedalive.fire_stacks < 5)
@@ -133,58 +141,6 @@
 		ammo_resupply(W, user)
 		return
 
-	if(isidcard(W))
-		if((mecha_flags & ADDING_ACCESS_POSSIBLE) || (mecha_flags & ADDING_MAINT_ACCESS_POSSIBLE))
-			if(internals_access_allowed(user))
-				ui_interact(user)
-				return
-			to_chat(user, span_warning("Invalid ID: Access denied."))
-			return
-		to_chat(user, span_warning("Maintenance protocols disabled by operator."))
-		return
-
-	if(istype(W, /obj/item/cell))
-		if(construction_state == MECHA_OPEN_HATCH)
-			if(!cell)
-				if(!user.transferItemToLoc(W, src))
-					return
-				var/obj/item/cell/C = W
-				to_chat(user, span_notice("You install the power cell."))
-				playsound(src, 'sound/items/screwdriver2.ogg', 50, FALSE)
-				cell = C
-				log_message("Power cell installed", LOG_MECHA)
-			else
-				to_chat(user, span_warning("There's already a power cell installed!"))
-		return
-
-	if(istype(W, /obj/item/stock_parts/scanning_module))
-		if(construction_state == MECHA_OPEN_HATCH)
-			if(!scanmod)
-				if(!user.transferItemToLoc(W, src))
-					return
-				to_chat(user, span_notice("You install the scanning module."))
-				playsound(src, 'sound/items/screwdriver2.ogg', 50, FALSE)
-				scanmod = W
-				log_message("[W] installed", LOG_MECHA)
-				update_part_values()
-			else
-				to_chat(user, span_warning("There's already a scanning module installed!"))
-		return
-
-	if(istype(W, /obj/item/stock_parts/capacitor))
-		if(construction_state == MECHA_OPEN_HATCH)
-			if(!capacitor)
-				if(!user.transferItemToLoc(W, src))
-					return
-				to_chat(user, span_notice("You install the capacitor."))
-				playsound(src, 'sound/items/screwdriver2.ogg', 50, FALSE)
-				capacitor = W
-				log_message("[W] installed", LOG_MECHA)
-				update_part_values()
-			else
-				to_chat(user, span_warning("There's already a capacitor installed!"))
-		return
-
 	if(istype(W, /obj/item/mecha_parts))
 		var/obj/item/mecha_parts/P = W
 		P.try_attach_part(user, src, FALSE)
@@ -195,7 +151,7 @@
 	if(!attacking_item.force)
 		return
 
-	var/damage_taken = take_damage(attacking_item.force, attacking_item.damtype, MELEE, 1)
+	var/damage_taken = take_damage(attacking_item.force, attacking_item.damtype, MELEE, blame_mob = user)
 	try_damage_component(damage_taken, user.zone_selected)
 
 	var/hit_verb = length(attacking_item.attack_verb) ? "[pick(attacking_item.attack_verb)]" : "hit"
@@ -215,7 +171,7 @@
 		try_damage_component(., user.zone_selected)
 
 /obj/vehicle/sealed/mecha/wrench_act(mob/living/user, obj/item/I)
-	..()
+	. = ..()
 	. = TRUE
 	if(construction_state == MECHA_SECURE_BOLTS)
 		construction_state = MECHA_LOOSE_BOLTS
@@ -226,7 +182,7 @@
 		to_chat(user, span_notice("You tighten the securing bolts."))
 
 /obj/vehicle/sealed/mecha/crowbar_act(mob/living/user, obj/item/I)
-	..()
+	. = ..()
 	. = TRUE
 	if(construction_state == MECHA_LOOSE_BOLTS)
 		construction_state = MECHA_OPEN_HATCH
@@ -257,7 +213,7 @@
 			visual_effect_icon = ATTACK_EFFECT_MECHFIRE
 		else if(damtype == TOX)
 			visual_effect_icon = ATTACK_EFFECT_MECHTOXIN
-	..()
+	return ..()
 
 /obj/vehicle/sealed/mecha/proc/ammo_resupply(obj/item/mecha_ammo/reload_box, mob/user,fail_chat_override = FALSE)
 	if(!reload_box.rounds)
@@ -303,3 +259,9 @@
 		else
 			to_chat(user, span_notice("None of the equipment on this exosuit can use this ammo!"))
 	return FALSE
+
+/obj/vehicle/sealed/mecha/projectile_hit(obj/projectile/proj, cardinal_move, uncrossing)
+	for(var/mob/living/carbon/human/crew AS in occupants)
+		if(crew.wear_id?.iff_signal & proj.iff_signal)
+			return FALSE
+	return ..()

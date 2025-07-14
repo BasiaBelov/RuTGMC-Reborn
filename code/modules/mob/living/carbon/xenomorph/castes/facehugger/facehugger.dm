@@ -15,8 +15,6 @@
 
 	pixel_x = -8
 	pixel_y = -3
-	old_x = -8
-	old_y = -3
 
 	// default_honor_value = 0
 
@@ -45,7 +43,7 @@
 		return
 	//We lose health if we go off the weed
 	if(!loc_weeds_type && !(lying_angle || resting))
-		adjustBruteLoss(2, TRUE)
+		adjust_brute_loss(2, TRUE)
 		return
 
 //Handles change in density (so people can walk through us)
@@ -80,8 +78,8 @@
 ///Trying to attach facehagger to face. Returns true on success and false otherwise
 /mob/living/carbon/xenomorph/facehugger/proc/try_attach(mob/living/carbon/human/host)
 	var/obj/item/clothing/mask/facehugger/larval/mask = new /obj/item/clothing/mask/facehugger/larval(host, src.hivenumber, src)
-	if(host.can_be_facehugged(mask, provoked = TRUE) && mask.Attach(host, FALSE)) //Attach hugger-mask
-		src.forceMove(host) //Moving sentient hugger inside host
+	if(host.can_be_facehugged(mask, provoked = TRUE) && mask.try_attach(host, FALSE)) //Attach hugger-mask
+		forceMove(host) //Moving sentient hugger inside host
 		if(client && isnormalhive(hive))
 			client.facehugger_exp_update(1)
 		return TRUE
@@ -105,7 +103,7 @@
 			rank_name = "Royal"
 		else
 			rank_name = "Young"
-	var/prefix = (hive.prefix || xeno_caste.upgrade_name) ? "[hive.prefix][xeno_caste.upgrade_name] " : ""
+	var/prefix = "[hive.prefix ? "[hive.prefix] " : ""][xeno_caste.upgrade_name ? "[xeno_caste.upgrade_name] " : ""]"
 	name = prefix + "[rank_name ? "[rank_name] " : ""][xeno_caste.display_name] ([nicknumber])"
 
 	real_name = name

@@ -6,45 +6,21 @@
 	desc = "A Infantry-pattern Jaeger combat exoskeleton made to work with modular attachments for the ability to function in many enviroments. This one seems to have a moderate amount of armor plating. Alt-Click to remove attached items. Use it to toggle the built-in flashlight."
 
 	icon_state = "chest"
-	item_state = "chest"
+	worn_icon_state = "chest"
 	soft_armor = MARINE_ARMOR_MEDIUM
 	slowdown = SLOWDOWN_ARMOR_MEDIUM
 
-	attachments_allowed = list(
-		/obj/item/armor_module/module/better_shoulder_lamp,
-		/obj/item/armor_module/module/pluto,
-		/obj/item/armor_module/module/valkyrie_autodoc,
-		/obj/item/armor_module/module/fire_proof,
-		/obj/item/armor_module/module/tyr_extra_armor,
-		/obj/item/armor_module/module/tyr_extra_armor/mark1,
-		/obj/item/armor_module/module/mimir_environment_protection,
-		/obj/item/armor_module/module/mimir_environment_protection/mark1,
-		/obj/item/armor_module/module/ballistic_armor,
-		/obj/item/armor_module/module/chemsystem,
-		/obj/item/armor_module/module/eshield,
-
-		/obj/item/armor_module/storage/general,
-		/obj/item/armor_module/storage/ammo_mag,
-		/obj/item/armor_module/storage/engineering,
-		/obj/item/armor_module/storage/medical,
-		/obj/item/armor_module/storage/general/som,
-		/obj/item/armor_module/storage/engineering/som,
-		/obj/item/armor_module/storage/medical/som,
-		/obj/item/armor_module/storage/injector,
-		/obj/item/armor_module/storage/grenade,
-		/obj/item/armor_module/storage/integrated,
-		/obj/item/armor_module/armor/badge,
-	)
-
-	flags_item_map_variant = ITEM_JUNGLE_VARIANT|ITEM_ICE_VARIANT|ITEM_DESERT_VARIANT
+	item_map_variant_flags = ITEM_JUNGLE_VARIANT|ITEM_ICE_VARIANT|ITEM_DESERT_VARIANT
 
 	greyscale_config = /datum/greyscale_config/armor_mk2/infantry
 	colorable_allowed = PRESET_COLORS_ALLOWED
 	colorable_colors = ARMOR_PALETTES_LIST
 	greyscale_colors = ARMOR_PALETTE_DRAB
 
-
 	allowed_uniform_type = /obj/item/clothing/under
+
+/obj/item/clothing/suit/modular/jaeger/generate_attachments_allowed()
+	attachments_allowed = general_list_of_marine_modules.Copy()
 
 /obj/item/clothing/suit/modular/jaeger/eva
 	name = "\improper Jaeger EVA medium exoskeleton"
@@ -107,12 +83,12 @@
 /obj/item/clothing/head/modular/marine
 	name = "Jaeger Pattern Infantry Helmet"
 	desc = "Usually paired with the Jaeger Combat Exoskeleton. Can mount utility functions on the helmet hard points. Has Infantry markings."
-	item_icons = list(
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',
+	worn_icon_list = list(
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',
 	)
 	icon_state = "helmet"
-	item_state = "helmet"
+	worn_icon_state = "helmet"
 	icon_override = null
 	soft_armor = MARINE_ARMOR_MEDIUM
 	greyscale_colors = ARMOR_PALETTE_DRAB
@@ -120,48 +96,9 @@
 	colorable_colors = ARMOR_PALETTES_LIST
 	greyscale_config = /datum/greyscale_config/armor_mk2/infantry
 
-
-	attachments_allowed = list(
-		/obj/item/armor_module/module/tyr_head,
-		/obj/item/armor_module/module/tyr_head/mark2,
-		/obj/item/armor_module/module/fire_proof_helmet,
-		/obj/item/armor_module/module/hod_head,
-		/obj/item/armor_module/module/mimir_environment_protection/mimir_helmet,
-		/obj/item/armor_module/module/mimir_environment_protection/mimir_helmet/mark1,
-		/obj/item/armor_module/module/welding,
-		/obj/item/armor_module/module/welding/superior,
-		/obj/item/armor_module/module/binoculars,
-		/obj/item/armor_module/module/binoculars/artemis_mark_two,
-		/obj/item/armor_module/module/artemis,
-		/obj/item/armor_module/module/antenna,
-		/obj/item/armor_module/module/night_vision,
-		/obj/item/armor_module/module/motion_detector,
-		/obj/item/armor_module/storage/helmet,
-		/obj/item/armor_module/armor/badge,
-		/obj/item/armor_module/armor/visor/marine,
-		/obj/item/armor_module/armor/visor/marine/skirmisher,
-		/obj/item/armor_module/armor/visor/marine/scout,
-		/obj/item/armor_module/armor/visor/marine/eva,
-		/obj/item/armor_module/armor/visor/marine/eva/skull,
-		/obj/item/armor_module/armor/visor/marine/gungnir,
-		/obj/item/armor_module/armor/visor/marine/eod,
-		/obj/item/armor_module/armor/visor/marine/assault,
-		/obj/item/armor_module/armor/visor/marine/helljumper,
-		/obj/item/armor_module/armor/visor/marine/ranger,
-		/obj/item/armor_module/armor/visor/marine/traditional,
-		/obj/item/armor_module/armor/visor/marine/trooper,
-		/obj/item/armor_module/armor/visor/marine/kabuto,
-		/obj/item/armor_module/armor/visor/marine/hotaru,
-		/obj/item/armor_module/armor/visor/marine/dashe,
-		/obj/item/armor_module/armor/visor/marine/fourvisor,
-		/obj/item/armor_module/armor/visor/marine/foureyevisor,
-		/obj/item/armor_module/armor/visor/marine/markonevisor,
-		/obj/item/armor_module/armor/secondary_color/helm,
-	)
-
 	starting_attachments = list(/obj/item/armor_module/armor/visor/marine, /obj/item/armor_module/storage/helmet)
 
-	flags_item_map_variant = ITEM_JUNGLE_VARIANT|ITEM_ICE_VARIANT|ITEM_DESERT_VARIANT
+	item_map_variant_flags = ITEM_JUNGLE_VARIANT|ITEM_ICE_VARIANT|ITEM_DESERT_VARIANT
 
 /obj/item/clothing/head/modular/marine/eva
 	name = "Jaeger Pattern EVA Helmet"

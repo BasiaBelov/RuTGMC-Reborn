@@ -20,12 +20,10 @@
 	var/obj/vehicle/sealed/mecha/chassis
 	///Bitflag. Determines the range of the equipment.
 	var/range = MECHA_MELEE
-	/// Bitflag. Used by exosuit fabricator to assign sub-categories based on which exosuits can equip this.
-	var/mech_flags = ALL
+	/// boolean. Can we equip this to greyscale mech, or this is just a decoration?
+	var/can_equip = FALSE
 	///boolean: FALSE if this equipment can not be removed/salvaged
 	var/detachable = TRUE
-	///Boolean: whether a pacifist can use this equipment
-	var/harmful = FALSE
 	///Sound file: Sound to play when this equipment is destroyed while still attached to the mech
 	destroy_sound = 'sound/mecha/critdestr.ogg'
 
@@ -124,7 +122,7 @@
 	return default_can_attach(M, attach_right)
 
 /obj/item/mecha_parts/mecha_equipment/proc/default_can_attach(obj/vehicle/sealed/mecha/mech, attach_right = FALSE)
-	if(!(mech_flags & mech.mech_type))
+	if(!can_equip)
 		return FALSE
 	if(equipment_slot == MECHA_WEAPON)
 		if(attach_right)
@@ -197,13 +195,14 @@
 /obj/item/mecha_parts/mecha_equipment/proc/get_snowflake_data()
 	return list()
 
-/**
- * Proc for reloading weapons from HTML UI or by AI
- * note that this is old and likely broken code
- */
+///Tries to rearm the module
+/obj/item/mecha_parts/mecha_equipment/proc/attempt_rearm()
+	return FALSE
+
+///Rearms the module
 /obj/item/mecha_parts/mecha_equipment/proc/rearm()
 	return FALSE
 
-/// AI mech pilot: returns TRUE if the Ai should try to reload the mecha
+///Checks if the module actually need rearming
 /obj/item/mecha_parts/mecha_equipment/proc/needs_rearm()
 	return FALSE

@@ -61,30 +61,30 @@
 			dat += "[health_ratio > 50 ? "<font color='#487553'>" : "<font color='#b54646'>"]\tHealth %: [health_ratio] ([t1])</FONT><BR>"
 			if(ishuman(occupant))
 				if(connected.filtering)
-					dat += "<A href='?src=[text_ref(src)];togglefilter=1'>Stop Dialysis</A><BR>"
+					dat += "<A href='byond://?src=[text_ref(src)];togglefilter=1'>Stop Dialysis</A><BR>"
 				else
-					dat += "<HR><A href='?src=[text_ref(src)];togglefilter=1'>Start Dialysis</A><BR>"
+					dat += "<HR><A href='byond://?src=[text_ref(src)];togglefilter=1'>Start Dialysis</A><BR>"
 				if(connected.stasis)
-					dat += "<HR><A href='?src=[text_ref(src)];togglestasis=1'>Deactivate Cryostasis</A><BR><HR>"
+					dat += "<HR><A href='byond://?src=[text_ref(src)];togglestasis=1'>Deactivate Cryostasis</A><BR><HR>"
 				else
-					dat += "<HR><A href='?src=[text_ref(src)];togglestasis=1'>Activate Cryostasis</A><BR><HR>"
+					dat += "<HR><A href='byond://?src=[text_ref(src)];togglestasis=1'>Activate Cryostasis</A><BR><HR>"
 			else
 				dat += "<HR>Dialysis Disabled - Non-human present.<BR><HR>"
 				var/mob/living/carbon/human/patient = occupant
 				var/pulse = patient.handle_pulse()
 				dat += "[pulse == PULSE_NONE || pulse == PULSE_THREADY ? "<font color='#b54646'>" : "<font color='#487553'>"]\t-Pulse, bpm: [patient.get_pulse(GETPULSE_TOOL)]</FONT><BR>"
-			dat += "[occupant.getBruteLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Brute Damage %: [occupant.getBruteLoss()]</FONT><BR>"
-			dat += "[occupant.getOxyLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Respiratory Damage %: [occupant.getOxyLoss()]</FONT><BR>"
-			dat += "[occupant.getToxLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Toxin Content %: [occupant.getToxLoss()]</FONT><BR>"
-			dat += "[occupant.getFireLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Burn Severity %: [occupant.getFireLoss()]</FONT><BR>"
+			dat += "[occupant.get_brute_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Brute Damage %: [occupant.get_brute_loss()]</FONT><BR>"
+			dat += "[occupant.get_oxy_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Respiratory Damage %: [occupant.get_oxy_loss()]</FONT><BR>"
+			dat += "[occupant.get_tox_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Toxin Content %: [occupant.get_tox_loss()]</FONT><BR>"
+			dat += "[occupant.get_fire_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Burn Severity %: [occupant.get_fire_loss()]</FONT><BR>"
 			dat += "<HR>Knocked Out Summary %: [occupant.AmountUnconscious()] ([round(occupant.AmountUnconscious() * 0.1)] seconds left!)<BR>"
 			for(var/chemical in connected.available_chemicals)
 				dat += "<label style='width:180px; display: inline-block'>[connected.available_chemicals[chemical]] ([round(occupant.reagents.get_reagent_amount(chemical), 0.01)] units)</label> Inject:"
 				for(var/amount in connected.amounts)
-					dat += " <a href ='?src=[text_ref(src)];chemical=[chemical];amount=[amount]'>[amount] units</a>"
+					dat += " <a href ='byond://?src=[text_ref(src)];chemical=[chemical];amount=[amount]'>[amount] units</a>"
 				dat += "<br>"
-			dat += "<A href='?src=[text_ref(src)];refresh=1'>Refresh Meter Readings</A><BR>"
-			dat += "<HR><A href='?src=[text_ref(src)];ejectify=1'>Eject Patient</A>"
+			dat += "<A href='byond://?src=[text_ref(src)];refresh=1'>Refresh Meter Readings</A><BR>"
+			dat += "<HR><A href='byond://?src=[text_ref(src)];ejectify=1'>Eject Patient</A>"
 		else
 			dat += "The sleeper is empty."
 	var/datum/browser/popup = new(user, "sleeper", "<div align='center'>Sleeper Console</div>", 400, 670)
@@ -108,11 +108,11 @@
 			var/amount = text2num(href_list["amount"])
 			if(amount == 5 || amount == 10)
 				connected.inject_chemical(usr, R, amount)
-	if (href_list["togglefilter"])
+	if(href_list["togglefilter"])
 		connected.toggle_filter()
-	if (href_list["togglestasis"])
+	if(href_list["togglestasis"])
 		connected.toggle_stasis()
-	if (href_list["ejectify"])
+	if(href_list["ejectify"])
 		connected.eject()
 
 	updateUsrDialog()
@@ -201,7 +201,7 @@
 		if(!(R.fields["last_scan_time"]))
 			. += span_deptradio("No scan report on record")
 		else
-			. += span_deptradio("<a href='?src=[text_ref(src)];scanreport=1'>It contains [occupant]: Scan from [R.fields["last_scan_time"]].[feedback]</a>")
+			. += span_deptradio("<a href='byond://?src=[text_ref(src)];scanreport=1'>It contains [occupant]: Scan from [R.fields["last_scan_time"]].[feedback]</a>")
 		break
 
 /obj/machinery/sleeper/Topic(href, href_list)
@@ -237,7 +237,7 @@
 		return
 
 	//Life support
-	occupant?.adjustOxyLoss(-occupant.getOxyLoss()) // keep them breathing, pretend they get IV dexalinplus
+	occupant?.adjust_oxy_loss(-occupant.get_oxy_loss()) // keep them breathing, pretend they get IV dexalinplus
 
 	if(filtering)
 		for(var/datum/reagent/x in occupant.reagents.reagent_list)
@@ -269,35 +269,49 @@
 
 /obj/machinery/sleeper/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/healthanalyzer) && occupant) //Allows us to use the analyzer on the occupant without taking him out.
 		var/obj/item/healthanalyzer/J = I
 		J.attack(occupant, user)
-		return
 
+/obj/machinery/sleeper/grab_interact(obj/item/grab/grab, mob/user, base_damage = BASE_OBJ_SLAM_DAMAGE, is_sharp = FALSE)
+	. = ..()
+	if(.)
+		return
 	if(isxeno(user))
 		return
-
+	if(machine_stat & (NOPOWER|BROKEN))
+		to_chat(user, span_notice("\ [src] is non-functional!"))
+		return
 	if(occupant)
-		to_chat(user, span_notice("The sleeper is already occupied!"))
+		to_chat(user, span_notice("\ [src] is already occupied!"))
 		return
 
-	if(!istype(I, /obj/item/grab))
+	var/mob/grabbed_mob
+
+	if(ismob(grab.grabbed_thing))
+		grabbed_mob = grab.grabbed_thing
+	else if(istype(grab.grabbed_thing,/obj/structure/closet/bodybag/cryobag))
+		var/obj/structure/closet/bodybag/cryobag/cryobag = grab.grabbed_thing
+		if(!cryobag.bodybag_occupant)
+			to_chat(user, span_warning("The stasis bag is empty!"))
+			return
+		grabbed_mob = cryobag.bodybag_occupant
+		cryobag.open()
+		user.start_pulling(grabbed_mob)
+	if(!grabbed_mob)
 		return
 
-	var/obj/item/grab/G = I
-	if(!ismob(G.grabbed_thing))
+	if(!grabbed_mob.forceMove(src))
 		return
-
-	var/mob/M = G.grabbed_thing
-	if(!M.forceMove(src))
-		return
-
-	visible_message("[user] puts [M] into the sleeper.", 3)
-	occupant = M
+	visible_message("[user] puts [grabbed_mob] into the sleeper.", 3)
+	occupant = grabbed_mob
 	start_processing()
 	connected.start_processing()
 	update_icon()
+	return TRUE
 
 /obj/machinery/sleeper/ex_act(severity)
 	if(filtering)
@@ -306,16 +320,15 @@
 		qdel(src)
 
 /obj/machinery/sleeper/emp_act(severity)
+	. = ..()
 	if(filtering)
 		toggle_filter()
 	if(stasis)
 		toggle_stasis()
 	if(machine_stat & (BROKEN|NOPOWER))
-		..(severity)
 		return
 	if(occupant)
 		go_out()
-	..()
 
 /obj/machinery/sleeper/proc/toggle_filter()
 	if(!occupant)
@@ -377,10 +390,10 @@
 		var/health_ratio = occupant.health * 100 / occupant.maxHealth
 		to_chat(user, "[health_ratio > 50 ? "<font color='#487553'> " : "<font color='#b54646'> "]\t Health %: [health_ratio] ([t1])</font>")
 		to_chat(user, "[occupant.bodytemperature > 50 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t -Core Temperature: [occupant.bodytemperature-T0C]&deg;C ([occupant.bodytemperature*1.8-459.67]&deg;F)</FONT><BR>")
-		to_chat(user, "[occupant.getBruteLoss() < 60 ? "<font color='#487553'> " : "<font class='#b54646'> "]\t -Brute Damage %: [occupant.getBruteLoss()]</font>")
-		to_chat(user, "[occupant.getOxyLoss() < 60 ? "<span color='#487553'> " : "<font color='#b54646'> "]\t -Respiratory Damage %: [occupant.getOxyLoss()]</font>")
-		to_chat(user, "[occupant.getToxLoss() < 60 ? "<font color='#487553'> " : "<font color='#b54646'> "]\t -Toxin Content %: [occupant.getToxLoss()]</font>")
-		to_chat(user, "[occupant.getFireLoss() < 60 ? "<font color='#487553'> " : "<font color='#b54646'> "]\t -Burn Severity %: [occupant.getFireLoss()]</font>")
+		to_chat(user, "[occupant.get_brute_loss() < 60 ? "<font color='#487553'> " : "<font class='#b54646'> "]\t -Brute Damage %: [occupant.get_brute_loss()]</font>")
+		to_chat(user, "[occupant.get_oxy_loss() < 60 ? "<span color='#487553'> " : "<font color='#b54646'> "]\t -Respiratory Damage %: [occupant.get_oxy_loss()]</font>")
+		to_chat(user, "[occupant.get_tox_loss() < 60 ? "<font color='#487553'> " : "<font color='#b54646'> "]\t -Toxin Content %: [occupant.get_tox_loss()]</font>")
+		to_chat(user, "[occupant.get_fire_loss() < 60 ? "<font color='#487553'> " : "<font color='#b54646'> "]\t -Burn Severity %: [occupant.get_fire_loss()]</font>")
 		to_chat(user, span_notice("Expected time till occupant can safely awake: (note: If health is below 20% these times are inaccurate)"))
 		to_chat(user, span_notice("\t [occupant.AmountUnconscious() * 0.1] second\s (if around 1 or 2 the sleeper is keeping them asleep.)"))
 	else
@@ -401,7 +414,7 @@
 
 /obj/machinery/sleeper/verb/eject()
 	set name = "Eject Sleeper"
-	set category = "Object.Mob"
+	set category = "IC.Mob"
 	set src in oview(1)
 
 	if(usr.stat != CONSCIOUS)
@@ -445,7 +458,7 @@
 
 /obj/machinery/sleeper/verb/move_inside()
 	set name = "Enter Sleeper"
-	set category = "Object.Mob"
+	set category = "IC.Mob"
 	set src in oview(1)
 
 	move_inside_wrapper(usr, usr)

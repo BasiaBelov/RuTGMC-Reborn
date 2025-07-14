@@ -3,22 +3,20 @@
 #define MINE_LIVING_OR_VEHICLE MINE_LIVING_ONLY|MINE_VEHICLE_ONLY
 
 /**
-Mines
-
 Mines have an invisible "tripwire" atom that explodes when crossed
 Stepping directly on the mine will also blow it up
 */
 /obj/item/explosive/mine
 	name = "\improper M20 Claymore anti-personnel mine"
 	desc = "The M20 Claymore is a directional proximity triggered anti-personnel mine designed by Armat Systems for use by the TerraGov Marine Corps."
-	icon = 'icons/obj/items/grenade.dmi'
+	icon = 'icons/obj/items/mine.dmi'
 	icon_state = "m20"
 	force = 5
 	w_class = WEIGHT_CLASS_SMALL
 	throwforce = 5
 	throw_range = 6
 	throw_speed = 3
-	flags_atom = CONDUCT
+	atom_flags = CONDUCT
 	///Trigger flags for this mine
 	var/target_mode = MINE_LIVING_ONLY
 	/// IFF signal - used to determine friendly units
@@ -102,10 +100,10 @@ Stepping directly on the mine will also blow it up
 	tripwire.linked_mine = src
 
 /// Supports diarming a mine
-/obj/item/explosive/mine/attackby(obj/item/I, mob/user, params)
+/obj/item/explosive/mine/multitool_act(mob/living/user, obj/item/I)
 	. = ..()
 
-	if(!ismultitool(I) || !anchored)
+	if(!anchored)
 		return
 
 	user.visible_message(span_notice("[user] starts disarming [src]."), \
@@ -253,6 +251,9 @@ Stepping directly on the mine will also blow it up
 	cell_explosion(tripwire ? tripwire.loc : loc, 120, 30)
 	QDEL_NULL(tripwire)
 	qdel(src)
+
+/obj/item/explosive/mine/anti_tank/emp_act()
+	return
 
 /obj/item/explosive/mine/anti_tank/ex_act(severity)
 	take_damage(severity, BRUTE, BOMB, 0)

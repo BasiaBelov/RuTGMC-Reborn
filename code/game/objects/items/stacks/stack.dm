@@ -1,3 +1,9 @@
+//stack recipe placement check types
+/// Checks if there is an object of the result type in any of the cardinal directions
+#define STACK_CHECK_CARDINALS (1<<0)
+/// Checks if there is an object of the result type within one tile
+#define STACK_CHECK_ADJACENT (1<<1)
+
 /obj/item/stack
 	icon = 'icons/obj/stack_objects.dmi'
 	gender = PLURAL
@@ -5,12 +11,9 @@
 	var/singular_name
 	var/stack_name = "stack"
 	var/amount = 1
-	///Also see stack recipes initialisation, param "max_res_amount" must be equal to this max_amount
-	var/max_amount = 50
-	///This path and its children should merge with this stack, defaults to src.type
-	var/merge_type
-	///Determines whether the item should update it's sprites based on amount.
-	var/number_of_extra_variants = 0
+	var/max_amount = 50 //also see stack recipes initialisation, param "max_res_amount" must be equal to this max_amount
+	var/merge_type // This path and its children should merge with this stack, defaults to src.type
+	var/number_of_extra_variants = 0 //Determines whether the item should update it's sprites based on amount.
 
 /obj/item/stack/Initialize(mapload, new_amount)
 	. = ..()
@@ -21,12 +24,20 @@
 		new type(loc, max_amount)
 	if(!merge_type)
 		merge_type = type
+	recipes = get_main_recipes().Copy()
 	update_weight()
 	update_icon()
 	var/static/list/connections = list(
 		COMSIG_ATOM_ENTERED = PROC_REF(on_cross),
 	)
 	AddElement(/datum/element/connect_loc, connections)
+
+///Use this proc to assign the appropriate global list to our var/recipes
+/obj/item/stack/proc/get_main_recipes()
+	RETURN_TYPE(/list)
+	SHOULD_CALL_PARENT(TRUE)
+
+	return list() //empty list
 
 /obj/item/stack/proc/update_weight()
 	var/percent = round((amount * 100) / max_amount)
@@ -93,7 +104,7 @@
 	if(.)
 		return
 
-	if(!recipes)
+	if(!recipes || recipes?.len <= 1)
 		return
 
 	if(QDELETED(src) || get_amount() <= 0)
@@ -114,7 +125,7 @@
 
 		if(istype(E, /datum/stack_recipe_list))
 			var/datum/stack_recipe_list/srl = E
-			t1 += "<a href='?src=[REF(src)];sublist=[i]'>[srl.title]</a>"
+			t1 += "<a href='byond://?src=[REF(src)];sublist=[i]'>[srl.title]</a>"
 
 		if(istype(E, /datum/stack_recipe))
 			var/datum/stack_recipe/recipe = E
@@ -129,7 +140,7 @@
 				title += "[recipe.title]"
 			title += " ([recipe.req_amount] [singular_name]\s)"
 			if(can_build)
-				t1 += "<A href='?src=[REF(src)];sublist=[recipes_sublist];make=[i];multiplier=1'>[title]</A>  "
+				t1 += "<A href='byond://?src=[REF(src)];sublist=[recipes_sublist];make=[i];multiplier=1'>[title]</A>  "
 			else
 				t1 += "[title]"
 				continue
@@ -139,9 +150,9 @@
 				var/list/multipliers = list(5,10,25)
 				for(var/n in multipliers)
 					if(max_multiplier >= n)
-						t1 += " <A href='?src=[REF(src)];make=[i];multiplier=[n]'>[n * recipe.res_amount]x</A>"
+						t1 += " <A href='byond://?src=[REF(src)];make=[i];multiplier=[n]'>[n * recipe.res_amount]x</A>"
 				if(!(max_multiplier in multipliers))
-					t1 += " <A href='?src=[REF(src)];make=[i];multiplier=[max_multiplier]'>[max_multiplier * recipe.res_amount]x</A>"
+					t1 += " <A href='byond://?src=[REF(src)];make=[i];multiplier=[max_multiplier]'>[max_multiplier * recipe.res_amount]x</A>"
 
 	var/datum/browser/popup = new(user, "stack", name, 400, 400)
 	popup.set_content(t1)
@@ -201,7 +212,7 @@
 		var/turf/our_turf = get_turf(user)
 		if(!isturf(our_turf))
 			return
-		our_turf.PlaceOnTop(recipe.result_type)
+		our_turf.place_on_top(recipe.result_type)
 	else
 		object = new recipe.result_type(get_turf(user))
 	if(object)
@@ -227,48 +238,50 @@
 	if(istype(object, /obj/structure))
 		user.record_structures_built()
 
-/obj/item/stack/proc/building_checks(mob/user, datum/stack_recipe/recipe, multiplier)
-	if(get_amount() < recipe.req_amount*multiplier)
-		if(recipe.req_amount*multiplier>1)
-			to_chat(user, span_warning("You haven't got enough [src] to build \the [recipe.req_amount*multiplier] [recipe.title]\s!"))
-		else
-			to_chat(user, span_warning("You haven't got enough [src] to build \the [recipe.title]!"))
+/obj/item/stack/proc/building_checks(mob/builder, datum/stack_recipe/recipe, multiplier)
+	if (get_amount() < recipe.req_amount * multiplier)
+		builder.balloon_alert(builder, "not enough material!")
 		return FALSE
-	var/turf/T = get_turf(user)
+	var/turf/dest_turf = get_turf(builder)
 
-	switch(recipe.max_per_turf)
-		if(STACK_RECIPE_ONE_PER_TILE)
-			if(locate(recipe.result_type) in T)
-				to_chat(user, span_warning("There is another [recipe.title] here!"))
-				return FALSE
-		if(STACK_RECIPE_ONE_DIRECTIONAL_PER_TILE)
-			for(var/obj/thing in T)
-				if(!istype(thing, recipe.result_type))
-					continue
-				if(thing.dir != user.dir)
-					continue
-				to_chat(user, span_warning("You can't build \the [recipe.title] on top of another!"))
-				return FALSE
-	if(recipe.on_floor)
-		if(!isfloorturf(T) && !isbasalt(T) && !islavacatwalk(T) && !isopengroundturf(T))
-			to_chat(user, span_warning("\The [recipe.title] must be constructed on the floor!"))
+	if((recipe.crafting_flags & CRAFT_ONE_PER_TURF) && (locate(recipe.result_type) in dest_turf))
+		builder.balloon_alert(builder, "already one here!")
+		return FALSE
+
+	if(recipe.crafting_flags & CRAFT_CHECK_DIRECTION)
+		if(!valid_build_direction(dest_turf, builder.dir, is_fulltile = (recipe.crafting_flags & CRAFT_IS_FULLTILE)))
+			builder.balloon_alert(builder, "won't fit here!")
 			return FALSE
-		for(var/obj/AM in T)
-			if(istype(AM,/obj/structure/grille))
-				continue
-			if(istype(AM,/obj/structure/table))
-				continue
-			if(!AM.density)
-				continue
-			if(AM.flags_atom & ON_BORDER && AM.dir != user.dir)
-				if(istype(AM, /obj/structure/window))
-					var/obj/structure/window/W = AM
-					if(!W.is_full_window())
-						continue
-				else
-					continue
-			to_chat(user, span_warning("There is a [AM.name] right where you want to place \the [recipe.title], blocking the construction."))
+
+	if(recipe.crafting_flags & CRAFT_ON_SOLID_GROUND)
+		if(!isopenturf(dest_turf))
+			builder.balloon_alert(builder, "cannot be made on a wall!")
 			return FALSE
+		var/turf/open/open_turf = dest_turf
+		if(!open_turf.allow_construction)
+			builder.balloon_alert(builder, "cant build here!")
+			return FALSE
+
+	if(recipe.crafting_flags & CRAFT_CHECK_DENSITY)
+		for(var/obj/object in dest_turf)
+			if(object.density && !(object.obj_flags & IGNORE_DENSITY) || object.obj_flags & BLOCKS_CONSTRUCTION)
+				builder.balloon_alert(builder, "something is in the way!")
+				return FALSE
+
+	if(recipe.placement_checks & STACK_CHECK_CARDINALS)
+		var/turf/nearby_turf
+		for(var/direction in GLOB.cardinals)
+			nearby_turf = get_step(dest_turf, direction)
+			if(locate(recipe.result_type) in nearby_turf)
+				to_chat(builder, span_warning("\The [recipe.title] must not be built directly adjacent to another!"))
+				builder.balloon_alert(builder, "can't be adjacent to another!")
+				return FALSE
+
+	if(recipe.placement_checks & STACK_CHECK_ADJACENT)
+		if(locate(recipe.result_type) in range(1, dest_turf))
+			builder.balloon_alert(builder, "can't be near another!")
+			return FALSE
+
 	return TRUE
 
 /obj/item/stack/use(used)
@@ -360,45 +373,5 @@
 /obj/item/stack/proc/select_radial(mob/user)
 	return TRUE
 
-/obj/item/stack/dropped(mob/user)
-	add_to_stacks(user)
-	return ..()
-
-/*
-* Recipe datum
-*/
-/datum/stack_recipe
-	var/title = "ERROR"
-	var/result_type
-	var/req_amount = 1
-	var/res_amount = 1
-	var/max_res_amount = 1
-	var/time = 0
-	var/max_per_turf = STACK_RECIPE_INFINITE_PER_TILE
-	var/on_floor = FALSE
-	var/skill_req = FALSE //whether only people with sufficient construction skill can build this.
-
-
-/datum/stack_recipe/New(title, result_type, req_amount = 1, res_amount = 1, max_res_amount = 1, time = 0, max_per_turf = STACK_RECIPE_INFINITE_PER_TILE, on_floor = FALSE, skill_req = FALSE)
-	src.title = title
-	src.result_type = result_type
-	src.req_amount = req_amount
-	src.res_amount = res_amount
-	src.max_res_amount = max_res_amount
-	src.time = time
-	src.max_per_turf = max_per_turf
-	src.on_floor = on_floor
-	src.skill_req = skill_req
-
-/*
-* Recipe list datum
-*/
-/datum/stack_recipe_list
-	var/title = "ERROR"
-	var/list/recipes
-	var/req_amount = 1
-
-/datum/stack_recipe_list/New(title, recipes, req_amount = 1)
-	src.title = title
-	src.recipes = recipes
-	src.req_amount = req_amount
+#undef STACK_CHECK_CARDINALS
+#undef STACK_CHECK_ADJACENT
