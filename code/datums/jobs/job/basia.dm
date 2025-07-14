@@ -6,7 +6,6 @@
 	name = "identification card"
 	desc = "Basia's card. No more."
 	icon_state = "gold"
-	item_state = "gold_id"
 
 /datum/skills/basia
 	name = BASIA
@@ -22,8 +21,8 @@
 	melee_weapons = SKILL_MELEE_SUPER
 	powerloader = SKILL_POWERLOADER_MASTER
 	surgery = SKILL_SURGERY_MASTER
-	engineer = SKILL_ENGINEER_INHUMAN
-	construction = SKILL_CONSTRUCTION_INHUMAN
+	engineer = SKILL_ENGINEER_MASTER
+	construction = SKILL_CONSTRUCTION_MASTER
 	firearms = SKILL_FIREARMS_TRAINED
 
 /datum/job/terragov/command/basia
@@ -72,8 +71,6 @@ In addition, you are tasked with the security of high-ranking personnel, includi
 	shoes = /obj/item/clothing/shoes/marine/headskin
 	head = /obj/item/clothing/head/tgmcberet/squad/bravo/black
 	glasses = /obj/item/clothing/glasses/sunglasses/sa
-	r_store = NONE
-	l_store = NONE
 	gloves = /obj/item/clothing/gloves/marine/fingerless
 	back = NONE
 	wear_suit = /obj/item/clothing/suit/storage/labcoat/researcher/basia
