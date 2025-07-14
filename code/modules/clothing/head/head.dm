@@ -1,12 +1,12 @@
 /obj/item/clothing/head
 	name = "head"
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/clothing/hats_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/clothing/hats_right.dmi',
 	)
-	flags_armor_protection = HEAD
-	flags_equip_slot = ITEM_SLOT_HEAD
+	armor_protection_flags = HEAD
+	equip_slot_flags = ITEM_SLOT_HEAD
 	w_class = WEIGHT_CLASS_SMALL
 	blood_sprite_state = "helmetblood"
 	attachments_by_slot = list(ATTACHMENT_SLOT_BADGE)
@@ -15,7 +15,7 @@
 	var/anti_hug = 0
 
 /obj/item/clothing/head/update_clothing_icon()
-	if (ismob(loc))
+	if(ismob(loc))
 		var/mob/M = loc
 		M.update_inv_head()
 
@@ -23,16 +23,7 @@
 	. = ..()
 	if(!greyscale_config)
 		return
-	item_icons = list(slot_head_str = icon)
-
-/obj/item/clothing/head/MouseDrop(over_object, src_location, over_location)
-	if(!attachments_by_slot[ATTACHMENT_SLOT_STORAGE])
-		return ..()
-	if(!istype(attachments_by_slot[ATTACHMENT_SLOT_STORAGE], /obj/item/armor_module/storage))
-		return ..()
-	var/obj/item/armor_module/storage/armor_storage = attachments_by_slot[ATTACHMENT_SLOT_STORAGE]
-	if(armor_storage.storage.handle_mousedrop(usr, over_object))
-		return ..()
+	worn_icon_list = list(slot_head_str = icon)
 
 /obj/item/clothing/head/examine(mob/user)
 	. = ..()
@@ -43,96 +34,105 @@
 	name = "\improper TGMC beanie"
 	desc = "A standard military beanie, often worn by non-combat military personnel and support crews, though the occasional one finds its way to the front line. Popular due to being comfortable and snug."
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon_state = "beanie_cargo"
-	flags_inv_hide = HIDETOPHAIR
+	inv_hide_flags = HIDETOPHAIR
 	species_exception = list(/datum/species/robot)
 
 /obj/item/clothing/head/tgmcberet
 	name = "\improper Dark gray beret"
 	desc = "A hat typically worn by the field-officers of the TGMC. Occasionally they find their way down the ranks into the hands of squad-leaders and decorated grunts."
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon_state = "beret"
-	flags_item_map_variant = NONE
-	flags_armor_features = ARMOR_NO_DECAP
+	item_map_variant_flags = NONE
+	armor_features_flags = ARMOR_NO_DECAP
 
 /obj/item/clothing/head/tgmcberet/tan
 	name = "\improper Tan beret"
 	icon_state = "berettan"
-	flags_item_map_variant = (ITEM_JUNGLE_VARIANT|ITEM_ICE_VARIANT)
+	item_map_variant_flags = (ITEM_JUNGLE_VARIANT|ITEM_ICE_VARIANT)
 
 /obj/item/clothing/head/tgmcberet/red
 	name = "\improper Red badged beret"
 	icon_state = "beretred"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/red2
 	name = "\improper Red beret"
 	icon_state = "beretred2"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
+
+/obj/item/clothing/head/tgmcberet/red2/erp
+	name = "\improper ERP Red Beret"
+	desc = "An ERP-approved improved design of the red beret, how this small piece of cloth has such good padding is a closely guarded ERP-secret."
+	soft_armor = MARINE_ARMOR_MEDIUM
+
+/obj/item/clothing/head/tgmcberet/red2/erp/masterprankster
+	desc = "An ERP-approved improved design of the red beret, how this small piece of cloth has such good padding is a closely guarded ERP-secret. This one is held by Master Pranksters only!"
+	icon_state = "beretred"
 
 /obj/item/clothing/head/tgmcberet/bloodred
 	name = "\improper Blood red beret"
 	icon_state = "bloodred_beret"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/blueberet
 	name = "\improper Blue beret"
 	icon_state = "blue_beret"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/darkgreen
 	name = "\improper Dark green beret"
 	icon_state = "darkgreen_beret"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/green
 	name = "\improper Green beret"
 	icon_state = "beretgreen"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/snow
 	name = "\improper White beret"
 	icon_state = "beretsnow"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/wo
 	name = "\improper Command Master at Arms beret"
 	desc = "A beret with the lieutenant insignia emblazoned on it. It shines with the glow of corrupt authority and a smudge of doughnut."
 	icon_state = "beretwo"
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmcberet/fc
 	name = "\improper Field Commander beret"
 	desc = "A beret with the field commander insignia emblazoned on it. It commands loyalty and bravery in all who gaze upon it."
 	icon_state = "beretfc"
 	soft_armor = list(MELEE = 50, BULLET = 50, LASER = 50, ENERGY = 50, BOMB = 10, BIO = 5, FIRE = 50, ACID = 50)
-	flags_item_map_variant = NONE
+	item_map_variant_flags = NONE
 
 /obj/item/clothing/head/tgmccap
 	name = "\improper TGMC cap"
 	desc = "A casual cap occasionally worn by Squad-leaders and Combat-Engineers. While it has limited combat functionality, some prefer to wear it instead of the standard issue helmet."
 	icon_state = "cap"
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	species_exception = list(/datum/species/robot)
+	item_map_variant_flags = (ITEM_ICE_VARIANT)
 	var/flipped_cap = FALSE
 	var/base_cap_icon
-	flags_item_map_variant = (ITEM_ICE_VARIANT)
 
 /obj/item/clothing/head/tgmccap/verb/fliphat()
 	set name = "Flip hat"
-	set category = "Object.Clothing"
+	set category = "IC.Clothing"
 	set src in usr
 	if(!isliving(usr))
 		return
@@ -163,13 +163,13 @@
 	name = "\improper TGMC requisition cap"
 	desc = "It's a fancy hat for a not-so-fancy military supply clerk."
 	icon_state = "cargocap"
-	flags_item_map_variant = null
+	item_map_variant_flags = null
 
 /obj/item/clothing/head/boonie
 	name = "Boonie Hat"
 	desc = "The pinnacle of tacticool technology."
 	icon_state = "booniehat"
-	item_state = "booniehat"
+	worn_icon_state = "booniehat"
 	species_exception = list(/datum/species/robot)
 
 /obj/item/clothing/head/ornamented_cap
@@ -177,17 +177,17 @@
 	desc = "An ornamented cap with a visor. This one seems to be torn at the back."
 	icon_state = "ornamented_cap"
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',)
 	species_exception = list(/datum/species/robot)
-	flags_armor_features = ARMOR_NO_DECAP
+	armor_features_flags = ARMOR_NO_DECAP
 
 /obj/item/clothing/head/slouch
 	name = "\improper TGMC slouch hat"
 	desc = "A nice slouch hat worn by some TGMC troopers while on planets with hot weather, or just for style. While it has limited combat functionality, some prefer to wear it instead of the standard issue helmet."
 	icon_state = "slouch_hat"
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
 	)
 	species_exception = list(/datum/species/robot)
@@ -196,13 +196,12 @@
 	name = "\improper Cyan headband"
 	desc = "A rag typically worn by the less-orthodox weapons operators in the TGMC. While it offers no protection, it is certainly comfortable to wear compared to the standard helmet. Comes in two stylish colors."
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon_state = "headband"
 	species_exception = list(/datum/species/robot)
-	flags_armor_features = ARMOR_NO_DECAP
 
 /obj/item/clothing/head/headband/red
 	name = "\improper Red headband"
@@ -223,16 +222,24 @@
 	desc = "A headset typically found in use by radio-operators and officers. This one appears to be malfunctioning."
 	icon_state = "headset"
 	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	species_exception = list(/datum/species/robot)
 
 /obj/item/clothing/head/cmo
 	name = "\improper Chief Medical hat"
 	desc = "A somewhat fancy hat, typically worn by those who wish to command medical respect."
 	icon_state = "cmohat"
+	species_exception = list(/datum/species/robot)
+
+/obj/item/clothing/head/securitycap
+	name = "Security Cap"
+	desc = "A hat often worn by security officers, it is comfortable and lightly armored."
+	icon_state = "security_cap"
+	icon = 'icons/obj/clothing/hats.dmi'
+	soft_armor = list(MELEE = 15, BULLET = 25, LASER = 20, ENERGY = 20, BOMB = 5, BIO = 5, FIRE = 15, ACID = 5)
 	species_exception = list(/datum/species/robot)
 
 /*============================BERETS=================================*/
@@ -242,7 +249,7 @@
 	name = "marine officer beret"
 	desc = "A beret with the TGMC insignia emblazoned on it. It radiates respect and authority."
 	icon_state = "hosberet"
-	flags_inventory = BLOCKSHARPOBJ
+	inventory_flags = BLOCKSHARPOBJ
 
 /obj/item/clothing/head/beret/marine/captain
 	name = "captain's beret"
@@ -266,23 +273,23 @@
 	name = "ushanka"
 	desc = "Perfect for winter in Siberia, da?"
 	icon_state = "ushankadown"
-	item_state = "ushankadown"
+	worn_icon_state = "ushankadown"
 	species_exception = list(/datum/species/robot)
-	flags_cold_protection = HEAD
+	cold_protection_flags = HEAD
 	min_cold_protection_temperature = ICE_PLANET_MIN_COLD_PROTECTION_TEMPERATURE
-	flags_inventory = BLOCKSHARPOBJ
-	flags_inv_hide = HIDEEARS|HIDETOPHAIR
+	inventory_flags = BLOCKSHARPOBJ
+	inv_hide_flags = HIDEEARS|HIDETOPHAIR
 	anti_hug = 1
 
 /obj/item/clothing/head/ushanka/attack_self(mob/user as mob)
 	. = ..()
 	if(icon_state == "ushankadown")
 		icon_state = "ushankaup"
-		item_state = "ushankaup"
+		worn_icon_state = "ushankaup"
 		to_chat(user, "You raise the ear flaps on the ushanka.")
 	else
 		icon_state = "ushankadown"
-		item_state = "ushankadown"
+		worn_icon_state = "ushankadown"
 		to_chat(user, "You lower the ear flaps on the ushanka.")
 
 /obj/item/clothing/head/bearpelt
@@ -291,33 +298,33 @@
 	icon_state = "bearpelt"
 	siemens_coefficient = 2
 	anti_hug = 4
-	flags_armor_protection = HEAD|CHEST|ARMS
+	armor_protection_flags = HEAD|CHEST|ARMS
 	species_exception = list(/datum/species/robot)
 	soft_armor = list(MELEE = 90, BULLET = 70, LASER = 45, ENERGY = 55, BOMB = 45, BIO = 10, FIRE = 55, ACID = 55)
-	flags_cold_protection = HEAD|CHEST|ARMS
+	cold_protection_flags = HEAD|CHEST|ARMS
 	min_cold_protection_temperature = ICE_PLANET_MIN_COLD_PROTECTION_TEMPERATURE
-	flags_inventory = BLOCKSHARPOBJ
-	flags_inv_hide = HIDEEARS|HIDETOPHAIR
+	inventory_flags = BLOCKSHARPOBJ
+	inv_hide_flags = HIDEEARS|HIDETOPHAIR
 
 /obj/item/clothing/head/uppcap
 	name = "\improper armored USL cap"
 	desc = "Standard USL head gear for covert operations and low-ranking pirates alike."
 	icon = 'icons/obj/clothing/headwear/ert_headwear.dmi'
 	icon_state = "upp_cap"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/ert_headwear.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	siemens_coefficient = 2
 	//anti_hug = 2
-	flags_armor_protection = HEAD
+	armor_protection_flags = HEAD
 	species_exception = list(/datum/species/robot)
 	soft_armor = list(MELEE = 50, BULLET = 50, LASER = 50, ENERGY = 55, BOMB = 50, BIO = 50, FIRE = 55, ACID = 55)
-	flags_cold_protection = HEAD
+	cold_protection_flags = HEAD
 	min_cold_protection_temperature = ICE_PLANET_MIN_COLD_PROTECTION_TEMPERATURE
-	flags_inventory = BLOCKSHARPOBJ
-	flags_inv_hide = HIDEEARS
-	flags_armor_features = ARMOR_NO_DECAP
+	inventory_flags = BLOCKSHARPOBJ
+	inv_hide_flags = HIDEEARS
+	armor_features_flags = ARMOR_NO_DECAP
 
 /obj/item/clothing/head/uppcap/beret
 	name = "\improper armored USL beret"
@@ -327,20 +334,20 @@
 	name = "\improper armored Freelancer helmet"
 	desc = "A sturdy freelancer's helmet."
 	icon = 'icons/obj/clothing/headwear/ert_headwear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/ert_headwear.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon_state = "freelancer_helmet"
 	siemens_coefficient = 2
-	flags_armor_protection = HEAD
+	armor_protection_flags = HEAD
 	species_exception = list(/datum/species/robot)
 	soft_armor = list(MELEE = 50, BULLET = 50, LASER = 50, ENERGY = 55, BOMB = 50, BIO = 50, FIRE = 55, ACID = 55)
-	flags_cold_protection = HEAD
+	cold_protection_flags = HEAD
 	min_cold_protection_temperature = ICE_PLANET_MIN_COLD_PROTECTION_TEMPERATURE
-	flags_inventory = BLOCKSHARPOBJ
-	flags_inv_hide = HIDEEARS
-	flags_armor_features = ARMOR_NO_DECAP
+	inventory_flags = BLOCKSHARPOBJ
+	inv_hide_flags = HIDEEARS
+	armor_features_flags = ARMOR_NO_DECAP
 	attachments_by_slot = list(
 		ATTACHMENT_SLOT_STORAGE,
 		ATTACHMENT_SLOT_HEAD_MODULE,
@@ -368,41 +375,41 @@
 	name = "\improper armored militia cowl"
 	desc = "A large hood in service with some militias, meant for obscurity on the frontier. Offers some head protection due to the study fibers utilized in production."
 	icon = 'icons/obj/clothing/headwear/ert_headwear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/ert_headwear.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon_state = "rebel_hood"
 	siemens_coefficient = 2
-	flags_armor_protection = HEAD|CHEST
+	armor_protection_flags = HEAD|CHEST
 	species_exception = list(/datum/species/robot)
 	soft_armor = list(MELEE = 50, BULLET = 50, LASER = 50, ENERGY = 50, BOMB = 50, BIO = 50, FIRE = 50, ACID = 50)
-	flags_cold_protection = HEAD
+	cold_protection_flags = HEAD
 	min_cold_protection_temperature = ICE_PLANET_MIN_COLD_PROTECTION_TEMPERATURE
-	flags_inventory = BLOCKSHARPOBJ
-	flags_inv_hide = HIDEEARS|HIDETOPHAIR
-	flags_armor_features = ARMOR_NO_DECAP
+	inventory_flags = BLOCKSHARPOBJ
+	inv_hide_flags = HIDEEARS|HIDETOPHAIR
+	armor_features_flags = ARMOR_NO_DECAP
 
 /obj/item/clothing/head/commissar
 	name = "\improper commissar cap"
 	desc = "A cap worn by commissars of the Imperial Army. This one seems to radiate authority."
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/ert_headwear.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon = 'icons/obj/clothing/headwear/ert_headwear.dmi'
 	icon_state = "commissar_cap"
 	species_exception = list(/datum/species/robot)
 	soft_armor = list(MELEE = 30, BULLET = 30, LASER = 30, ENERGY = 30, BOMB = 15, BIO = 10, FIRE = 20, ACID = 20)
-	flags_armor_features = ARMOR_NO_DECAP
+	armor_features_flags = ARMOR_NO_DECAP
 
 /obj/item/clothing/head/strawhat
 	name = "\improper straw hat"
 	desc = "A hat lined with durathread on the outside, has the usual iconic look of a straw hat. A common hat across the bubble."
-	item_icons = list(
+	worn_icon_list = list(
 		slot_head_str = 'icons/mob/clothing/headwear/ert_headwear.dmi',
-		slot_l_hand_str = 'icons/mob/items_lefthand_1.dmi',
-		slot_r_hand_str = 'icons/mob/items_righthand_1.dmi',)
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',)
 	icon = 'icons/obj/clothing/headwear/ert_headwear.dmi'
 	icon_state = "straw_hat"
 	species_exception = list(/datum/species/robot)
@@ -411,8 +418,9 @@
 	name = "\improper Squad headband"
 	desc = "Headband made from ultra-thin special cloth. Cloth thickness provides more than just a stylish fluttering of headband. You can tie around headband onto a helmet. This squad version of a headband has secret unique features created by the cloth coloring component. "
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 	icon_state = ""
 	soft_armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 0, ACID = 0)
 	slowdown = -0.1
@@ -447,8 +455,9 @@
 	icon_state = ""
 	desc = "Military beret with TGMC marine squad insignia."
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/tgmcberet/squad/alpha
 	name = "\improper Alpha Squad beret"
@@ -505,38 +514,42 @@
 	desc = "Dark Green beret with an old TGMC insignia on it."
 	icon_state = "marcommandoberet"
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/tgmcberet/vdv
 	name = "\improper Airborne beret"
 	desc = "Blue badged beret that smells like ethanol and fountain water for some reason."
 	icon_state = "russobluecamohat"
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/tgmcberet/medical
 	name = "\improper Medical beret"
 	desc = "A white beret with a green cross finely threaded into it. It has that sterile smell about it."
 	icon_state = "medberet"
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/hachimaki
 	name = "\improper Ancient pilot headband and scarf kit"
 	desc = "Ancient pilot kit of scarf that protects neck from cold wind and headband that protects face from sweat"
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/head_0.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/head_0.dmi'
+	)
 	icon_state = "Banzai"
 	soft_armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 0, ACID = 0)
 	w_class = WEIGHT_CLASS_SMALL
 
 	actions_types = list(/datum/action/item_action)
-	flags_armor_features = ARMOR_LAMP_OVERLAY|ARMOR_NO_DECAP
-	flags_item = SYNTH_RESTRICTED
+	armor_features_flags = ARMOR_LAMP_OVERLAY|ARMOR_NO_DECAP
+	item_flags = SYNTH_RESTRICTED
 	species_exception = list(/datum/species/robot)
 
 /obj/item/clothing/head/hachimaki/item_action_slot_check(mob/user, slot)
@@ -561,8 +574,9 @@
 	icon_state = "alpha_black_beret"
 	desc = "Black stylish beret with TGMC marine squad insignia. This one belongs to the Alpha Squad."
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/tgmcberet/squad/black/bravo
 	name = "\improper Bravo squad black beret"
@@ -580,20 +594,27 @@
 	desc = "Black stylish beret with TGMC marine squad insignia. This one belongs to the Charlie Squad."
 
 /obj/item/clothing/head/beret/marine
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
-
-/obj/item/clothing/head/beret/sec/warden
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/beret/sec
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
+
+/obj/item/clothing/head/beret/sec/mp
+	soft_armor = list(MELEE = 10, BULLET = 75, LASER = 75, ENERGY = 0, BOMB = 0, BIO = 85, FIRE = 0, ACID = 0)
+
+/obj/item/clothing/head/beret/sec/warden
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/beret/eng
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 
 /obj/item/clothing/head/beret/marine/captain
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
@@ -610,11 +631,12 @@
 //Peaked caps
 /obj/item/clothing/head/highcap
 	icon = 'icons/obj/clothing/headwear/hats.dmi'
-	item_icons = list(
-		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi')
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi'
+	)
 	icon_state = "cap_black"
-	flags_inventory = BLOCKSHARPOBJ
-	flags_armor_features = ARMOR_NO_DECAP
+	inventory_flags = BLOCKSHARPOBJ
+	armor_features_flags = ARMOR_NO_DECAP
 	species_exception = list(/datum/species/robot)
 
 /obj/item/clothing/head/highcap/staff
@@ -629,3 +651,30 @@
 
 /obj/item/clothing/head/highcap/captain/black
 	icon_state = "captain_alt_black"
+
+/obj/item/clothing/head/vsd
+	name = "\improper armored baseball cap"
+	desc = "Baseball caps worn by V.S.D. GIs for the 'Call of Duty' feel."
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/ert_headwear.dmi',
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',
+	)
+	icon = 'icons/obj/clothing/headwear/ert_headwear.dmi'
+	icon_state = "vsd_cap"
+	worn_icon_state = "vsd_cap"
+	soft_armor = list(MELEE = 50, BULLET = 50, LASER = 50, ENERGY = 55, BOMB = 50, BIO = 50, FIRE = 55, ACID = 55)
+	armor_features_flags = ARMOR_NO_DECAP
+	species_exception = list(/datum/species/robot)
+
+/obj/item/clothing/head/vsd/beret
+	name = "\improper armored red patched beret"
+	desc = "A red beret for V.S.D. Squad Leaders for the commando look."
+	icon_state = "beretred"
+	worn_icon_state = "vsd_cap"
+	icon = 'icons/obj/clothing/headwear/marine_hats.dmi'
+	worn_icon_list = list(
+		slot_head_str = 'icons/mob/clothing/headwear/marine_hats.dmi',
+		slot_l_hand_str = 'icons/mob/inhands/items_lefthand_1.dmi',
+		slot_r_hand_str = 'icons/mob/inhands/items_righthand_1.dmi',
+	)

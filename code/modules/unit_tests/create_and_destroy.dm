@@ -36,8 +36,6 @@ GLOBAL_VAR_INIT(running_create_and_destroy, FALSE)
 	ignore += typesof(/obj/effect/buildmode_line)
 	//Our system doesn't support it without warning spam from unregister calls on things that never registered
 	ignore += typesof(/obj/docking_port)
-	//Needs a linked mecha
-	ignore += typesof(/obj/effect/skyfall_landingzone)
 	//These shouldn't be spawned directly, rather they should be spawned through their weapon item counterparts
 	ignore += typesof(/obj/machinery/deployable/mounted)
 	//Various temporary effects that aren't meant to be spawned
@@ -53,6 +51,8 @@ GLOBAL_VAR_INIT(running_create_and_destroy, FALSE)
 	ignore += typesof(/obj/hitbox)
 	//Screen objects don't play nicely when spawned manually.
 	ignore += typesof(/atom/movable/screen)
+	///created by owning tank with necessary arg
+	ignore += typesof(/atom/movable/vis_obj/turret_overlay)
 
 	var/list/cached_contents = spawn_at.contents.Copy()
 	var/original_turf_type = spawn_at.type
@@ -62,9 +62,9 @@ GLOBAL_VAR_INIT(running_create_and_destroy, FALSE)
 
 	for(var/type_path in typesof(/atom/movable, /turf) - ignore) //No areas please
 		if(ispath(type_path, /turf))
-			spawn_at.ChangeTurf(type_path)
+			spawn_at.change_turf(type_path)
 			//We change it back to prevent baseturfs stacking and hitting the limit
-			spawn_at.ChangeTurf(original_turf_type, original_baseturfs)
+			spawn_at.change_turf(original_turf_type, original_baseturfs)
 			if(original_baseturf_count != length(spawn_at.baseturfs))
 				Fail("[type_path] changed the amount of baseturfs from [original_baseturf_count] to [length(spawn_at.baseturfs)]; [english_list(original_baseturfs)] to [islist(spawn_at.baseturfs) ? english_list(spawn_at.baseturfs) : spawn_at.baseturfs]")
 				//Warn if it changes again

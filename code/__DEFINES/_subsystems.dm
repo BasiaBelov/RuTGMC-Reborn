@@ -47,7 +47,7 @@
 //type and all subtypes should always call Initialize in New()
 #define INITIALIZE_IMMEDIATE(X) ##X/New(loc, ...){\
 	..();\
-	if(!(flags_atom & INITIALIZED)) {\
+	if(!(atom_flags & INITIALIZED)) {\
 		args[1] = TRUE;\
 		SSatoms.InitAtom(src, FALSE, args);\
 	}\
@@ -80,7 +80,8 @@
 #define INIT_ORDER_GARBAGE 27
 #define INIT_ORDER_DBCORE 25
 #define INIT_ORDER_SERVER_MAINT 23
-#define INIT_ORDER_INPUT 21
+#define INIT_ORDER_INPUT 22
+#define INIT_ORDER_ADMIN_VERBS 21 // needs to be pretty high, admins can't do much without it
 #define INIT_ORDER_VIS 20
 #define INIT_ORDER_SOUNDS 19
 #define INIT_ORDER_INSTRUMENTS 16
@@ -109,6 +110,7 @@
 #define INIT_ORDER_ICON_SMOOTHING -16
 #define INIT_ORDER_LIGHTING -20
 #define INIT_ORDER_SHUTTLE -21
+#define INIT_ORDER_PREDSHIPS -22
 #define INIT_ORDER_XENODEN -23
 #define INIT_ORDER_PATH -50
 #define INIT_ORDER_EXCAVATION -78
@@ -193,3 +195,12 @@
 #define FEEDBACK_TALLY "tally"
 #define FEEDBACK_NESTED_TALLY "nested_tally"
 #define FEEDBACK_ASSOCIATIVE "associative"
+
+/// Mobs subsystem defines
+
+/// The mobs subsystem buckets up mobs to smooth out processing load,
+/// each 5 ticks it fires, but won't actually run Life on every fire()
+/// Instead it buckets mobs and ends up running Life on every mob every 2 seconds
+/// but since subsystem wait only considers the last fire,
+/// we need to multiply wait enough that it matches the 2 second interval Life is actually running on
+#define SS_MOBS_BUCKET_DELAY 4

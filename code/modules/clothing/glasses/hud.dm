@@ -1,9 +1,12 @@
 /obj/item/clothing/glasses/hud
 	name = "HUD"
 	desc = "A heads-up display that provides important info in (almost) real time."
-	flags_armor_protection = NONE //doesn't protect eyes because it's a monocle, duh
+	armor_protection_flags = NONE //doesn't protect eyes because it's a monocle, duh
 	var/hud_type
 	var/mob/living/carbon/human/affected_user
+
+/obj/item/clothing/glasses/hud/examine_descriptor(mob/user)
+	return "HUD"
 
 /obj/item/clothing/glasses/hud/Destroy()
 	if(affected_user)
@@ -71,7 +74,7 @@
 	name = "\improper HealthMate ballistic goggles"
 	desc = "Standard issue TGMC goggles. This pair has been fitted with an internal HealthMate HUD projector."
 	icon_state = "medgoggles"
-	item_state = "medgoggles"
+	worn_icon_state = "medgoggles"
 	deactive_state = "deactivated_mgoggles"
 	toggleable = TRUE
 	hud_type = DATA_HUD_MEDICAL_ADVANCED
@@ -83,7 +86,7 @@
 		"Hammerhead Combat Robot" = 'icons/mob/species/robot/glasses_alpharii.dmi',
 		"Ratcher Combat Robot" = 'icons/mob/species/robot/glasses_deltad.dmi')
 	soft_armor = list(MELEE = 40, BULLET = 40, LASER = 0, ENERGY = 15, BOMB = 35, BIO = 10, FIRE = 30, ACID = 30)
-	flags_equip_slot = ITEM_SLOT_EYES
+	equip_slot_flags = ITEM_SLOT_EYES
 	goggles_layer = TRUE
 
 /obj/item/clothing/glasses/hud/medgoggles/prescription
@@ -110,7 +113,7 @@
 	name = "\improper HealthMate regulation prescription glasses"
 	desc = "Standard issue TGMC Regulation Prescription Glasses. This pair has been fitted with an internal HealthMate HUD projector."
 	icon_state = "medglasses"
-	item_state = "medglasses"
+	worn_icon_state = "medglasses"
 	deactive_state = "deactivated_medglasses"
 	species_exception = list(/datum/species/robot)
 	sprite_sheets = list(
@@ -127,7 +130,7 @@
 	name = "\improper HealthMate sunglasses"
 	desc = "A pair of designer sunglasses. This pair has been fitted with an internal HealthMate HUD projector."
 	icon_state = "medsunglasses"
-	item_state = "medsunglasses"
+	worn_icon_state = "medsunglasses"
 	deactive_state = "deactivated_sunglasses"
 	species_exception = list(/datum/species/robot)
 	sprite_sheets = list(
@@ -153,7 +156,6 @@
 	icon_state = "securityhud"
 	deactive_state = "deactivated_sec" // there are differences in mob sprite
 	toggleable = TRUE
-	hud_type = DATA_HUD_SECURITY_ADVANCED
 
 /obj/item/clothing/glasses/hud/xenohud
 	name = "XenoMate HUD"
@@ -174,10 +176,10 @@
 	name = "spatial agent's sunglasses"
 	desc = "Glasses worn by a spatial agent."
 	icon_state = "sun"
-	item_state = "sunglasses"
+	worn_icon_state = "sunglasses"
 	eye_protection = 2
 	darkness_view = 8
-	hud_type = list(DATA_HUD_MEDICAL_OBSERVER, DATA_HUD_XENO_STATUS, DATA_HUD_SECURITY_ADVANCED, DATA_HUD_SQUAD_TERRAGOV, DATA_HUD_ORDER)
+	hud_type = list(DATA_HUD_MEDICAL_OBSERVER, DATA_HUD_XENO_STATUS, DATA_HUD_SQUAD_TERRAGOV, DATA_HUD_ORDER)
 	vision_flags = SEE_TURFS|SEE_MOBS|SEE_OBJS
 	lighting_alpha = LIGHTING_PLANE_ALPHA_INVISIBLE
 	activation_sound = null
@@ -189,4 +191,4 @@
 
 /obj/item/clothing/glasses/hud/sa/nodrop
 	desc = "Glasses worn by a spatial agent. They delete themselves if you take them off!"
-	flags_item = DELONDROP
+	item_flags = DELONDROP

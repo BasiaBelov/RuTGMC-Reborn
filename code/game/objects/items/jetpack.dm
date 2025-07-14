@@ -7,12 +7,12 @@
 	desc = "A high powered jetpack with enough fuel to send a person flying for a short while. It allows for fast and agile movement on the battlefield. <b>Alt right click or middleclick to fly to a destination when the jetpack is equipped.</b>"
 	icon = 'icons/obj/items/jetpack.dmi'
 	icon_state = "jetpack_marine"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/backpacks_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/backpacks_right.dmi',
 	)
 	w_class = WEIGHT_CLASS_BULKY
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	obj_flags = CAN_BE_HIT
 	///Time between uses
 	var/cooldown_time = 10 SECONDS
@@ -53,7 +53,7 @@
 	toggle_action.remove_action(user)
 
 /obj/item/jetpack_marine/ui_action_click(mob/user, datum/action/item_action/action, target)
-	use_jetpack(target, user)
+	return use_jetpack(target, user)
 
 ///remove the flame overlay
 /obj/item/jetpack_marine/proc/reset_flame(mob/living/carbon/human/human_user)
@@ -120,13 +120,13 @@
 /obj/item/jetpack_marine/proc/change_fuel_indicator()
 	if(fuel_left-fuel_indicator > 0)
 		return
-	if (fuel_left >= FUEL_INDICATOR_FULL)
+	if(fuel_left >= FUEL_INDICATOR_FULL)
 		fuel_indicator = FUEL_INDICATOR_FULL
 		return
-	if (fuel_left >= FUEL_INDICATOR_HALF_FULL)
+	if(fuel_left >= FUEL_INDICATOR_HALF_FULL)
 		fuel_indicator = FUEL_INDICATOR_HALF_FULL
 		return
-	if (fuel_left >= FUEL_USE)
+	if(fuel_left >= FUEL_USE)
 		fuel_indicator = FUEL_USE
 		return
 	fuel_indicator = 0
@@ -150,6 +150,8 @@
 
 /obj/item/jetpack_marine/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(!istype(I, /obj/item/ammo_magazine/flamer_tank))
 		return
 	var/obj/item/ammo_magazine/flamer_tank/FT = I
@@ -168,11 +170,10 @@
 
 /datum/action/ability/activable/item_toggle/jetpack
 	name = "Use jetpack"
-	action_icon_state = "axe_sweep"
 	desc = "Briefly fly using your jetpack."
-	keybind_flags = ABILITY_USE_STAGGERED|ABILITY_USE_BUSY
+	action_icon_state = "123" // for whatever fucking reason, there's no proper icon state without this bullshit
+	use_state_flags = ABILITY_USE_STAGGERED|ABILITY_USE_BUSY
 	keybinding_signals = list(KEYBINDING_NORMAL = COMSIG_ITEM_TOGGLE_JETPACK)
-	use_state_flags = ABILITY_USE_STAGGERED
 
 /datum/action/ability/activable/item_toggle/jetpack/New(Target, obj/item/holder)
 	. = ..()
@@ -210,6 +211,8 @@
 /obj/item/jetpack_marine/heavy/use_jetpack(atom/A, mob/living/carbon/human/human_user)
 	. = ..()
 	if(!.)
+		return
+	if(!human_user.throwing) //if we instantly run into something, the throw is already over
 		return
 	if(human_user.a_intent != INTENT_HELP)
 		human_user.pass_flags &= ~PASS_MOB //we explicitly want to hit people

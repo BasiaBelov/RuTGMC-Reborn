@@ -16,6 +16,7 @@ Thumbs.db
 data/
 cfg/
 tmp/
+/cache/**/*
 tools/Runtime Condenser/Input.txt
 tools/Runtime Condenser/Output.txt
 tools/MapDaemon/logs/*.txt
@@ -67,3 +68,4 @@ define_sanity_output.txt
 
 # Running OpenDream locally
 tgmc.json
+rust_g64.dll

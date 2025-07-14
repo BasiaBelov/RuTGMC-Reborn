@@ -1,6 +1,5 @@
 //max channel is 1024. Only go lower from here, because byond tends to pick the first availiable channel to play sounds on
 #define CHANNEL_LOBBYMUSIC 1024
-#define CHANNEL_AMBIENT 1023
 #define CHANNEL_NOTIFY 1022 // observer, new player, vote notifications
 #define CHANNEL_ANNOUNCEMENTS 1021 // IC priority announcements, hivemind messages etc
 #define CHANNEL_CINEMATIC 1020
@@ -28,6 +27,8 @@
 #define SOUND_FALLOFF_EXPONENT 6
 
 #define FALLOFF_SOUNDS 1
+
+#define GUN_FIRE_SOUND_VOLUME 50
 
 ///Frequency stuff only works with 45kbps oggs.
 #define GET_RAND_FREQUENCY (rand(32000, 55000))
@@ -106,6 +107,7 @@
 #define SFX_SVD_FIRE "svd_fire"
 #define SFX_FAL_FIRE "fal_fire"
 #define SFX_MP38_FIRE "mp38_fire"
+#define SFX_SLAM "slam"
 #define SFX_ACID_HIT "acid_hit"
 #define SFX_ACID_BOUNCE "acid_bounce"
 #define SFX_ALIEN_CLAW_FLESH "alien_claw_flesh"
@@ -166,3 +168,5 @@
 #define SFX_PRED_LAUGH "pred_laugh"
 #define SFX_CLAN_SWORD_HIT "clan_sword_hit"
 #define SFX_CHAIN_SWING "chain_swing"
+#define SFX_HOVER_TANK "hover_tank"
+#define SFX_REVOLVER_SPIN "revolver_spin"

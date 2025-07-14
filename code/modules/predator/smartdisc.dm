@@ -3,15 +3,15 @@
 	spawner_type = /mob/living/simple_animal/hostile/smartdisc
 	deliveryamt = 1
 	desc = "A strange piece of alien technology. It has many jagged, whirring blades and bizarre writing."
-	flags_item = ITEM_PREDATOR
+	item_flags = ITEM_PREDATOR
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_back_str = 'icons/mob/hunter/pred_gear.dmi',
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
 	icon_state = "disc"
-	item_state = "pred_disc"
+	worn_icon_state = "pred_disc"
 	w_class = WEIGHT_CLASS_TINY
 	det_time = 30
 	resistance_flags = UNACIDABLE
@@ -198,7 +198,7 @@
 	apply_damage(proj.damage, BRUTE)
 	return 1
 
-/mob/living/simple_animal/hostile/smartdisc/Life()
+/mob/living/simple_animal/hostile/smartdisc/Life(seconds_per_tick, times_fired)
 	. = ..()
 	lifetime--
 	if(lifetime <= 0 || time_idle > 3)
@@ -264,7 +264,7 @@
 		var/mob/living/L = target
 		L.attack_animal(src)
 		if(prob(5))
-			L.apply_effect(3, WEAKEN)
+			L.apply_effect(3, EFFECT_PARALYZE)
 			L.visible_message(span_danger("\The [src] viciously slashes at \the [L]!"))
 			log_attack("[key_name(L)] was knocked down by [src]")
 		log_attack("[key_name(L)] was attacked by [src]")

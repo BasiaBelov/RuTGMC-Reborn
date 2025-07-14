@@ -7,6 +7,7 @@
 	health = 150
 	maxHealth = 150
 	plasma_stored = 200
+	mob_size = MOB_SIZE_HUMAN
 	tier = XENO_TIER_MINION
 	upgrade = XENO_UPGRADE_BASETYPE
 	pull_speed = -2
@@ -47,7 +48,7 @@
 	if(!spidermother)
 		return
 	if(get_dist(src, spidermother) > SPIDERLING_WITHER_RANGE)
-		adjustBruteLoss(25)
+		adjust_brute_loss(25)
 
 // ***************************************
 // *********** Spiderling AI Section
@@ -190,7 +191,7 @@
 ///behavior to deal with obstacles
 /datum/ai_behavior/spiderling/deal_with_obstacle(datum/source, direction)
 	var/turf/obstacle_turf = get_step(mob_parent, direction)
-	if(obstacle_turf.flags_atom & AI_BLOCKED)
+	if(obstacle_turf.atom_flags & AI_BLOCKED)
 		return
 	for(var/thing in obstacle_turf.contents)
 		if(istype(thing, /obj/structure/window_frame)) //if its a window, climb it after 2 seconds

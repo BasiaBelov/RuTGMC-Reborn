@@ -29,7 +29,7 @@
 	return TRUE
 
 /obj/item/quikdeploy/cade
-	thing_to_deploy = /obj/structure/barricade/metal
+	thing_to_deploy = /obj/structure/barricade/solid
 	icon_state = "metal"
 	delay = 3 SECONDS
 
@@ -51,7 +51,7 @@
 	for(var/obj/thing in user.loc)
 		if(!thing.density) //not dense, move on
 			continue
-		if(!(thing.flags_atom & ON_BORDER)) //dense and non-directional, end
+		if(!(thing.atom_flags & ON_BORDER)) //dense and non-directional, end
 			balloon_alert(user, "No space")
 			return FALSE
 		if(thing.dir != user.dir)
@@ -62,5 +62,5 @@
 	return TRUE
 
 /obj/item/quikdeploy/cade/plasteel
-	thing_to_deploy = /obj/structure/barricade/plasteel
+	thing_to_deploy = /obj/structure/barricade/folding
 	icon_state = "plasteel"

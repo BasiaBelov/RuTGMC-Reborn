@@ -1,6 +1,6 @@
 /obj/item/tool/kitchen
 	icon = 'icons/obj/items/kitchen_tools.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/kitchen_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/kitchen_right.dmi',
 	)
@@ -14,17 +14,27 @@
 	throwforce = 5
 	throw_speed = 3
 	throw_range = 5
-	flags_atom = CONDUCT
-	attack_verb = list("attacked", "stabbed", "poked")
+	atom_flags = CONDUCT
+	attack_verb = list("attacks", "stabs", "pokes")
 	sharp = 0
-	var/loaded      //Descriptive string for currently loaded food object.
+	/// Is there something on this utensil?
+	var/image/loaded
 
 /obj/item/tool/kitchen/utensil/Initialize(mapload)
 	. = ..()
-	if (prob(60))
-		src.pixel_y = rand(0, 4)
+	pixel_y = rand(0, 4)
 
 	create_reagents(5)
+
+/obj/item/tool/kitchen/utensil/Destroy()
+	QDEL_NULL(loaded)
+	return ..()
+
+/obj/item/tool/kitchen/utensil/update_overlays()
+	. = ..()
+	if(!loaded)
+		return
+	. += loaded
 
 /obj/item/tool/kitchen/utensil/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(!istype(M))
@@ -33,7 +43,7 @@
 	if(user.a_intent != INTENT_HELP)
 		return ..()
 
-	if (reagents.total_volume > 0)
+	if(reagents.total_volume > 0)
 		reagents.reaction(M, INGEST)
 		reagents.trans_to(M, reagents.total_volume, transfer_to_stomach = TRUE)
 		if(M == user)
@@ -43,10 +53,10 @@
 			visible_message(span_notice("[user] feeds [M] some [loaded] from \the [src]"))
 			M.reagents.add_reagent(/datum/reagent/consumable/nutriment, 1)
 		playsound(M.loc,'sound/items/eatfood.ogg', 15, 1)
-		overlays.Cut()
+		QDEL_NULL(loaded)
+		update_appearance(UPDATE_OVERLAYS)
 		return
-	else
-		..()
+	return ..()
 
 /obj/item/tool/kitchen/utensil/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount = xeno_attacker.xeno_caste.melee_damage, damage_type = BRUTE, damage_flag = MELEE, effects = TRUE, armor_penetration = 0, isrightclick = FALSE)
 	if(!CONFIG_GET(flag/fun_allowed))
@@ -65,15 +75,15 @@
 
 /obj/item/tool/kitchen/utensil/spoon
 	name = "spoon"
-	desc = "It's a spoon. You can see your own upside-down face in it."
+	desc = "It's a spoon. You can see your own upside-down face in the reflection."
 	icon_state = "spoon"
-	attack_verb = list("attacked", "poked")
+	attack_verb = list("attacks", "pokes")
 
 /obj/item/tool/kitchen/utensil/pspoon
 	name = "plastic spoon"
 	desc = "It's a plastic spoon. How dull."
 	icon_state = "pspoon"
-	attack_verb = list("attacked", "poked")
+	attack_verb = list("attacks", "pokes")
 
 /*
 * Knives
@@ -105,7 +115,7 @@
 	name = "kitchen knife"
 	icon_state = "knife"
 	desc = "A general purpose Chef's Knife made by SpaceCook Incorporated. Guaranteed to stay sharp for years to come."
-	flags_atom = CONDUCT
+	atom_flags = CONDUCT
 	sharp = IS_SHARP_ITEM_ACCURATE
 	edge = 1
 	force = 10
@@ -113,7 +123,7 @@
 	throwforce = 6
 	throw_speed = 3
 	throw_range = 6
-	attack_verb = list("slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
+	attack_verb = list("slashes", "stabs", "slices", "tears", "rips", "dices", "cuts")
 
 /obj/item/tool/kitchen/knife/ritual
 	name = "ritual knife"
@@ -128,19 +138,16 @@
 	name = "butcher's cleaver"
 	icon_state = "butch"
 	desc = "A huge thing used for chopping and chopping up meat. This includes clowns and clown-by-products."
-	flags_atom = CONDUCT
-	force = 15
+	atom_flags = CONDUCT
+	force = 35
 	w_class = WEIGHT_CLASS_SMALL
-	throwforce = 8
+	throwforce = 25
 	throw_speed = 3
 	throw_range = 6
-	attack_verb = list("cleaved", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
+	attack_verb = list("cleaves", "slashes", "stabs", "slices", "tears", "rips", "dices", "cuts")
 	sharp = IS_SHARP_ITEM_ACCURATE
 	edge = 1
-
-/obj/item/tool/kitchen/knife/butcher/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
-	playsound(loc, 'sound/weapons/bladeslice.ogg', 25, 1, 5)
-	return ..()
+	hitsound = 'sound/weapons/bladeslice.ogg'
 
 /*
 * Rolling Pins
@@ -155,8 +162,7 @@
 	throw_speed = 2
 	throw_range = 7
 	w_class = WEIGHT_CLASS_NORMAL
-	attack_verb = list("bashed", "battered", "bludgeoned", "thrashed", "whacked")
-
+	attack_verb = list("bashes", "batters", "bludgeons", "thrashes", "whacks")
 
 /*
 * Trays - Agouri
@@ -171,29 +177,13 @@
 	throw_speed = 1
 	throw_range = 5
 	w_class = WEIGHT_CLASS_NORMAL
-	flags_atom = CONDUCT
-	/* // NOPE
-	var/food_total= 0
-	var/burger_amt = 0
-	var/cheese_amt = 0
-	var/fries_amt = 0
-	var/classyalcdrink_amt = 0
-	var/alcdrink_amt = 0
-	var/bottle_amt = 0
-	var/soda_amt = 0
-	var/carton_amt = 0
-	var/pie_amt = 0
-	var/meatbreadslice_amt = 0
-	var/salad_amt = 0
-	var/miscfood_amt = 0
-	*/
-	var/list/carrying = list() // List of things on the tray. - Doohl
-	var/max_carry = 10 // w_class = WEIGHT_CLASS_TINY -- takes up 1
-						// w_class = WEIGHT_CLASS_SMALL -- takes up 3
-						// w_class = WEIGHT_CLASS_NORMAL -- takes up 5
+	atom_flags = CONDUCT
+	/// List of things on the tray. - Doohl
+	var/list/carrying = list()
+	/// WEIGHT_CLASS_TINY == 1, WEIGHT_CLASS_SMALL == 3, WEIGHT_CLASS_NORMAL == 5
+	var/max_carry = 10
 
 /obj/item/tool/kitchen/tray/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
-
 	// Drop all the things. All of them.
 	overlays.Cut()
 	for(var/obj/item/I in carrying)
@@ -222,23 +212,21 @@
 			playsound(M, 'sound/items/trayhit1.ogg', 25, 1)
 			visible_message(span_danger("[user] slams [M] with the tray!"))
 			return
-		else
-			playsound(M, 'sound/items/trayhit2.ogg', 25, 1)  //we applied the damage, we played the sound, we showed the appropriate messages. Time to return and stop the proc
-			visible_message(span_danger("[user] slams [M] with the tray!"))
-			return
+		playsound(M, 'sound/items/trayhit2.ogg', 25, 1)  //we applied the damage, we played the sound, we showed the appropriate messages. Time to return and stop the proc
+		visible_message(span_danger("[user] slams [M] with the tray!"))
 
-	if(ishuman(M) && ((H.head && (H.head.flags_inventory & COVEREYES) ) || (H.wear_mask && (H.wear_mask.flags_inventory & COVEREYES) ) || (H.glasses && (H.glasses.flags_inventory & COVEREYES) )))
+	if(ishuman(M) && ((H.head && (H.head.inventory_flags & COVEREYES) ) || (H.wear_mask && (H.wear_mask.inventory_flags & COVEREYES) ) || (H.glasses && (H.glasses.inventory_flags & COVEREYES) )))
 		to_chat(M, span_warning("You get slammed in the face with the tray, against your mask!"))
 		if(prob(33))
-			src.add_mob_blood(H)
-			if (H.wear_mask)
+			add_mob_blood(H)
+			if(H.wear_mask)
 				H.wear_mask.add_mob_blood(H)
-			if (H.head)
+			if(H.head)
 				H.head.add_mob_blood(H)
-			if (H.glasses && prob(33))
+			if(H.glasses && prob(33))
 				H.glasses.add_mob_blood(H)
 			var/turf/location = H.loc
-			if (istype(location, /turf))     //Addin' blood! At least on the floor and item :v
+			if(istype(location, /turf))     //Addin' blood! At least on the floor and item :v
 				location.add_mob_blood(H)
 
 		if(prob(50))
@@ -258,7 +246,7 @@
 	else //No eye or head protection, tough luck!
 		to_chat(M, span_warning("You get slammed in the face with the tray!"))
 		if(prob(33))
-			src.add_mob_blood(M)
+			add_mob_blood(M)
 			var/turf/location = H.loc
 			if (istype(location, /turf))
 				location.add_mob_blood(H)
@@ -277,13 +265,13 @@
 			M.take_limb_damage(8)
 			if(prob(30))
 				M.Paralyze(4 SECONDS)
-				return
-			return
 
 /obj/item/tool/kitchen/tray/var/cooldown = 0	//shield bash cooldown. based on world.time
 
 /obj/item/tool/kitchen/tray/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/tool/kitchen/rollingpin))
 		if(cooldown < world.time - 25)
@@ -314,7 +302,6 @@
 	return val
 
 /obj/item/tool/kitchen/tray/pickup(mob/user)
-
 	if(!isturf(loc))
 		return
 

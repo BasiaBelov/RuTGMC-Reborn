@@ -150,8 +150,6 @@
 	var/scan_id = TRUE
 	/// How much damage we can take before tipping over.
 	var/knockdown_threshold = 100
-	///Faction of the vendor. Can be null
-	var/faction
 
 /obj/machinery/vending/Initialize(mapload, ...)
 	. = ..()
@@ -313,48 +311,74 @@
 	tipped_level = 0
 	allow_pass_flags &= ~(PASS_LOW_STRUCTURE|PASS_MOB)
 	coverage = initial(coverage)
+	density = initial(density)
 
 /obj/machinery/vending/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(tipped_level)
 		to_chat(user, "Tip it back upright first!")
+		return
 
-	else if(isscrewdriver(I))
-		TOGGLE_BITFIELD(machine_stat, PANEL_OPEN)
-		to_chat(user, "You [CHECK_BITFIELD(machine_stat, PANEL_OPEN) ? "open" : "close"] the maintenance panel.")
-		overlays.Cut()
-		if(CHECK_BITFIELD(machine_stat, PANEL_OPEN))
-			overlays += image(icon, "[initial(icon_state)]-panel")
-
-	else if(ismultitool(I) || iswirecutter(I))
-		if(!CHECK_BITFIELD(machine_stat, PANEL_OPEN))
-			return
-
-		attack_hand(user)
-
-	else if(iswrench(I))
-		if(!wrenchable)
-			return
-
-		if(!do_after(user, 20, NONE, src, BUSY_ICON_BUILD))
-			return
-
-		playsound(loc, 'sound/items/ratchet.ogg', 25, 1)
-		anchored = !anchored
-		if(anchored)
-			user.visible_message("[user] tightens the bolts securing \the [src] to the floor.", "You tighten the bolts securing \the [src] to the floor.")
-			var/turf/current_turf = get_turf(src)
-			if(current_turf && density)
-				current_turf.flags_atom |= AI_BLOCKED
-		else
-			user.visible_message("[user] unfastens the bolts securing \the [src] to the floor.", "You unfasten the bolts securing \the [src] to the floor.")
-			var/turf/current_turf = get_turf(src)
-			if(current_turf && density)
-				current_turf.flags_atom &= ~AI_BLOCKED
-	else if(isitem(I))
+	if(isitem(I))
 		var/obj/item/to_stock = I
 		stock(to_stock, user)
+
+/obj/machinery/vending/screwdriver_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(tipped_level)
+		to_chat(user, span_warning("Tip it back upright first!"))
+		return
+
+	TOGGLE_BITFIELD(machine_stat, PANEL_OPEN)
+	to_chat(user, "You [CHECK_BITFIELD(machine_stat, PANEL_OPEN) ? "open" : "close"] the maintenance panel.")
+	overlays.Cut()
+	if(CHECK_BITFIELD(machine_stat, PANEL_OPEN))
+		overlays += image(icon, "[initial(icon_state)]-panel")
+
+/obj/machinery/vending/multitool_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(tipped_level)
+		to_chat(user, span_warning("Tip it back upright first!"))
+		return
+
+	if(!CHECK_BITFIELD(machine_stat, PANEL_OPEN))
+		return
+	attack_hand(user)
+
+/obj/machinery/vending/wirecutter_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(tipped_level)
+		to_chat(user, span_warning("Tip it back upright first!"))
+		return
+
+	if(!CHECK_BITFIELD(machine_stat, PANEL_OPEN))
+		return
+	attack_hand(user)
+
+/obj/machinery/vending/wrench_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(tipped_level)
+		to_chat(user, span_warning("Tip it back upright first!"))
+		return
+	if(!wrenchable)
+		return
+	if(!do_after(user, 20, NONE, src, BUSY_ICON_BUILD))
+		return
+	playsound(loc, 'sound/items/ratchet.ogg', 25, 1)
+	anchored = !anchored
+	if(anchored)
+		user.visible_message("[user] tightens the bolts securing \the [src] to the floor.", "You tighten the bolts securing \the [src] to the floor.")
+		var/turf/current_turf = get_turf(src)
+		if(current_turf && density)
+			current_turf.atom_flags |= AI_BLOCKED
+	else
+		user.visible_message("[user] unfastens the bolts securing \the [src] to the floor.", "You unfasten the bolts securing \the [src] to the floor.")
+		var/turf/current_turf = get_turf(src)
+		if(current_turf && density)
+			current_turf.atom_flags &= ~AI_BLOCKED
 
 /obj/machinery/vending/can_interact(mob/user)
 	. = ..()
@@ -464,14 +488,16 @@
 			stock_vacuum(usr)
 			. = TRUE
 
-/obj/machinery/vending/proc/vend(datum/vending_product/R, mob/user)
+/obj/machinery/vending/proc/vend(datum/vending_product/product, mob/user)
+	if(!vend_ready)
+		return
 	if(!allowed(user) && (!wires.is_cut(WIRE_IDSCAN) || hacking_safety)) //For SECURE VENDING MACHINES YEAH
 		to_chat(user, span_warning("Access denied."))
 		if(icon_deny)
 			flick(icon_deny, src)
 		return
 
-	if(R.category == CAT_HIDDEN && !extended_inventory)
+	if(product.category == CAT_HIDDEN && !extended_inventory)
 		return
 
 	var/turf/T = loc
@@ -481,49 +507,50 @@
 			flick(icon_deny, src)
 		return
 
-	vend_ready = 0 //One thing at a time!!
-	R.amount--
+	vend_ready = FALSE //One thing at a time!!
 
-	if(((last_reply + (src.vend_delay + 200)) <= world.time) && vend_reply)
+	if(((last_reply + (vend_delay + 200)) <= world.time) && vend_reply)
 		INVOKE_ASYNC(src, PROC_REF(speak_on_vend))
 
-	var/obj/item/new_item = release_item(R, vend_delay)
-
-	if(istype(new_item))
-		new_item.on_vend(user, faction, fill_container = TRUE)
-	vend_ready = 1
+	start_release_item(product, vend_delay, user)
 
 /obj/machinery/vending/proc/speak_on_vend()
 	speak(vend_reply)
 	last_reply = world.time
 
-/obj/machinery/vending/proc/release_item(datum/vending_product/R, delay_vending = 0, dump_product = 0)
+///Tries to vend the item
+/obj/machinery/vending/proc/start_release_item(datum/vending_product/product, delay_vending = 0, mob/user)
+	if(powered(power_channel))
+		use_power(active_power_usage)
+	else if(machine_current_charge > active_power_usage) //if no power, use the machine's battery
+		machine_current_charge -= min(machine_current_charge, active_power_usage)
+	else
+		return
+	if(icon_vend)
+		flick(icon_vend, src)
 	if(delay_vending)
-		if(powered(power_channel))
-			use_power(active_power_usage)	//actuators and stuff
-			if (icon_vend)
-				flick(icon_vend, src) //Show the vending animation if needed
-			sleep(delay_vending)
-		else if(machine_current_charge > active_power_usage) //if no power, use the machine's battery.
-			machine_current_charge -= min(machine_current_charge, active_power_usage) //Sterilize with min; no negatives allowed.
-			//to_chat(world, span_warning("DEBUG: Machine Auto_Use_Power: Vend Power Usage: [active_power_usage] Machine Current Charge: [machine_current_charge]."))
-			if (icon_vend)
-				flick(icon_vend,src) //Show the vending animation if needed
-			sleep(delay_vending)
-		else
-			return
-		if(R.amount <= 0)
-			return
-	SSblackbox.record_feedback(FEEDBACK_TALLY, "vendored", 1, R.product_name)
+		addtimer(CALLBACK(src, PROC_REF(release_item), product, user), delay_vending)
+		return
+	return release_item(product, user)
+
+///Vends the item
+/obj/machinery/vending/proc/release_item(datum/vending_product/product, mob/user)
+	SSblackbox.record_feedback(FEEDBACK_TALLY, "vendored", 1, product.product_name)
 	addtimer(CALLBACK(src, PROC_REF(stock_vacuum)), 2.5 MINUTES, TIMER_UNIQUE | TIMER_OVERRIDE) // We clean up some time after the last item has been vended.
-	if(vending_sound)
-		playsound(src, vending_sound, 25, 0)
+	playsound(src, vending_sound ? vending_sound : "vending", 25, 0)
+	var/obj/item/new_item
+	if(ispath(product.product_path,/obj/item/weapon/gun))
+		new_item = new product.product_path(get_turf(src), 1)
 	else
-		playsound(src, SFX_VENDING, 25, 0)
-	if(ispath(R.product_path,/obj/item/weapon/gun))
-		return new R.product_path(get_turf(src), 1)
-	else
-		return new R.product_path(get_turf(src))
+		new_item = new product.product_path(get_turf(src))
+
+	. = new_item
+	product.amount--
+	vend_ready = TRUE
+
+	if(!user || !istype(new_item))
+		return
+	new_item.on_vend(user, faction, fill_container = TRUE)
 
 /obj/machinery/vending/MouseDrop_T(atom/movable/A, mob/user)
 	. = ..()
@@ -606,9 +633,9 @@
  */
 /datum/vending_product/proc/attempt_restock(obj/item/item_to_stock, mob/user, show_feedback = TRUE)
 	//More accurate comparison between absolute paths.
-	if(isstorage(item_to_stock)) //Nice try, specialists/engis
-		var/obj/item/storage/storage_to_stock = item_to_stock
-		if(!(storage_to_stock.flags_storage & BYPASS_VENDOR_CHECK)) //If your storage has this flag, it can be restocked
+	if(item_to_stock.storage_datum) //Nice try, specialists/engis
+		var/datum/storage/storage_to_stock = item_to_stock.storage_datum
+		if(!(storage_to_stock.storage_flags & BYPASS_VENDOR_CHECK)) //If your storage has this flag, it can be restocked
 			user?.balloon_alert(user, "Can't restock containers!")
 			return FALSE
 
@@ -647,13 +674,15 @@
 	//Actually restocks the item after our checks
 	if(user)
 		if(item_to_stock.loc == user) //Inside the mob's inventory
-			if(item_to_stock.flags_item & WIELDED)
+			if(item_to_stock.item_flags & WIELDED)
 				item_to_stock.unwield(user)
 			user.temporarilyRemoveItemFromInventory(item_to_stock)
 
-		else if(istype(item_to_stock.loc, /obj/item/storage)) //inside a storage item
+		// Hey I don't think this code does anything, it looks like it wants to restock things that are inside a storage?
+		// Probably should be running a loop over every item inside the storage, but whatever that's not for this PR
+		else if(item_to_stock.item_flags & IN_STORAGE) //inside a storage item
 			var/obj/item/storage/S = item_to_stock.loc
-			S.remove_from_storage(item_to_stock, user.loc, user)
+			S.storage_datum.remove_from_storage(item_to_stock, user.loc, user)
 
 	item_to_stock.removed_from_inventory(user)
 	qdel(item_to_stock)
@@ -759,8 +788,8 @@
 			continue
 
 		while(R.amount>0)
-			release_item(R, 0)
-			R.amount--
+			if(!start_release_item(R, 0))
+				break
 		break
 
 	machine_stat |= BROKEN
@@ -780,8 +809,7 @@
 		if (!dump_path)
 			continue
 
-		R.amount--
-		throw_item = release_item(R, 0)
+		throw_item = start_release_item(R, 0)
 		break
 	if (!throw_item)
 		return FALSE
@@ -789,7 +817,7 @@
 	src.visible_message(span_warning("[src] launches [throw_item.name] at [target]!"))
 	. = TRUE
 
-/obj/machinery/vending/take_damage(damage_amount, damage_type = BRUTE, damage_flag = MELEE, effects = TRUE, attack_dir, armour_penetration = 0)
+/obj/machinery/vending/take_damage(damage_amount, damage_type = BRUTE, damage_flag = null, effects = TRUE, attack_dir, armour_penetration = 0, mob/living/blame_mob)
 	if(density && damage_amount >= knockdown_threshold)
 		tip_over()
 	return ..()

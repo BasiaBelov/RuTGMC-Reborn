@@ -199,31 +199,7 @@ GLOBAL_VAR(restart_counter)
 /world/Topic(T, addr, master, key)
 	TGS_TOPIC	//redirect to server tools if necessary
 
-	var/static/list/bannedsourceaddrs = list()
-
-	var/static/list/lasttimeaddr = list()
 	var/static/list/topic_handlers = TopicHandlers()
-
-	//LEAVE THIS COOLDOWN HANDLING IN PLACE, OR SO HELP ME I WILL MAKE YOU SUFFER
-	if (bannedsourceaddrs[addr])
-		return
-
-	var/list/filtering_whitelist = CONFIG_GET(keyed_list/topic_filtering_whitelist)
-	var/host = splittext(addr, ":")
-	if(!filtering_whitelist[host[1]]) // We only ever check the host, not the port (if provided)
-		if(length(T) >= MAX_TOPIC_LEN)
-			log_admin_private("[addr] banned from topic calls for a round for too long status message")
-			bannedsourceaddrs[addr] = TOPIC_BANNED
-			return
-
-		if(lasttimeaddr[addr])
-			var/lasttime = lasttimeaddr[addr]
-			if(world.time < lasttime)
-				log_admin_private("[addr] banned from topic calls for a round for too frequent messages")
-				bannedsourceaddrs[addr] = TOPIC_BANNED
-				return
-
-		lasttimeaddr[addr] = world.time + 2 SECONDS
 
 	var/list/input = params2list(T)
 	var/datum/world_topic/handler
@@ -271,22 +247,16 @@ GLOBAL_VAR(restart_counter)
 		if(GLOB.round_id)
 			msg += "Round ID [GLOB.round_id] finished"
 
-		var/datum/map_config/next_gound_map
-		var/datum/map_config/next_ship_map
+		var/datum/map_config/next_ground_map
 
 		if(length(SSmapping.next_map_configs)) //To avoid a bad index, let's check if there's actually a list.
-			next_gound_map = SSmapping.next_map_configs[GROUND_MAP]
-			next_ship_map = SSmapping.next_map_configs[SHIP_MAP]
+			next_ground_map = SSmapping.next_map_configs[GROUND_MAP]
 
-		if(!next_gound_map) //The list could hold a single item, so better check each because there's no guarantee both exist.
-			next_gound_map = SSmapping.configs[GROUND_MAP]
-		if(!next_ship_map)
-			next_ship_map = SSmapping.configs[SHIP_MAP]
+		if(!next_ground_map) //The list could hold a single item, so better check each because there's no guarantee both exist.
+			next_ground_map = SSmapping.configs[GROUND_MAP]
 
-		if(next_gound_map)
-			msg += "Next Ground Map: [next_gound_map.map_name]"
-		if(next_ship_map)
-			msg += "Next Ship Map: [next_ship_map.map_name]"
+		if(next_ground_map)
+			msg += "Next Ground Map: [next_ground_map.map_name]"
 
 		if(SSticker.mode)
 			msg += "Game Mode: [SSticker.mode.name]"
@@ -381,12 +351,25 @@ GLOBAL_VAR(restart_counter)
 	// Finally set the new status
 	status = new_status
 
+/**
+ * Handles incresing the world's maxx var and intializing the new turfs and assigning them to the global area.
+ * If map_load_z_cutoff is passed in, it will only load turfs up to that z level, inclusive.
+ * This is because maploading will handle the turfs it loads itself.
+ */
+/world/proc/increase_max_x(new_maxx)
+	if(new_maxx <= maxx)
+		return
+	maxx = new_maxx
+
+/world/proc/increase_max_y(new_maxy)
+	if(new_maxy <= maxy)
+		return
+	maxy = new_maxy
 
 /world/proc/incrementMaxZ()
 	maxz++
 	SSmobs.MaxZChanged()
 	SSidlenpcpool.MaxZChanged()
-
 
 /world/proc/update_hub_visibility(new_visibility)
 	if(new_visibility == GLOB.hub_visibility)

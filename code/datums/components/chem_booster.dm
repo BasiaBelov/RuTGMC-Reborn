@@ -85,6 +85,11 @@
 		/datum/reagent/medicine/dylovene = list(NAME = "Dylovene", REQ = 5, BRUTE_AMP = 0, BURN_AMP = 0, TOX_HEAL = 0.5, STAM_REG_AMP = 0, SPEED_BOOST = 0),
 		/datum/reagent/medicine/synaptizine = list(NAME = "Synaptizine", REQ = 1, BRUTE_AMP = 0, BURN_AMP = 0, TOX_HEAL = 1, STAM_REG_AMP = 0.1, SPEED_BOOST = 0),
 		/datum/reagent/medicine/neuraline = list(NAME = "Neuraline", REQ = 2, BRUTE_AMP = 1, BURN_AMP = 1, TOX_HEAL = -3, STAM_REG_AMP = 0, SPEED_BOOST = -0.3),
+		/datum/reagent/toxin/xeno_hemodile = list(NAME = "Hemodile", REQ = 3, BRUTE_AMP = 0, BURN_AMP = 0, TOX_HEAL = 0, STAM_REG_AMP = -0.2, SPEED_BOOST = 0.2),
+		/datum/reagent/toxin/xeno_transvitox = list(NAME = "Transvitox", REQ = 3, BRUTE_AMP = 0, BURN_AMP = 0, TOX_HEAL = -0.3, STAM_REG_AMP = 0, SPEED_BOOST = 0),
+		/datum/reagent/toxin/xeno_sanguinal = list(NAME = "Sanguinal", REQ = 3, BRUTE_AMP = -0.3, BURN_AMP = 0, TOX_HEAL = 0, STAM_REG_AMP = 0, SPEED_BOOST = 0),
+		/datum/reagent/toxin/xeno_ozelomelyn = list(NAME = "Ozelomelyn", REQ = 3, BRUTE_AMP = -0.2, BURN_AMP = -0.2, TOX_HEAL = -0.2, STAM_REG_AMP = 0, SPEED_BOOST = 0),
+		/datum/reagent/toxin/satrapine = list(NAME = "Satrapine", REQ = 3, BRUTE_AMP = 0, BURN_AMP = 0, TOX_HEAL = -0.3, STAM_REG_AMP = -0.3, SPEED_BOOST = 0),
 	)
 
 /datum/component/chem_booster/Initialize()
@@ -188,18 +193,18 @@
 		return
 	update_resource(-resource_drain_amount)
 
-	wearer.adjustToxLoss(-tox_heal * boost_amount)
+	wearer.adjust_tox_loss(-tox_heal * boost_amount)
 	wearer.heal_overall_damage(6 * boost_amount*brute_heal_amp, 6 * boost_amount * burn_heal_amp)
 	vali_necro_timer = world.time - processing_start
 	if(vali_necro_timer > 20 SECONDS)
 		return
 	if(connected_weapon)
-		wearer.adjustStaminaLoss(-7 * stamina_regen_amp * ((20 - (vali_necro_timer) * 0.1) * 0.05)) //stamina gain scales inversely with passed time, up to 20 seconds
+		wearer.adjust_stamina_loss(-7 * stamina_regen_amp * ((20 - (vali_necro_timer) * 0.1) * 0.05)) //stamina gain scales inversely with passed time, up to 20 seconds
 	if(vali_necro_timer > 10 SECONDS)
 		to_chat(wearer, span_bold("WARNING: You have [(200 - (vali_necro_timer)) * 0.1] seconds before necrotic tissue forms on your limbs."))
 	if(vali_necro_timer > 15 SECONDS)
 		wearer.overlay_fullscreen("degeneration", /atom/movable/screen/fullscreen/animated/infection, 1)
-		to_chat(wearer, span_highdanger("The process of necrosis begins to set in. Turn it off before it's too late!"))
+		to_chat(wearer, span_userdanger("The process of necrosis begins to set in. Turn it off before it's too late!"))
 
 /**
  *	Opens the radial menu with everything
@@ -379,7 +384,7 @@
 	if(resource_storage_current >= resource_storage_max)
 		return
 	var/obj/item/vali_weapon = wearer.get_held_item()
-	if(vali_weapon.type == /obj/item/weapon/claymore/mercsword/officersword/valirapier)
+	if(vali_weapon.type == /obj/item/weapon/sword/officer/valirapier)
 		update_resource(20)
 	else
 		update_resource(round(20 * connected_weapon.attack_speed / 11))

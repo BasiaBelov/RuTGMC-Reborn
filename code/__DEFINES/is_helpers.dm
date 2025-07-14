@@ -10,6 +10,15 @@
 
 #define isweakref(D) (istype(D, /datum/weakref))
 
+#define isimage(thing) (istype(thing, /image))
+
+GLOBAL_VAR_INIT(magic_appearance_detecting_image, new /image) // appearances are awful to detect safely, but this seems to be the best way ~ninjanomnom
+#define isappearance(thing) (!isimage(thing) && !ispath(thing) && istype(GLOB.magic_appearance_detecting_image, thing))
+
+// The filters list has the same ref type id as a filter, but isnt one and also isnt a list, so we have to check if the thing has Cut() instead
+GLOBAL_VAR_INIT(refid_filter, TYPEID(filter(type="angular_blur")))
+#define isfilter(thing) (!hascall(thing, "Cut") && TYPEID(thing) == GLOB.refid_filter)
+
 #define isgenerator(A) (istype(A, /generator))
 
 //Turfs
@@ -26,8 +35,6 @@
 #define iswater(A) (istype(A, /turf/open/liquid/water))
 
 #define isbasalt(A) (istype(A, /turf/open/lavaland/basalt))
-
-#define islavacatwalk(A) (istype(A, /turf/open/lavaland/catwalk))
 
 #define isfloorturf(A) (istype(A, /turf/open/floor))
 
@@ -71,6 +78,7 @@
 //Job/role helpers
 #define ismarinefaction(H) (H.faction == "TerraGov")
 #define isterragovjob(J) (istype(J, /datum/job/terragov))
+#define isspatialagentjob(J) (istype(J, /datum/job/spatial_agent))
 #define ismedicaljob(J) (istype(J, /datum/job/terragov/medical))
 #define ismarinejob(J) (istype(J, /datum/job/terragov/squad))
 #define ismarinespecjob(J) (istype(J, /datum/job/terragov/squad/specialist))
@@ -98,6 +106,7 @@
 #define isxenopraetorian(A) (istype(A, /mob/living/carbon/xenomorph/praetorian))
 #define isxenoravager(A) (istype(A, /mob/living/carbon/xenomorph/ravager))
 #define isxenorunner(A) (istype(A, /mob/living/carbon/xenomorph/runner))
+#define isxenobaneling(A) (istype(A, /mob/living/carbon/xenomorph/baneling))
 #define isxenospitter(A) (istype(A, /mob/living/carbon/xenomorph/spitter))
 #define isxenosentinel(A) (istype(A, /mob/living/carbon/xenomorph/sentinel))
 #define isxenowarrior(A) (istype(A, /mob/living/carbon/xenomorph/warrior))
@@ -121,6 +130,8 @@
 #define issiliconoradminghost(A) (istype(A, /mob/living/silicon) || IsAdminGhost(A))
 
 #define isAI(A) (istype(A, /mob/living/silicon/ai))
+
+#define isAIeye(A) (istype(A, /mob/camera/aiEye))
 
 //Simple animals
 #define isanimal(A) (istype(A, /mob/living/simple_animal))
@@ -173,7 +184,9 @@
 
 #define isgrenade(A) (istype(A, /obj/item/explosive/grenade))
 
-#define isstorage(A) (istype(A, /obj/item/storage))
+#define isdatumstorage(A) (istype(A, /datum/storage))
+
+#define isstorageobj(A) (istype(A, /obj/item/storage))
 
 #define isitemstack(A) (istype(A, /obj/item/stack))
 
@@ -227,6 +240,8 @@
 
 #define isstructure(A) (istype(A, /obj/structure))
 
+#define isxenostructure(A) (istype(A, /obj/structure/xeno))
+
 #define iscable(A) (istype(A, /obj/structure/cable))
 
 #define isladder(A) (istype(A, /obj/structure/ladder))
@@ -269,6 +284,10 @@
 
 #define issentry(A) (istype(A, /obj/machinery/deployable/mounted/sentry))
 
+#define is_reagent_container(O) (istype(O, /obj/item/reagent_containers))
+
+#define isimplant(A) (istype(A, /obj/item/implant))
+
 //Assemblies
 #define isassembly(O) (istype(O, /obj/item/assembly))
 
@@ -288,6 +307,7 @@
 
 //Gamemode
 #define iscrashgamemode(O) (istype(O, /datum/game_mode/infestation/crash))
+#define iszombiecrashgamemode(O) (istype(O, /datum/game_mode/infestation/crash/zombie))
 #define isinfestationgamemode(O) (istype(O, /datum/game_mode/infestation))
 #define isexterminationgamemode(O) (istype(O, /datum/game_mode/infestation/distress/extermination))
 #define isdistressgamemode(O) (istype(O, /datum/game_mode/infestation/distress))
@@ -303,7 +323,7 @@
 #define isclientedaghost(living) (isaghost(living) && GLOB.directory[copytext_char(living.ckey, 2)] && living.get_ghost())
 
 // Shuttles
-#define isshuttleturf(T) (length(T.baseturfs) && (/turf/baseturf_skipover/shuttle in T.baseturfs))
+#define isshuttleturf(T) (!isnull(T.depth_to_find_baseturf(/turf/baseturf_skipover/shuttle)))
 #define isdropshiparea(A) (istype(A, /area/shuttle/dropship))
 
 // Xeno hives

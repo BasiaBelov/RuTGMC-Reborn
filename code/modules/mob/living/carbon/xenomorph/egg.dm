@@ -1,7 +1,7 @@
 /obj/alien/egg
 	name = "theoretical egg"
 	density = FALSE
-	flags_atom = CRITICAL_ATOM
+	atom_flags = CRITICAL_ATOM
 	max_integrity = 80
 	integrity_failure = 20
 	///What maturity stage are we in
@@ -24,8 +24,9 @@
 	. = ..()
 	icon_state = initial(icon_state) + "[maturity_stage]"
 
-/obj/alien/egg/obj_break(damage_flag)
-	burst(TRUE)
+/obj/alien/egg/obj_destruction(damage_amount, damage_type, damage_flag)
+	if((damage_amount || damage_flag))
+		burst(TRUE)
 	return ..()
 
 ///Advance the maturity state by one, or set it to maturity
@@ -41,7 +42,7 @@
 		RegisterSignal(turf_to_watch, COMSIG_ATOM_ENTERED, PROC_REF(enemy_crossed))
 
 ///Bursts the egg. Return TRUE if it bursts successfully, FALSE if it fails for any reason.
-/obj/alien/egg/proc/burst(via_damage)
+/obj/alien/egg/proc/burst(via_damage = FALSE)
 	SHOULD_CALL_PARENT(TRUE)
 	if(maturity_stage != stage_ready_to_burst) //already popped, or not ready yet
 		return FALSE
@@ -60,7 +61,7 @@
 		return
 	if(!should_proc_burst(entered))
 		return
-	burst()
+	burst(FALSE)
 
 /obj/alien/egg/proc/should_proc_burst(mob/living/carbon/carbon_mover)
 	if(issamexenohive(carbon_mover))
@@ -80,7 +81,7 @@
 	name = "hugger egg"
 	icon_state = "egg_hugger"
 	density = FALSE
-	flags_atom = CRITICAL_ATOM
+	atom_flags = CRITICAL_ATOM
 	max_integrity = 80
 	maturity_time = 15 SECONDS
 	stage_ready_to_burst = 2
@@ -113,7 +114,7 @@
 	advance_maturity(stage_ready_to_burst + 1)
 	for(var/turf/turf_to_watch AS in filled_turfs(src, trigger_size, "circle", FALSE))
 		UnregisterSignal(turf_to_watch, COMSIG_ATOM_ENTERED)
-	playsound(loc, "sound/effects/alien/egg_move.ogg", 25)
+	playsound(loc, 'sound/effects/alien/egg_move.ogg', 25)
 	flick("egg opening", src)
 
 	var/mob/living/carbon/xenomorph/facehugger/new_hugger = new(loc)
@@ -153,16 +154,16 @@
 		return
 	color = null
 
-/obj/alien/egg/hugger/burst(via_damage)
+/obj/alien/egg/hugger/burst(via_damage = FALSE)
 	. = ..()
 	if(!.)
 		return
 	if(via_damage)
 		hugger_type = null
-		playsound(loc, "sound/effects/alien/egg_burst.ogg", 30)
+		playsound(loc, 'sound/effects/alien/egg_burst.ogg', 30)
 		flick("egg exploding", src)
 		return
-	playsound(src.loc, "sound/effects/alien/egg_move.ogg", 25)
+	playsound(src.loc, 'sound/effects/alien/egg_move.ogg', 25)
 	flick("egg opening", src)
 	addtimer(CALLBACK(src, PROC_REF(spawn_hugger), loc), 1 SECONDS)
 
@@ -181,7 +182,7 @@
 	if(!issamexenohive(xenomorph))
 		xenomorph.do_attack_animation(src, ATTACK_EFFECT_SMASH)
 		xenomorph.visible_message(span_xenowarning("[xenomorph] crushes \the [src]."), span_xenowarning("We crush \the [src]."))
-		burst(FALSE)
+		burst(TRUE)
 		return
 
 	switch(maturity_stage)
@@ -189,7 +190,7 @@
 			to_chat(xenomorph, span_xenowarning("The child is not developed yet."))
 		if(2)
 			to_chat(xenomorph, span_xenonotice("We retrieve the child."))
-			burst()
+			burst(FALSE)
 		if(3, 4)
 			xenomorph.visible_message(span_xenonotice("\The [xenomorph] clears the hatched egg."), \
 			span_xenonotice("We clear the hatched egg."))
@@ -198,6 +199,8 @@
 
 /obj/alien/egg/hugger/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(!istype(I, /obj/item/clothing/mask/facehugger))
 		return FALSE
@@ -268,17 +271,17 @@
 		return
 	color = null
 
-/obj/alien/egg/gas/burst(via_damage)
+/obj/alien/egg/gas/burst(via_damage = FALSE)
 	. = ..()
 	if(!.)
 		return
 	var/spread = EGG_GAS_DEFAULT_SPREAD
 	if(via_damage) // More violent destruction, more gas.
-		playsound(loc, "sound/effects/alien/egg_burst.ogg", 30)
+		playsound(loc, 'sound/effects/alien/egg_burst.ogg', 30)
 		flick("egg gas exploding", src)
 		spread = EGG_GAS_KILL_SPREAD
 	else
-		playsound(src.loc, "sound/effects/alien/egg_move.ogg", 25)
+		playsound(src.loc, 'sound/effects/alien/egg_move.ogg', 25)
 		flick("egg gas opening", src)
 	spread += gas_size_bonus
 
@@ -298,6 +301,4 @@
 		xenomorph.visible_message(span_xenowarning("[xenomorph] crushes \the [src]."), span_xenowarning("We crush \the [src]."))
 		burst(TRUE)
 		return
-
 	to_chat(xenomorph, span_warning("That egg is filled with gas and has no child to retrieve."))
-

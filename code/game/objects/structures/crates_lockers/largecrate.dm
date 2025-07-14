@@ -5,13 +5,13 @@
 	icon_state = "densecrate"
 	density = TRUE
 	anchored = FALSE
-	var/dropmetal = TRUE
 	resistance_flags = XENO_DAMAGEABLE
 	interaction_flags = INTERACT_OBJ_DEFAULT|INTERACT_POWERLOADER_PICKUP_ALLOWED
 	allow_pass_flags = PASSABLE|PASS_WALKOVER|PASS_LOW_STRUCTURE
 	max_integrity = 40
 	soft_armor = list(MELEE = 0, BULLET = 80, LASER = 80, ENERGY = 80, BOMB = 0, BIO = 0, FIRE = 0, ACID = 0)
 	hit_sound = 'sound/effects/woodhit.ogg'
+	var/dropmetal = TRUE
 	var/spawn_type
 	var/spawn_amount
 
@@ -23,9 +23,9 @@
 	AddElement(/datum/element/connect_loc, connections)
 
 /obj/structure/largecrate/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_WOOD, -10, 5)
+	AddElement(/datum/element/debris, DEBRIS_WOOD, -40, 5)
 
-/obj/structure/largecrate/deconstruct(disassembled = TRUE)
+/obj/structure/largecrate/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	spawn_stuff()
 	return ..()
 
@@ -120,7 +120,7 @@
 	desc = "A stack of black storage cases."
 	icon_state = "case_double"
 
-/obj/structure/largecrate/random/case/double/deconstruct(disassembled = TRUE)
+/obj/structure/largecrate/random/case/double/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	new /obj/structure/largecrate/random/case(loc)
 	new /obj/structure/largecrate/random/case(loc)
 	return ..()
@@ -137,7 +137,7 @@
 	. = ..()
 	icon_state = pick("mini_case", "mini_case_b", "mini_case_c")
 
-/obj/structure/largecrate/random/barrel/deconstruct(disassembled = TRUE)
+/obj/structure/largecrate/random/barrel/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	if(dropmetal)
 		new /obj/item/stack/sheet/metal/small_stack(src)
 	return ..()
@@ -161,7 +161,7 @@
 	. += span_notice("You need a blowtorch to weld this open!")
 
 /obj/structure/largecrate/random/barrel/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_SPARKS, -15, 8, 1)
+	AddElement(/datum/element/debris, DEBRIS_SPARKS, -40, 8, 1)
 
 /obj/structure/largecrate/random/barrel
 	name = "blue barrel"

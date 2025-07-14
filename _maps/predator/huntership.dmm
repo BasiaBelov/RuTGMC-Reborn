@@ -1,7 +1,7 @@
 //MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
 "aa" = (
-/turf/open/space,
-/area/space)
+/turf/template_noop,
+/area/template_noop)
 "ab" = (
 /obj/item/skull/king{
 	anchored = 1
@@ -397,6 +397,10 @@
 /obj/effect/step_trigger/teleporter/yautja_ship,
 /turf/open/floor/light,
 /area/yautja)
+"be" = (
+/obj/alien/egg/hugger/yautja,
+/turf/open/floor/strata/multi_tiles,
+/area/yautja)
 "bg" = (
 /obj/structure/rack{
 	color = "#6b675e";
@@ -489,11 +493,6 @@
 	name = "\improper Storage Chamber"
 	},
 /turf/open/shuttle/dropship/fourteen,
-/area/yautja)
-"by" = (
-/obj/effect/decal/remains/human,
-/obj/alien/egg/hugger/yautja,
-/turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "bz" = (
 /obj/structure/window/reinforced{
@@ -853,36 +852,36 @@
 	layer = 2.79;
 	resistance_flags = 1
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	pixel_x = 12
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	pixel_x = 8
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	pixel_x = 4
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	pixel_x = -4
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	pixel_x = -12
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	pixel_x = -8
@@ -941,7 +940,7 @@
 	color = "#6b675e";
 	resistance_flags = 1
 	},
-/obj/item/clothing/shoes/combat,
+/obj/item/clothing/shoes/marine/srf/full,
 /obj/item/clothing/under/chainshirt/hunter,
 /obj/item/clothing/gloves/combat,
 /obj/item/clothing/head/helmet/gladiator,
@@ -1009,7 +1008,7 @@
 /turf/open/floor/corsat,
 /area/yautja)
 "cY" = (
-/obj/item/tool/kitchen/tray{
+/obj/item/storage/kitchen_tray{
 	pixel_y = -3
 	},
 /obj/effect/decal/cleanable/blood,
@@ -1020,7 +1019,7 @@
 	color = "#6b675e";
 	resistance_flags = 1
 	},
-/obj/item/weapon/claymore/mercsword/machete/arnold,
+/obj/item/weapon/sword/machete/arnold,
 /turf/open/floor/corsat,
 /area/yautja)
 "da" = (
@@ -1101,9 +1100,6 @@
 /obj/effect/turf_decal/lvsanddecal/full,
 /turf/open/beach/sand,
 /area/yautja)
-"dI" = (
-/turf/open/space/basic,
-/area/space)
 "dP" = (
 /obj/item/explosive/grenade/spawnergrenade/hellhound,
 /obj/item/explosive/grenade/spawnergrenade/hellhound,
@@ -1392,7 +1388,7 @@
 /turf/open/floor/corsat,
 /area/yautja)
 "ja" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 8
 	},
 /turf/open/floor/plating/ground/dirtgrassborder{
@@ -1423,29 +1419,34 @@
 	layer = 2.79;
 	resistance_flags = 1
 	},
-/obj/item/weapon/claymore{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	name = "duelling claymore"
 	},
-/obj/item/weapon/claymore{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	name = "duelling claymore";
 	pixel_x = -5
 	},
-/obj/item/weapon/claymore{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	name = "duelling claymore";
 	pixel_x = 5
 	},
-/obj/item/weapon/claymore{
+/obj/item/weapon/sword{
 	attack_speed = 12;
 	force = 25;
 	name = "duelling claymore";
 	pixel_x = 10
 	},
+/turf/open/floor/strata/multi_tiles,
+/area/yautja)
+"jY" = (
+/obj/effect/decal/remains/human,
+/obj/alien/egg/hugger/yautja,
 /turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "kA" = (
@@ -1483,10 +1484,10 @@
 /turf/open/shuttle/dropship/fourteen,
 /area/yautja)
 "lu" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 8
 	},
-/obj/structure/barricade/metal/handrail,
+/obj/structure/barricade/solid/handrail,
 /turf/open/floor/plating/ground/dirtgrassborder/corner{
 	dir = 8
 	},
@@ -1509,14 +1510,14 @@
 /turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "mj" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 4
 	},
-/obj/structure/barricade/metal/handrail,
+/obj/structure/barricade/solid/handrail,
 /turf/open/ground/grass,
 /area/yautja)
 "mv" = (
-/obj/item/weapon/katana{
+/obj/item/weapon/sword/katana{
 	anchored = 1
 	},
 /obj/structure/table/reinforced/prison{
@@ -1553,10 +1554,10 @@
 /turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "ny" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 1
 	},
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 4
 	},
 /turf/open/ground/grass,
@@ -1631,10 +1632,10 @@
 /turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "pJ" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 1
 	},
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 8
 	},
 /turf/open/floor/plating/ground/dirtgrassborder/corner,
@@ -1783,10 +1784,6 @@
 	},
 /turf/open/floor/corsat,
 /area/yautja)
-"ua" = (
-/obj/alien/egg/hugger/yautja,
-/turf/open/floor/strata/multi_tiles,
-/area/yautja)
 "uO" = (
 /obj/structure/bed/chair/hunter{
 	dir = 4
@@ -1812,7 +1809,7 @@
 	color = "#6b675e";
 	resistance_flags = 1
 	},
-/obj/item/weapon/claymore/mercsword{
+/obj/item/weapon/sword{
 	anchored = 1
 	},
 /turf/open/floor/corsat,
@@ -2026,7 +2023,7 @@
 	color = "#6b675e";
 	resistance_flags = 1
 	},
-/obj/item/tool/kitchen/tray{
+/obj/item/storage/kitchen_tray{
 	color = "#FFE55C";
 	pixel_y = 4
 	},
@@ -2117,7 +2114,7 @@
 /turf/open/floor/corsat,
 /area/yautja)
 "GG" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 1
 	},
 /turf/open/ground/grass,
@@ -2171,10 +2168,10 @@
 /turf/open/floor/corsat,
 /area/yautja)
 "Hz" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 1
 	},
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 8
 	},
 /turf/open/ground/grass,
@@ -2313,7 +2310,7 @@
 /turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "Ku" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 4
 	},
 /turf/open/floor/plating/ground/dirtgrassborder{
@@ -2321,7 +2318,7 @@
 	},
 /area/yautja)
 "KI" = (
-/obj/item/tool/kitchen/tray{
+/obj/item/storage/kitchen_tray{
 	pixel_y = -5
 	},
 /obj/effect/decal/cleanable/blood,
@@ -2456,10 +2453,10 @@
 /turf/open/floor/corsat,
 /area/yautja)
 "Pb" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 8
 	},
-/obj/structure/barricade/metal/handrail,
+/obj/structure/barricade/solid/handrail,
 /turf/open/ground/grass,
 /area/yautja)
 "Pm" = (
@@ -2530,10 +2527,10 @@
 /turf/open/floor/corsat,
 /area/yautja)
 "Qx" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 4
 	},
-/obj/structure/barricade/metal/handrail,
+/obj/structure/barricade/solid/handrail,
 /turf/open/floor/plating/ground/dirtgrassborder/corner{
 	dir = 4
 	},
@@ -2596,7 +2593,7 @@
 /turf/open/shuttle/dropship/fourteen,
 /area/yautja)
 "UG" = (
-/obj/structure/barricade/metal/handrail,
+/obj/structure/barricade/solid/handrail,
 /turf/open/ground/grass,
 /area/yautja)
 "UR" = (
@@ -2683,7 +2680,7 @@
 	color = "#6b675e";
 	resistance_flags = 1
 	},
-/obj/item/tool/kitchen/tray,
+/obj/item/storage/kitchen_tray,
 /obj/item/tool/kitchen/utensil/fork{
 	pixel_x = 10;
 	pixel_y = 3
@@ -2703,10 +2700,10 @@
 /turf/open/floor/strata/multi_tiles,
 /area/yautja)
 "Xn" = (
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 1
 	},
-/obj/structure/barricade/metal/handrail{
+/obj/structure/barricade/solid/handrail{
 	dir = 4
 	},
 /turf/open/floor/plating/ground/dirtgrassborder/corner{
@@ -4378,9 +4375,9 @@ aa
 bj
 bj
 bj
-ua
+be
 MD
-ua
+be
 bj
 bj
 bj
@@ -4450,9 +4447,9 @@ aa
 aa
 bj
 bj
-by
+jY
 Kp
-ua
+be
 bj
 bj
 bj
@@ -7106,11 +7103,11 @@ bj
 aa
 aa
 aa
-dI
-dI
-dI
-dI
-dI
+aa
+aa
+aa
+aa
+aa
 aa
 aa
 aa
@@ -7328,7 +7325,7 @@ aa
 aa
 aa
 aa
-dI
+aa
 aa
 aa
 aa
@@ -7371,7 +7368,7 @@ aa
 aa
 aa
 aa
-dI
+aa
 aa
 aa
 aa

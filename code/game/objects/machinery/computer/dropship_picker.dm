@@ -66,6 +66,9 @@
 		"_mobile_bar" = 'icons/ui_icons/dropshippicker/_mobile_bar.png',
 		"_umbilical" = 'icons/ui_icons/dropshippicker/_umbilical.png',
 		"_cargo" = 'icons/ui_icons/dropshippicker/_cargo.png',
+		"_barge" = 'icons/ui_icons/dropshippicker/_barge.png',
+		"_voidraider" = 'icons/ui_icons/dropshippicker/_voidraider.png',
+		"_urbantower" = 'icons/ui_icons/dropshippicker/_urbantower.png',
 	)
 
 /obj/machinery/computer/dropship_picker/ui_act(action, list/params, datum/tgui/ui)
@@ -82,12 +85,13 @@
 		if("confirm")
 			if(!current_template_ref)
 				return FALSE
+			dropship_selected = TRUE
 			var/datum/map_template/shuttle/template = locate(current_template_ref) in SSmapping.minidropship_templates
 			var/obj/docking_port/mobile/shuttle = SSshuttle.action_load(template)
 			SSshuttle.moveShuttleQuickToDock(template.shuttle_id, dock_id)
 			shuttle.setTimer(0)
-			dropship_selected = TRUE
 			balloon_alert(usr, "shuttle selected, locking")
 			ui.close()
+			log_game("[key_name(usr)] has picked the tadpole")
 	return TRUE
 

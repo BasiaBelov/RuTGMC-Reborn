@@ -17,8 +17,10 @@
 	desc = "A rectangular metallic frame sitting on four legs with a back panel. Designed to fit the sitting position, more or less comfortably."
 	icon_state = "chair"
 	buckle_lying = 0
+	buckling_y = 0
 	max_integrity = 20
-	var/propelled = 0 //Check for fire-extinguisher-driven chairs
+	///Check for fire-extinguisher-driven chairs
+	var/propelled = 0
 
 //directional variants mostly used for random spawners
 /obj/structure/bed/chair/east
@@ -31,7 +33,7 @@
 	dir = NORTH
 
 /obj/structure/bed/chair/alt
-	icon = 'icons/Marine/mainship_props.dmi'
+	icon = 'icons/obj/structures/mainship_props.dmi'
 	icon_state = "chair_alt"
 
 /obj/structure/bed/chair/nometal
@@ -67,7 +69,7 @@
 
 /obj/structure/bed/chair/verb/rotate()
 	set name = "Rotate Chair"
-	set category = "Object.Rotate"
+	set category = "IC.Rotate"
 	set src in view(0)
 
 	var/mob/living/carbon/user = usr
@@ -87,42 +89,41 @@
 	desc = "Some say that the TGMC shouldn't spent this much money on reinforced chairs, but the documents from briefing riots prove otherwise."
 	buildstackamount = 2
 
-/obj/structure/bed/chair/reinforced/attackby(obj/item/I, mob/user, params)
+/obj/structure/bed/chair/reinforced/wrench_act(mob/living/user, obj/item/I)
 	. = ..()
+	to_chat(user, span_warning("You can only deconstruct this by welding it down!"))
 
-	if(iswrench(I))
-		to_chat(user, span_warning("You can only deconstruct this by welding it down!"))
+/obj/structure/bed/chair/reinforced/welder_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(user.do_actions)
+		return
+	var/obj/item/tool/weldingtool/WT = I
 
-	else if(iswelder(I))
-		if(user.do_actions)
-			return
-		var/obj/item/tool/weldingtool/WT = I
-
-		if(user.skills.getRating(SKILL_ENGINEER) < SKILL_ENGINEER_METAL)
-			user.visible_message(span_notice("[user] fumbles around figuring out how to weld down \the [src]."),
-			span_notice("You fumble around figuring out how to weld down \the [src]."))
-			var/fumbling_time = 5 SECONDS * (SKILL_ENGINEER_METAL - user.skills.getRating(SKILL_ENGINEER))
-			if(!do_after(user, fumbling_time, NONE, src, BUSY_ICON_UNSKILLED, extra_checks = CALLBACK(WT, /obj/item/tool/weldingtool/proc/isOn)))
-				return
-
-		if(!WT.remove_fuel(0, user))
+	if(user.skills.getRating(SKILL_ENGINEER) < SKILL_ENGINEER_METAL)
+		user.visible_message(span_notice("[user] fumbles around figuring out how to weld down \the [src]."),
+		span_notice("You fumble around figuring out how to weld down \the [src]."))
+		var/fumbling_time = 5 SECONDS * (SKILL_ENGINEER_METAL - user.skills.getRating(SKILL_ENGINEER))
+		if(!do_after(user, fumbling_time, NONE, src, BUSY_ICON_UNSKILLED, extra_checks = CALLBACK(WT, TYPE_PROC_REF(/obj/item/tool/weldingtool, isOn))))
 			return
 
-		user.visible_message(span_notice("[user] begins welding down \the [src]."),
-		span_notice("You begin welding down \the [src]."))
-		add_overlay(GLOB.welding_sparks)
-		playsound(loc, 'sound/items/welder2.ogg', 25, 1)
-		if(!do_after(user, 5 SECONDS, NONE, src, BUSY_ICON_FRIENDLY))
-			cut_overlay(GLOB.welding_sparks)
-			to_chat(user, span_warning("You need to stand still!"))
-			return
-		user.visible_message(span_notice("[user] welds down \the [src]."),
-		span_notice("You weld down \the [src]."))
+	if(!WT.remove_fuel(0, user))
+		return
+
+	user.visible_message(span_notice("[user] begins welding down \the [src]."),
+	span_notice("You begin welding down \the [src]."))
+	add_overlay(GLOB.welding_sparks)
+	playsound(loc, 'sound/items/welder2.ogg', 25, 1)
+	if(!do_after(user, 5 SECONDS, NONE, src, BUSY_ICON_FRIENDLY))
 		cut_overlay(GLOB.welding_sparks)
-		if(buildstacktype && dropmetal)
-			new buildstacktype(loc, buildstackamount)
-		playsound(loc, 'sound/items/welder2.ogg', 25, 1)
-		qdel(src)
+		to_chat(user, span_warning("You need to stand still!"))
+		return
+	user.visible_message(span_notice("[user] welds down \the [src]."),
+	span_notice("You weld down \the [src]."))
+	cut_overlay(GLOB.welding_sparks)
+	if(buildstacktype && dropmetal)
+		new buildstacktype(loc, buildstackamount)
+	playsound(loc, 'sound/items/welder2.ogg', 25, 1)
+	qdel(src)
 
 /obj/structure/bed/chair/wood
 	buildstacktype = /obj/item/stack/sheet/wood
@@ -269,9 +270,9 @@
 	var/def_zone = ran_zone()
 	var/armor_modifier = occupant.modify_by_armor(1, MELEE, 0, def_zone)
 	occupant.throw_at(A, 3, propelled)
-	occupant.apply_effect(6 SECONDS * armor_modifier, STUN)
-	occupant.apply_effect(6 SECONDS * armor_modifier, WEAKEN)
-	occupant.apply_effect(6 SECONDS * armor_modifier, STUTTER)
+	occupant.apply_effect(6 SECONDS * armor_modifier, EFFECT_STUN)
+	occupant.apply_effect(6 SECONDS * armor_modifier, EFFECT_PARALYZE)
+	occupant.apply_effect(6 SECONDS * armor_modifier, EFFECT_STUTTER)
 	occupant.apply_damage(10 * armor_modifier, BRUTE, def_zone)
 	UPDATEHEALTH(occupant)
 	playsound(src.loc, 'sound/weapons/punch1.ogg', 25, 1)
@@ -279,9 +280,9 @@
 		var/mob/living/victim = A
 		def_zone = ran_zone()
 		armor_modifier = victim.modify_by_armor(1, MELEE, 0, def_zone)
-		victim.apply_effect(6 SECONDS * armor_modifier, STUN)
-		victim.apply_effect(6 SECONDS * armor_modifier, WEAKEN)
-		victim.apply_effect(6 SECONDS * armor_modifier, STUTTER)
+		victim.apply_effect(6 SECONDS * armor_modifier, EFFECT_STUN)
+		victim.apply_effect(6 SECONDS * armor_modifier, EFFECT_PARALYZE)
+		victim.apply_effect(6 SECONDS * armor_modifier, EFFECT_STUTTER)
 		victim.apply_damage(10 * armor_modifier, BRUTE, def_zone)
 		UPDATEHEALTH(victim)
 	occupant.visible_message(span_danger("[occupant] crashed into \the [A]!"))
@@ -395,55 +396,54 @@
 		span_warning("We smash \the [src], shearing the bolts!"))
 		fold_down(1)
 
-/obj/structure/bed/chair/dropship/passenger/attackby(obj/item/I, mob/user, params)
+/obj/structure/bed/chair/dropship/passenger/wrench_act(mob/living/user, obj/item/I)
 	. = ..()
+	switch(chair_state)
+		if(DROPSHIP_CHAIR_UNBUCKLED)
+			user.visible_message(span_warning("[user] begins loosening the bolts on \the [src]."),
+			span_warning("You begin loosening the bolts on \the [src]."))
+			playsound(loc, 'sound/items/ratchet.ogg', 25, 1)
 
-	if(iswrench(I))
-		switch(chair_state)
-			if(DROPSHIP_CHAIR_UNBUCKLED)
-				user.visible_message(span_warning("[user] begins loosening the bolts on \the [src]."),
-				span_warning("You begin loosening the bolts on \the [src]."))
-				playsound(loc, 'sound/items/ratchet.ogg', 25, 1)
-
-				if(!do_after(user, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
-					return
-
-				user.visible_message(span_warning("[user] loosens the bolts on \the [src], folding it into the decking."),
-				span_warning("You loosen the bolts on \the [src], folding it into the decking."))
-				fold_down()
-
-			if(DROPSHIP_CHAIR_FOLDED)
-				user.visible_message(span_warning("[user] begins unfolding \the [src]."),
-				span_warning("You begin unfolding \the [src]."))
-				playsound(loc, 'sound/items/ratchet.ogg', 25, 1)
-
-				if(!do_after(user, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
-					return
-
-				user.visible_message(span_warning("[user] unfolds \the [src] from the floor and tightens the bolts."),
-				span_warning("You unfold \the [src] from the floor and tighten the bolts."))
-				unfold_up()
-
-			if(DROPSHIP_CHAIR_BROKEN)
-				to_chat(user, span_warning("\The [src] appears to be broken and needs welding."))
+			if(!do_after(user, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
 				return
 
-	else if(iswelder(I) && chair_state == DROPSHIP_CHAIR_BROKEN)
-		var/obj/item/tool/weldingtool/C = I
-		if(!C.remove_fuel(0, user))
+			user.visible_message(span_warning("[user] loosens the bolts on \the [src], folding it into the decking."),
+			span_warning("You loosen the bolts on \the [src], folding it into the decking."))
+			fold_down()
+
+		if(DROPSHIP_CHAIR_FOLDED)
+			user.visible_message(span_warning("[user] begins unfolding \the [src]."),
+			span_warning("You begin unfolding \the [src]."))
+			playsound(loc, 'sound/items/ratchet.ogg', 25, 1)
+
+			if(!do_after(user, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
+				return
+
+			user.visible_message(span_warning("[user] unfolds \the [src] from the floor and tightens the bolts."),
+			span_warning("You unfold \the [src] from the floor and tighten the bolts."))
+			unfold_up()
+
+		if(DROPSHIP_CHAIR_BROKEN)
+			to_chat(user, span_warning("\The [src] appears to be broken and needs welding."))
 			return
 
-		playsound(loc, 'sound/items/weldingtool_weld.ogg', 25)
-		user.visible_message(span_warning("[user] begins repairing \the [src]."),
-		span_warning("You begin repairing \the [src]."))
-		add_overlay(GLOB.welding_sparks)
-		if(!do_after(user, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
-			cut_overlay(GLOB.welding_sparks)
-			return
-
-		user.visible_message(span_warning("[user] repairs \the [src]."),
-		span_warning("You repair \the [src]."))
-		chair_state = DROPSHIP_CHAIR_FOLDED
+/obj/structure/bed/chair/dropship/passenger/welder_act(mob/living/user, obj/item/I)
+	. = ..()
+	if(chair_state != DROPSHIP_CHAIR_BROKEN)
+		return
+	var/obj/item/tool/weldingtool/C = I
+	if(!C.remove_fuel(0, user))
+		return
+	playsound(loc, 'sound/items/weldingtool_weld.ogg', 25)
+	user.visible_message(span_warning("[user] begins repairing \the [src]."),
+	span_warning("You begin repairing \the [src]."))
+	add_overlay(GLOB.welding_sparks)
+	if(!do_after(user, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
+		cut_overlay(GLOB.welding_sparks)
+		return
+	user.visible_message(span_warning("[user] repairs \the [src]."),
+	span_warning("You repair \the [src]."))
+	chair_state = DROPSHIP_CHAIR_FOLDED
 
 /obj/structure/bed/chair/dropship/doublewide
 	name = "doublewide seat"
@@ -453,8 +453,6 @@
 	var/chair_color = NO_CHAIR_COLOR
 	/// If the chair can only be sat in by a leader or not
 	var/leader_chair = FALSE
-	/// pixel x shift to give to the buckled mob
-	var/buckling_x = 0
 
 /obj/structure/bed/chair/dropship/doublewide/attack_alien(mob/living/carbon/xenomorph/X, damage_amount = X.xeno_caste.melee_damage, damage_type = BRUTE, damage_flag = "", effects = TRUE, armor_penetration = 0, isrightclick = FALSE)
 	if(X.status_flags & INCORPOREAL)
@@ -482,6 +480,8 @@
 
 /obj/structure/bed/chair/dropship/doublewide/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(LAZYLEN(buckled_mobs) && chair_state == DROPSHIP_CHAIR_BROKEN)
 		unbuckle_mob(buckled_mobs[1])
 		balloon_alert_to_viewers("This chair is too damaged to stay sitting in")
@@ -498,14 +498,10 @@
 	return ..()
 
 /obj/structure/bed/chair/dropship/doublewide/post_buckle_mob(mob/buckling_mob)
-	buckling_mob.pixel_x = buckling_x
-	buckling_mob.old_x = buckling_x
 	doublewide_mob_density(buckling_mob, TRUE)
 	return ..()
 
 /obj/structure/bed/chair/dropship/doublewide/post_unbuckle_mob(mob/buckled_mob)
-	buckled_mob.pixel_x = initial(buckled_mob.pixel_x)
-	buckled_mob.old_x = initial(buckled_mob.pixel_x)
 	doublewide_mob_density(buckled_mob, FALSE)
 	return ..()
 

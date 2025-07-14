@@ -1,5 +1,3 @@
-
-
 /obj/structure/reagent_dispensers
 	name = "dispenser"
 	desc = "..."
@@ -40,15 +38,17 @@
 
 	var/static/list/connections = list(
 		COMSIG_OBJ_TRY_ALLOW_THROUGH = PROC_REF(can_climb_over),
+		COMSIG_FIND_FOOTSTEP_SOUND = TYPE_PROC_REF(/atom/movable, footstep_override),
+		COMSIG_TURF_CHECK_COVERED = TYPE_PROC_REF(/atom/movable, turf_cover_check),
 	)
 	AddElement(/datum/element/connect_loc, connections)
 
 	create_reagents(tank_volume, AMOUNT_VISIBLE|DRAINABLE, list_reagents)
 
-/obj/structure/reagent_dispensers/ex_act(severity)
-	if(prob(severity * 0.25))
+/obj/structure/reagent_dispensers/obj_destruction(damage_amount, damage_type, damage_flag)
+	. = ..()
+	if(damage_amount)
 		new /obj/effect/particle_effect/water(loc)
-		qdel(src)
 
 //Dispensers
 /obj/structure/reagent_dispensers/watertank
@@ -107,7 +107,6 @@
 	rig = null
 	cut_overlays()
 
-
 /obj/structure/reagent_dispensers/fueltank/wrench_act(mob/living/user, obj/item/I)
 	user.visible_message("[user] wrenches [src]'s faucet [modded ? "closed" : "open"].", \
 	"You wrench [src]'s faucet [modded ? "closed" : "open"]")
@@ -138,9 +137,10 @@
 	explode()
 	return TRUE
 
-
 /obj/structure/reagent_dispensers/fueltank/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(!istype(I, /obj/item/assembly_holder))
 		return
@@ -162,23 +162,21 @@
 	overlay.pixel_y = 6
 	add_overlay(overlay)
 
-
 /obj/structure/reagent_dispensers/fueltank/bullet_act(obj/projectile/proj)
 	if(exploding)
 		return FALSE
-
+	. = ..()
+	if(QDELETED(src))
+		return
 	if(proj.damage > 10 && prob(60) && (proj.ammo.damage_type in list(BRUTE, BURN)))
 		log_attack("[key_name(proj.firer)] detonated a fuel tank with a projectile at [AREACOORD(src)].")
 		explode()
-		return
-	return ..()
 
 /obj/structure/reagent_dispensers/fueltank/ex_act()
 	explode()
 
 ///Does what it says on the tin, blows up the fueltank with radius depending on fuel left
 /obj/structure/reagent_dispensers/fueltank/proc/explode()
-	log_bomber(usr, "triggered a fueltank explosion with", src)
 	if(exploding)
 		return
 	exploding = TRUE
@@ -228,7 +226,7 @@
 	exploding = TRUE
 
 	cell_explosion(loc, reagents.total_volume * 0.4, reagents.total_volume * 0.2)
-	flame_radius(round(reagents.total_volume * 0.005), loc, 46, 40, 31, 30, colour = FLAME_COLOR_BLUE )
+	flame_radius(round(reagents.total_volume * 0.005), loc, 40, 46, 31, 30, colour = FLAME_COLOR_BLUE )
 	qdel(src)
 
 /obj/structure/reagent_dispensers/fueltank/gfuel
@@ -259,7 +257,6 @@
 	list_reagents = list(/datum/reagent/water = 500)
 	coverage = 20
 
-
 /obj/structure/reagent_dispensers/beerkeg
 	name = "beer keg"
 	desc = "A beer keg"
@@ -267,7 +264,6 @@
 	icon_state = "beertankTEMP"
 	list_reagents = list(/datum/reagent/consumable/ethanol/beer = 1000)
 	coverage = 30
-
 
 /obj/structure/reagent_dispensers/wallmounted
 	icon = 'icons/obj/wallframes.dmi'

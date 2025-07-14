@@ -1,6 +1,6 @@
 // -- Docks
 /obj/docking_port/stationary/crashmode
-	id = "canterbury_dock"
+	shuttle_id = "canterbury_dock"
 	name = "Canterbury Crash Site"
 	icon = 'icons/effects/landmarks_static.dmi'
 	icon_state = "crash_site"
@@ -52,11 +52,13 @@
 	for(var/mob/living/carbon/human/human AS in GLOB.alive_human_list)
 		if(human.faction != FACTION_TERRAGOV)
 			return
-		human.play_screen_text("<span class='maptext' style=font-size:24pt;text-align:left valign='top'><u>[op_name]</u></span><br>" + "[SSmapping.configs[GROUND_MAP].map_name]<br>" + "[GAME_YEAR]-[time2text(world.realtime, "MM-DD")] █:█<br>" + "Black Ops Platoon<br>" + "[human.job.title], ████", /atom/movable/screen/text/screen_text/picture/blackop)
+		var/initiate_title = op_name
+		var/initiate_screen_message = "[SSmapping.configs[GROUND_MAP].map_name]<br>" + "[GAME_YEAR]-[time2text(world.realtime, "MM-DD")] █:█<br>" + "Black Ops Platoon<br>" + "[human.job.title], ████"
+		human.play_screen_text(HUD_ANNOUNCEMENT_FORMATTING(initiate_title, initiate_screen_message, LEFT_ALIGN_TEXT), /atom/movable/screen/text/screen_text/picture/blackop)
 
 /obj/docking_port/stationary/crashmode/hangar
 	name = "Hangar Pad One"
-	id = "canterbury"
+	shuttle_id = "canterbury"
 	roundstart_template = /datum/map_template/shuttle/tgs_canterbury
 
 /obj/docking_port/mobile/crashmode/bigbury

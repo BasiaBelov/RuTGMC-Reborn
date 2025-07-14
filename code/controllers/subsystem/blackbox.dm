@@ -42,16 +42,13 @@ SUBSYSTEM_DEF(blackbox)
 	if(!GLOB.round_id)
 		SSdbcore.InitializeRound()
 
-
 	if(CONFIG_GET(flag/use_exp_tracking))
 		update_exp(10, FALSE)
 
-
 /datum/controller/subsystem/blackbox/vv_get_var(var_name)
 	if(var_name == "feedback")
-		return debug_variable(var_name, deepCopyList(feedback), 0, src)
+		return debug_variable(var_name, deep_copy_list(feedback), 0, src)
 	return ..()
-
 
 /datum/controller/subsystem/blackbox/vv_edit_var(var_name, var_value)
 	switch(var_name)
@@ -86,7 +83,7 @@ SUBSYSTEM_DEF(blackbox)
 	if (!length(sqlrowlist))
 		return
 
-	SSdbcore.MassInsert(format_table_name("feedback"), sqlrowlist, ignore_errors = TRUE, delayed = TRUE, special_columns = special_columns)
+	SSdbcore.MassInsert(format_table_name("feedback"), sqlrowlist, ignore_errors = TRUE, delayed = FALSE, special_columns = special_columns)
 
 /datum/controller/subsystem/blackbox/proc/Seal()
 	if(sealed)
@@ -199,13 +196,13 @@ SUBSYSTEM_DEF(blackbox)
 			"pod" = get_area_name(L, TRUE) || "",
 			"laname" = L.real_name,
 			"lakey" = L.ckey,
-			"brute" = L.getBruteLoss(),
-			"fire" = L.getFireLoss(),
-			"brain" = L.getBrainLoss(),
-			"oxy" = L.getOxyLoss(),
-			"tox" = L.getToxLoss(),
-			"clone" = L.getCloneLoss(),
-			"stamina" = L.getStaminaLoss(),
+			"brute" = L.get_brute_loss(),
+			"fire" = L.get_fire_loss(),
+			"brain" = L.get_brain_loss(),
+			"oxy" = L.get_oxy_loss(),
+			"tox" = L.get_tox_loss(),
+			"clone" = L.get_clone_loss(),
+			"stamina" = L.get_stamina_loss(),
 			"x_coord" = L.x,
 			"y_coord" = L.y,
 			"z_coord" = L.z,

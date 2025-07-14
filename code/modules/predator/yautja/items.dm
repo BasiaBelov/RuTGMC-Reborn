@@ -25,8 +25,8 @@
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "halfarmor1_ebony"
-	item_state = "armor"
-	item_icons = list(
+	worn_icon_state = "armor"
+	worn_icon_list = list(
 		slot_wear_suit_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
 
@@ -55,9 +55,9 @@
 
 	soft_armor = list(MELEE = 20, BULLET = 20, LASER = 20, ENERGY = 20, BOMB = 25, BIO = 20, FIRE = 20, ACID = 20)
 
-	flags_armor_protection = CHEST|GROIN|ARMS
-	flags_item = ITEM_PREDATOR
-	flags_inventory = NONE
+	armor_protection_flags = CHEST|GROIN|ARMS
+	item_flags = ITEM_PREDATOR
+	inventory_flags = NONE
 	slowdown = 0
 	min_cold_protection_temperature = HELMET_MIN_COLD_PROTECTION_TEMPERATURE
 	max_heat_protection_temperature = HELMET_MAX_HEAT_PROTECTION_TEMPERATURE
@@ -69,50 +69,51 @@
 		/obj/item/weapon/twohanded/yautja,
 	)
 	resistance_flags = UNACIDABLE
-	item_state_slots = list(slot_wear_suit_str = "halfarmor1")
-	var/thrall = FALSE//Used to affect icon generation.
+	worn_worn_icon_state_slots = list(slot_wear_suit_str = "halfarmor1")
+	/// Used to affect icon generation.
+	var/thrall = FALSE
 
 /obj/item/clothing/suit/armor/yautja/Initialize(mapload, armor_number = rand(1,7), armor_material = "ebony", legacy = "None")
 	. = ..()
 	if(thrall)
 		return
 
-	flags_cold_protection = flags_armor_protection
-	flags_heat_protection = flags_armor_protection
+	cold_protection_flags = armor_protection_flags
+	heat_protection_flags = armor_protection_flags
 
 	if(legacy != "None")
 		switch(legacy)
 			if("Dragon")
 				name = "\improper 'Armor of the Dragon'"
 				icon_state = "halfarmor_elder_tr"
-				LAZYSET(item_state_slots, slot_wear_suit_str, "halfarmor_elder_tr")
+				LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "halfarmor_elder_tr")
 				return
 			if("Swamp")
 				name = "\improper 'Armor of the Swamp Horror'"
 				icon_state = "halfarmor_elder_joshuu"
-				LAZYSET(item_state_slots, slot_wear_suit_str, "halfarmor_elder_joshuu")
+				LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "halfarmor_elder_joshuu")
 				return
 			if("Enforcer")
 				name = "\improper 'Armor of the Enforcer'"
 				icon_state = "halfarmor_elder_feweh"
-				LAZYSET(item_state_slots, slot_wear_suit_str, "halfarmor_elder_feweh")
+				LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "halfarmor_elder_feweh")
 				return
 			if("Collector")
 				name = "\improper 'Armor of the Ambivalent Collector'"
 				icon_state = "halfarmor_elder_n"
-				LAZYSET(item_state_slots, slot_wear_suit_str, "halfarmor_elder_n")
+				LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "halfarmor_elder_n")
 				return
 			else
 				name = "clan elder's armor"
 				icon_state = "halfarmor_elder"
-				LAZYSET(item_state_slots, slot_wear_suit_str, "halfarmor_elder")
+				LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "halfarmor_elder")
 				return
 
 	if(armor_number > 7)
 		armor_number = 1
 	if(armor_number) //Don't change full armor number
 		icon_state = "halfarmor[armor_number]_[armor_material]"
-		LAZYSET(item_state_slots, slot_wear_suit_str, "halfarmor[armor_number]_[armor_material]")
+		LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "halfarmor[armor_number]_[armor_material]")
 
 /obj/item/clothing/suit/armor/yautja/hunter
 	name = "clan armor"
@@ -129,12 +130,12 @@
 	name = "heavy clan armor"
 	desc = "A suit of armor with heavy padding. It looks old, yet functional."
 	icon_state = "fullarmor_ebony"
-	flags_armor_protection = CHEST|GROIN|ARMS|HEAD|LEGS
-	flags_item = ITEM_PREDATOR
+	armor_protection_flags = CHEST|GROIN|ARMS|HEAD|LEGS
+	item_flags = ITEM_PREDATOR
 
 	soft_armor = list(MELEE = 40, BULLET = 30, LASER = 35, ENERGY = 35, BOMB = 45, BIO = 40, FIRE = 30, ACID = 30)
 	slowdown = 0.7
-	item_state_slots = list(slot_wear_suit_str = "fullarmor")
+	worn_worn_icon_state_slots = list(slot_wear_suit_str = "fullarmor")
 	allowed = list(
 		/obj/item/weapon/harpoon,
 		/obj/item/weapon/gun/energy/yautja,
@@ -146,19 +147,18 @@
 /obj/item/clothing/suit/armor/yautja/hunter/full/Initialize(mapload, armor_number, armor_material = "ebony")
 	. = ..(mapload, 0)
 	icon_state = "fullarmor_[armor_material]"
-	LAZYSET(item_state_slots, slot_wear_suit_str, "fullarmor_[armor_material]")
-
+	LAZYSET(worn_worn_icon_state_slots, slot_wear_suit_str, "fullarmor_[armor_material]")
 
 /obj/item/clothing/yautja_cape
 	name = PRED_YAUTJA_CAPE
 	desc = "A battle-worn cape passed down by elder Yautja."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "fullcape"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_back_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
-	flags_equip_slot = ITEM_SLOT_BACK
-	flags_item = ITEM_PREDATOR
+	equip_slot_flags = ITEM_SLOT_BACK
+	item_flags = ITEM_PREDATOR
 	resistance_flags = UNACIDABLE
 	var/clan_rank_required = CLAN_RANK_ELDER_INT
 	var/councillor_override = FALSE
@@ -169,12 +169,12 @@
 
 /obj/item/clothing/yautja_cape/dropped(mob/living/user)
 	add_to_missing_pred_gear(src)
-	..()
+	return ..()
 
 /obj/item/clothing/yautja_cape/pickup(mob/living/user)
 	if(isyautja(user))
 		remove_from_missing_pred_gear(src)
-	..()
+	return ..()
 
 /obj/item/clothing/yautja_cape/Destroy()
 	. = ..()
@@ -210,16 +210,16 @@
 	desc = "Greaves made from scraps of cloth and a strange alloy. They feel cold with an alien weight."
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_shoes_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
 	icon_state = "y-boots1_ebony"
 
 	resistance_flags = UNACIDABLE
 	permeability_coefficient = 0.01
-	flags_inventory = NOSLIPPING
-	flags_armor_protection = FEET|LEGS
-	flags_item = ITEM_PREDATOR
+	inventory_flags = NOSLIPPING
+	armor_protection_flags = FEET|LEGS
+	item_flags = ITEM_PREDATOR
 
 	siemens_coefficient = 0.2
 	min_cold_protection_temperature = SHOE_MIN_COLD_PROTECTION_TEMPERATURE
@@ -229,15 +229,15 @@
 	var/thrall = FALSE//Used to affect icon generation.
 
 /obj/item/clothing/shoes/marine/yautja/New(location, boot_number = rand(1,4), armor_material = "ebony")
-	..()
+	. = ..()
 	if(thrall)
 		return
 	if(boot_number > 4)
 		boot_number = 1
 	icon_state = "y-boots[boot_number]_[armor_material]"
 
-	flags_cold_protection = flags_armor_protection
-	flags_heat_protection = flags_armor_protection
+	cold_protection_flags = armor_protection_flags
+	heat_protection_flags = armor_protection_flags
 
 /obj/item/clothing/shoes/marine/yautja/update_icon_state()
 	return
@@ -257,10 +257,8 @@
 	attachments_allowed = list(/obj/item/armor_module/storage/boot/yautja_knife)
 	starting_attachments = list(/obj/item/armor_module/storage/boot/yautja_knife)
 
-/obj/item/armor_module/storage/boot/yautja_knife/Initialize(mapload)
-	. = ..()
-	new /obj/item/weapon/yautja/knife(storage)
-
+/obj/item/armor_module/storage/boot/yautja_knife/PopulateContents()
+	new /obj/item/weapon/yautja/knife(src)
 
 /obj/item/clothing/under/chainshirt
 	name = "ancient alien mesh suit"
@@ -268,14 +266,14 @@
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "mesh_shirt"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_w_uniform_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
 
-	flags_armor_protection = CHEST|GROIN|ARMS
-	flags_cold_protection = CHEST|GROIN|LEGS|ARMS|FEET|HANDS //Does not cover the head though.
-	flags_heat_protection = CHEST|GROIN|LEGS|ARMS|FEET|HANDS
-	flags_item = ITEM_PREDATOR
+	armor_protection_flags = CHEST|GROIN|ARMS
+	cold_protection_flags = CHEST|GROIN|LEGS|ARMS|FEET|HANDS //Does not cover the head though.
+	heat_protection_flags = CHEST|GROIN|LEGS|ARMS|FEET|HANDS
+	item_flags = ITEM_PREDATOR
 	has_sensor = 0
 	sensor_mode = 0
 	siemens_coefficient = 0.9
@@ -294,7 +292,7 @@
 //======================================\\
 
 /*
-				   GEAR
+				GEAR
 */
 
 //======================================\\
@@ -306,7 +304,7 @@
 	desc = "A strange Yautja device used for projecting the Yautja's voice to the others in its pack. Similar in function to a standard human radio."
 	icon_state = "communicator"
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_state = "headset"
+	worn_icon_state = "headset"
 	frequency = YAUT_FREQ
 	keyslot = /obj/item/encryptionkey/yautja
 	freqlock = TRUE
@@ -332,7 +330,7 @@
 	for(var/mob/living/carbon/xenomorph/hellhound/hellhound as anything in GLOB.hellhound_list)
 		if(!hellhound.stat)
 			to_chat(hellhound, "\[Radio\]: [talking_movable], '<B>[message]</b>'.")
-	..()
+	return ..()
 
 /obj/item/radio/headset/yautja/attackby()
 	return
@@ -352,46 +350,39 @@
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "beltbag"
-	item_state = "beltbag_w"
-	item_icons = list(
+	worn_icon_state = "beltbag_w"
+	worn_icon_list = list(
 		slot_belt_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
+	item_flags = ITEM_PREDATOR
 
-	can_hold = list()
-	max_w_class = WEIGHT_CLASS_BULKY
-	flags_item = ITEM_PREDATOR
-	storage_slots = 12
-	max_storage_space = 30
+/obj/item/storage/belt/yautja/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.max_w_class = WEIGHT_CLASS_BULKY
+	storage_datum.storage_slots = 12
+	storage_datum.max_storage_space = 30
 
 /obj/item/yautja_teleporter
 	name = "relay beacon"
 	desc = "A device covered in sacred text. It whirrs and beeps every couple of seconds."
-
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "teleporter"
-
-	flags_item = ITEM_PREDATOR
-	flags_atom = CONDUCT
+	item_flags = ITEM_PREDATOR
+	atom_flags = CONDUCT
 	w_class = WEIGHT_CLASS_TINY
 	force = 1
 	throwforce = 1
 	resistance_flags = UNACIDABLE
-	var/timer = 0
 
 /obj/item/yautja_teleporter/attack_self(mob/user)
-	set waitfor = FALSE
-
-	..()
-
-	if(!ishuman(user))
-		return
+	. = ..()
 
 	if(!HAS_TRAIT(user, TRAIT_YAUTJA_TECH) || is_centcom_level(user.z))
 		to_chat(user, span_warning("You fiddle with it, but nothing happens!"))
 		return
 
 	var/mob/living/carbon/human/H = user
-	var/ship_to_tele = list("Yautja Ship" = -1, "Human Ship" = "Human")
+	var/ship_to_tele = list("Yautja Ship" = -1, "Human Ship" = "Human") // what the fuck is this piece of crap
 
 	if(H.client && H.client.clan_info)
 		if(H.client.clan_info.item[3] & CLAN_PERMISSION_ADMIN_VIEW)
@@ -416,35 +407,34 @@
 		target_turf = get_turf(pickedYT)
 	else
 		target_turf = SAFEPICK(SSpredships.get_clan_spawnpoints(clan))
-	if(!istype(target_turf))
+	if(!target_turf)
 		return
 
 	// Let's go
 	playsound(src, 'sound/ambience/signal.ogg', 25, 1, sound_range = 6)
-	timer = 1
 	user.visible_message(span_info("[user] starts becoming shimmery and indistinct..."))
 
-	if(do_after(user, 10 SECONDS, NONE, src, BUSY_ICON_GENERIC, BUSY_ICON_GENERIC))
-		// Display fancy animation for you and the person you might be pulling (Legacy)
-		user.visible_message(span_warning("[icon2html(user, viewers(src))][user] disappears!"))
-		var/tele_time = animation_teleport_quick_out(user)
-		var/mob/living/M = user.pulling
-		SEND_SIGNAL(H, COMSIG_ATOM_TELEPORT, src)
-		if(istype(M)) // Pulled person
-			SEND_SIGNAL(M, COMSIG_ATOM_TELEPORT, src)
-			M.visible_message(span_warning("[icon2html(M, viewers(src))][M] disappears!"))
-			animation_teleport_quick_out(M)
+	if(!do_after(user, 10 SECONDS, NONE, src, BUSY_ICON_GENERIC, BUSY_ICON_GENERIC))
+		return
+	// Display fancy animation for you and the person you might be pulling (Legacy)
+	user.visible_message(span_warning("[icon2html(user, viewers(src))][user] disappears!"))
+	animation_teleport_quick_out(user)
+	SEND_SIGNAL(H, COMSIG_ATOM_TELEPORT, src)
+	var/mob/living/pulled_mob = user.pulling
+	if(pulled_mob) // Pulled person
+		SEND_SIGNAL(pulled_mob, COMSIG_ATOM_TELEPORT, src)
+		pulled_mob.visible_message(span_warning("[icon2html(pulled_mob, viewers(src))][pulled_mob] disappears!"))
+		animation_teleport_quick_out(pulled_mob)
 
-		sleep(tele_time) // Animation delay
-		user.trainteleport(target_turf) // Actually teleports everyone, not just you + pulled
+	addtimer(CALLBACK(src, PROC_REF(teleport), target_turf, user, pulled_mob), 1 SECONDS)
 
-		// Undo animations
-		animation_teleport_quick_in(user)
-		if(istype(M) && !QDELETED(M))
-			animation_teleport_quick_in(M)
-		timer = 0
-	else
-		addtimer(VARSET_CALLBACK(src, timer, FALSE), 1 SECONDS)
+/obj/item/yautja_teleporter/proc/teleport(turf/target_turf, mob/user, mob/pulled_mob)
+	user.trainteleport(target_turf) // Actually teleports everyone, not just you + pulled
+
+	// Undo animations
+	animation_teleport_quick_in(user)
+	if(pulled_mob)
+		animation_teleport_quick_in(pulled_mob)
 
 /obj/item/yautja_teleporter/verb/add_tele_loc()
 	set name = "Add Teleporter Destination"
@@ -477,7 +467,7 @@
 //======================================\\
 
 /*
-			   OTHER THINGS
+				OTHER THINGS
 */
 
 //======================================\\
@@ -487,13 +477,13 @@
 	name = "scalp"
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "scalp_1"
-	item_state = "scalp"
-	item_icons = list(
+	worn_icon_state = "scalp"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
-	var/true_desc = "This is the scalp of a" //humans and Yautja see different things when examining these.
 	appearance_flags = NONE //So that the blood overlay renders separately and isn't affected by the hair color matrix.
+	var/true_desc = "This is the scalp of a" //humans and Yautja see different things when examining these.
 
 /obj/item/scalp/Initialize(mapload, mob/living/carbon/human/scalpee, mob/living/carbon/human/user)
 	. = ..()
@@ -501,7 +491,7 @@
 	var/variant = rand(1, 4) //Random sprite variant.
 	icon_state = "scalp_[variant]"
 	blood_color =  "#A10808" //So examine describes it as 'bloody'. Synths can't be scalped so it'll always be human blood.
-	flags_atom = NOBLOODY //Don't want the ugly item blood overlay ending up on this. We'll use our own blood overlay.
+	atom_flags = NOBLOODY //Don't want the ugly item blood overlay ending up on this. We'll use our own blood overlay.
 
 	var/image/blood_overlay = image('icons/obj/hunter/pred_gear.dmi', "scalp_[variant]_blood")
 	blood_overlay.appearance_flags = RESET_COLOR
@@ -613,12 +603,14 @@
 /obj/item/explosive/grenade/spawnergrenade/hellhound
 	name = "hellhound caller"
 	spawner_type = /mob/living/carbon/xenomorph/hellhound
+	force = 20
+	throwforce = 40
 	deliveryamt = 1
 	desc = "A strange piece of alien technology. It seems to call forth a hellhound."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "hellnade"
 	w_class = WEIGHT_CLASS_TINY
-	det_time = 30
+	det_time = 3 SECONDS
 	var/obj/machinery/camera/current = null
 	var/turf/activated_turf = null
 
@@ -627,7 +619,7 @@
 	return ..()
 
 /obj/item/explosive/grenade/spawnergrenade/hellhound/attack_self(mob/living/carbon/human/user)
-	..()
+	. = ..()
 	if(!active)
 		if(!HAS_TRAIT(user, TRAIT_YAUTJA_TECH))
 			to_chat(user, span_warning("What's this thing?"))
@@ -665,28 +657,20 @@
 	else if (!current || get_turf(user) != activated_turf || src.loc != user ) //camera doesn't work, or we moved.
 		user.unset_interaction()
 
-/obj/item/explosive/grenade/spawnergrenade/hellhound/New()
-	. = ..()
-
-	force = 20
-	throwforce = 40
-
 /obj/item/explosive/grenade/spawnergrenade/hellhound/on_set_interaction(mob/user)
-	..()
+	. = ..()
 	user.reset_perspective(current)
 
 /obj/item/explosive/grenade/spawnergrenade/hellhound/on_unset_interaction(mob/user)
-	..()
+	. = ..()
 	current = null
 	user.reset_perspective(null)
 
-
-/obj/item/weapon/claymore/mercsword/ceremonial
+/obj/item/weapon/sword/ceremonial
 	name = "Ceremonial Sword"
 	desc = "A fancy ceremonial sword passed down from generation to generation. Despite this, it has been very well cared for, and is in top condition."
 	icon_state = "officer_sword"
-	item_state = "machete"
-
+	worn_icon_state = "officer_sword"
 
 // Hunting traps
 /obj/item/hunting_trap
@@ -714,7 +698,7 @@
 
 /obj/item/hunting_trap/Destroy()
 	cleanup_tether()
-	. = ..()
+	return ..()
 
 /obj/item/hunting_trap/dropped(mob/living/carbon/human/mob) //Changes to "camouflaged" icons based on where it was dropped.
 	if(armed && isturf(mob.loc))
@@ -725,10 +709,10 @@
 			icon_state = "yauttrapgrass"
 		else
 			icon_state = "yauttrap1"
-	..()
+	return ..()
 
 /obj/item/hunting_trap/attack_self(mob/user as mob)
-	..()
+	. = ..()
 	if(ishuman(user) && !user.stat && !user.restrained())
 		var/wait_time = 3 SECONDS
 		if(!HAS_TRAIT(user, TRAIT_YAUTJA_TECH))
@@ -750,7 +734,7 @@
 		to_chat(user, span_warning("You foolishly reach out for \the [src]..."))
 		trapMob(user)
 		return
-	. = ..()
+	return ..()
 
 /obj/item/hunting_trap/proc/trapMob(mob/living/carbon/C)
 	if(!armed)
@@ -843,7 +827,7 @@
 
 /obj/item/hunting_trap/verb/configure_trap()
 	set name = "Configure Hunting Trap"
-	set category = "Object"
+	set category = "IC.Object"
 
 	var/mob/living/carbon/human/H = usr
 	if(!HAS_TRAIT(H, TRAIT_YAUTJA_TECH))
@@ -861,13 +845,13 @@
 	desc = "A suit of armor made entirely out of stone. Looks incredibly heavy."
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_wear_suit_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
-	item_state = "armor"
+	worn_icon_state = "armor"
 	icon_state = "fullarmor_ebony"
 
-	flags_armor_protection = CHEST|GROIN|ARMS|HEAD|LEGS
+	armor_protection_flags = CHEST|GROIN|ARMS|HEAD|LEGS
 	soft_armor = list(MELEE = 20, BULLET = 30, LASER = 25, ENERGY = 25, BOMB = 30, BIO = 25, FIRE = 25, ACID = 25)
 	slowdown = SLOWDOWN_ARMOR_VERY_HEAVY
 	siemens_coefficient = 0.1
@@ -878,20 +862,20 @@
 		/obj/item/weapon/twohanded/yautja,
 	)
 	resistance_flags = UNACIDABLE
-	item_state_slots = list(slot_wear_suit_str = "fullarmor_ebony")
+	worn_worn_icon_state_slots = list(slot_wear_suit_str = "fullarmor_ebony")
 
 /obj/item/clothing/shoes/yautja_flavor
 	name = "alien stone greaves"
 	desc = "A pair of armored, perfectly balanced boots. Perfect for running through cement because they're incredibly heavy."
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_shoes_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
 	icon_state = "y-boots2_ebony"
 
 	resistance_flags = UNACIDABLE
-	flags_armor_protection = FEET|LEGS|GROIN
+	armor_protection_flags = FEET|LEGS|GROIN
 	soft_armor = list(MELEE = 20, BULLET = 30, LASER = 25, ENERGY = 25, BOMB = 30, BIO = 25, FIRE = 25, ACID = 25)
 
 /obj/item/card/id/bracer_chip
@@ -901,7 +885,7 @@
 	icon_state = "upp_key"
 	access = list(ACCESS_YAUTJA_SECURE)
 	w_class = WEIGHT_CLASS_TINY
-	flags_item = ITEM_PREDATOR
+	item_flags = ITEM_PREDATOR
 	paygrade = null
 
 /obj/item/card/id/bracer_chip/Initialize()
@@ -928,14 +912,16 @@
 /obj/item/storage/medicomp
 	name = "medicomp"
 	desc = "A complex kit of alien tools and medicines."
-	icon = 'icons/obj/items/storage/storage.dmi'
 	icon_state = "medicomp"
-	use_sound = "toolbox"
 	w_class = WEIGHT_CLASS_SMALL
-	flags_item = ITEM_PREDATOR
-	storage_slots = 16
-	max_storage_space = 17
-	can_hold = list(
+	item_flags = ITEM_PREDATOR
+
+/obj/item/storage/medicomp/full/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.use_sound = "toolbox"
+	storage_datum.storage_slots = 16
+	storage_datum.max_storage_space = 17
+	storage_datum.set_holdable(can_hold_list = list(
 		/obj/item/tool/surgery/stabilizer_gel,
 		/obj/item/tool/surgery/healing_gun,
 		/obj/item/tool/surgery/wound_clamp,
@@ -944,10 +930,9 @@
 		/obj/item/tool/surgery/healing_gel,
 		/obj/item/stack/medical/heal_pack/advanced/bruise_pack/predator,
 		/obj/item/stack/medical/heal_pack/ointment/predator,
-	)
+	))
 
-/obj/item/storage/medicomp/full/Initialize(mapload, ...)
-	. = ..()
+/obj/item/storage/medicomp/full/PopulateContents()
 	new /obj/item/tool/surgery/stabilizer_gel(src)
 	new /obj/item/tool/surgery/healing_gun(src)
 	new /obj/item/tool/surgery/wound_clamp(src)
@@ -1003,7 +988,7 @@
 /obj/item/armor_module/limb/skeleton
 	name = "How did you get this?"
 	desc = "A bone from a human."
-	flags_attach_features = ATTACH_REMOVABLE|ATTACH_APPLY_ON_MOB|ATTACH_SEPERATE_MOB_OVERLAY|ATTACH_NO_HANDS
+	attach_features_flags = ATTACH_REMOVABLE|ATTACH_APPLY_ON_MOB|ATTACH_SEPERATE_MOB_OVERLAY|ATTACH_NO_HANDS
 	icon = 'icons/obj/items/skeleton.dmi'
 	attach_icon = 'icons/obj/items/skeleton.dmi'
 	mob_overlay_icon = 'icons/mob/hunter/pred_gear.dmi'
@@ -1082,16 +1067,15 @@
 	desc = "A modular belt with various clips. This version lacks any hunting functionality, and is commonly used by engineers to transport important tools."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "utilitybelt_pred"
-	item_state = "utility"
+	worn_icon_state = "utility"
 
-/obj/item/storage/belt/utility/pred/full/Initialize()
-	. = ..()
+/obj/item/storage/belt/utility/pred/full/PopulateContents()
 	new /obj/item/tool/screwdriver/yautja(src)
 	new /obj/item/tool/wrench/yautja(src)
 	new /obj/item/tool/weldingtool/yautja(src)
 	new /obj/item/tool/crowbar/yautja(src)
 	new /obj/item/tool/wirecutters/yautja(src)
-	new /obj/item/stack/cable_coil(src,30,pick("red","orange"))
+	new /obj/item/stack/cable_coil(src, 30, pick("red", "orange"))
 	new /obj/item/tool/multitool/yautja(src)
 
 /// SKULLS
@@ -1142,8 +1126,8 @@
 	desc = "Used to remove floors and to pry open doors, made of an unusual alloy."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "bar"
-	item_state = "bar"
-	item_icons = list(
+	worn_icon_state = "bar"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -1153,8 +1137,8 @@
 	desc = "A wrench with many common uses. Made of some bizarre alien bones."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "wrench"
-	item_state = "wrench"
-	item_icons = list(
+	worn_icon_state = "wrench"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -1164,8 +1148,8 @@
 	desc = "This cuts wires, also flesh. Made of some razorsharp animal teeth."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "wirescutter"
-	item_state = "wirescutter"
-	item_icons = list(
+	worn_icon_state = "wirescutter"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -1175,8 +1159,8 @@
 	desc = "Some hightech screwing abilities."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "screwdriver"
-	item_state = "screwdriver"
-	item_icons = list(
+	worn_icon_state = "screwdriver"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -1188,8 +1172,8 @@
 	desc = "Top notch alien tech for B&E through hacking."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "multitool"
-	item_state = "multitool"
-	item_icons = list(
+	worn_icon_state = "multitool"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -1199,7 +1183,7 @@
 	desc = "A complex chemical welding device, keep away from youngblood."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "welder"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -1208,10 +1192,10 @@
 	usesound = list('sound/items/welder.ogg', 'sound/items/welder2.ogg')
 	max_fuel = 150	//The max amount of fuel the welder can hold
 
-/obj/item/weapon/claymore/mercsword/machete/arnold
-	anchored = TRUE
+/obj/item/weapon/sword/machete/arnold
+	name = "\improper Dutch's Machete"
+	desc = "Won by an Elder during their youthful hunting days. None are allowed to touch it."
 	icon = 'icons/obj/items/weapons.dmi'
 	icon_state = "arnold-machete"
-	desc = "Won by an Elder during their youthful hunting days. None are allowed to touch it."
-	name = "\improper Dutch's Machete"
 	force = 130
+	anchored = TRUE

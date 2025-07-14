@@ -1,22 +1,16 @@
 /mob/living/carbon/human/gib()
-	var/is_a_synth = issynth(src)
 	for(var/datum/limb/E in limbs)
 		if(istype(E, /datum/limb/chest))
 			continue
-		if(istype(E, /datum/limb/groin) && is_a_synth)
+		if(istype(E, /datum/limb/groin))
 			continue
 		// Only make the limb drop if it's not too damaged
 		if(prob(100 - E.get_damage()))
 			// Override the current limb status
-
-			E.droplimb(silent = TRUE)
+			E.drop_limb(silent = TRUE)
 	visible_message(span_warning("[name] explodes violently into a bloody mess!"),
-		span_highdanger("<b>You explode violently into a bloody mess!</b>"),
+		span_userdanger("<b>You explode violently into a bloody mess!</b>"),
 		span_warning("You hear a terrible sound of breaking bones and ripping flesh!"), 3)
-
-	if(is_a_synth)
-		spawn_gibs()
-		return
 	return ..()
 
 /mob/living/carbon/human/gib_animation()
@@ -25,8 +19,10 @@
 /mob/living/carbon/human/spawn_gibs()
 	if(species)
 		hgibs(loc, species.flesh_color, species.blood_color)
+		new /obj/effect/temp_visual/gib_particles(get_turf(src), species.blood_color)
 	else
 		hgibs(loc)
+		new /obj/effect/temp_visual/gib_particles(get_turf(src), get_blood_color())
 
 /mob/living/carbon/human/spawn_dust_remains()
 	if(species)

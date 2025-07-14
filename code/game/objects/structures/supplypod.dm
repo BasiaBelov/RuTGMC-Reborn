@@ -26,7 +26,7 @@ GLOBAL_LIST_INIT(pod_styles, list(\
 	closet_flags = CLOSET_ALLOW_OBJS|CLOSET_ALLOW_DENSE_OBJ
 	soft_armor = list(MELEE = 30, BULLET = 50, LASER = 50, ENERGY = 100, BOMB = 100, BIO = 0, FIRE = 100, ACID = 80)
 	anchored = TRUE
-	flags_atom = PREVENT_CONTENTS_EXPLOSION
+	atom_flags = PREVENT_CONTENTS_EXPLOSION
 	var/adminNamed = FALSE
 	var/bluespace = FALSE
 	var/landingDelay = 30
@@ -115,15 +115,13 @@ GLOBAL_LIST_INIT(pod_styles, list(\
 			for(var/datum/limb/E in H.limbs)
 				if(istype(E, /datum/limb/chest) || istype(E, /datum/limb/groin) || istype(E, /datum/limb/head))
 					continue
-				E.droplimb()
+				E.drop_limb()
 
 		if(effectGib)
-			L.adjustBruteLoss(5000)
 			L.gib()
 			continue
 
-		L.adjustBruteLoss(damage)
-		UPDATEHEALTH(L)
+		L.adjust_brute_loss(damage, TRUE)
 
 	if(explosion_power > 0 && explosion_falloff > 0)
 		cell_explosion(get_turf(src), explosion_power, explosion_falloff)

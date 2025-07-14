@@ -1,8 +1,8 @@
 /datum/game_mode/last_stand
 	name = "Last Stand"
 	config_tag = "Last Stand"
-	flags_xeno_abilities = ABILITY_LAST_STAND
-	flags_round_type = MODE_XENO_SPAWN_PROTECT
+	xeno_abilities_flags = ABILITY_LAST_STAND
+	round_type_flags = MODE_XENO_SPAWN_PROTECT
 	valid_job_types = list(
 		/datum/job/terragov/command/captain = 1,
 		/datum/job/terragov/command/fieldcommander = 1,
@@ -71,7 +71,7 @@
 			continue
 		GLOB.latejoin_gateway -= loc
 
-	for(var/atom/nuke in GLOB.last_stand_nukes)
+	for(var/atom/nuke in GLOB.nuclear_bombs)
 		var/turf_targeted = get_turf(nuke)
 		new /obj/effect/ai_node/goal(turf_targeted, null)
 
@@ -126,7 +126,7 @@
 	var/list/living_player_list = count_humans_and_xenos(count_flags = COUNT_IGNORE_ALIVE_SSD|COUNT_IGNORE_XENO_SPECIAL_AREA)
 	var/num_humans = living_player_list[1]
 
-	if(!length(GLOB.last_stand_nukes))
+	if(!length(GLOB.nuclear_bombs))
 		message_admins("Round finished: [MODE_INFESTATION_X_MAJOR]") //xenos destroyed the bombs, xeno major victory
 		round_finished = MODE_INFESTATION_X_MAJOR
 		return TRUE

@@ -28,6 +28,7 @@
 	if(iscarbon(affected_mob))
 		var/mob/living/carbon/C = affected_mob
 		C.med_hud_set_status()
+	RegisterSignal(affected_mob, COMSIG_HUMAN_SET_UNDEFIBBABLE, PROC_REF(on_host_dnr))
 
 /obj/item/alien_embryo/Destroy()
 	if(affected_mob)
@@ -66,6 +67,11 @@
 
 	process_growth()
 
+///Kills larva when host goes DNR
+/obj/item/alien_embryo/proc/on_host_dnr(datum/source)
+	SIGNAL_HANDLER
+	qdel(src)
+
 /obj/item/alien_embryo/proc/process_growth()
 	if(CHECK_BITFIELD(affected_mob.restrained_flags, RESTRAINED_XENO_NEST)) //Hosts who are nested in resin nests provide an ideal setting, larva grows faster.
 		counter += 1 + max(0, (0.03 * affected_mob.health)) //Up to +300% faster, depending on the health of the host.
@@ -86,7 +92,7 @@
 		counter += 2.5 //Doubles larval growth progress. Burst time in ~3 min.
 		adjust_boost_timer(-1)
 
-	if(stage < 5 && counter >= 100)
+	if(stage < 5 && counter >= 120)
 		counter = 0
 		stage++
 		log_combat(affected_mob, null, "had their embryo advance to stage [stage]")
@@ -163,11 +169,12 @@
 
 	stage = 6
 
-/mob/living/carbon/xenomorph/larva/proc/initiate_burst(mob/living/carbon/victim)
+
+/mob/living/carbon/xenomorph/larva/proc/initiate_burst(mob/living/carbon/human/victim)
 	if(victim.chestburst || loc != victim)
 		return
 
-	victim.chestburst = 1
+	victim.chestburst = CARBON_IS_CHEST_BURSTING
 	ADD_TRAIT(victim, TRAIT_PSY_DRAINED, TRAIT_PSY_DRAINED)
 	to_chat(src, span_danger("We start bursting out of [victim]'s chest!"))
 
@@ -190,12 +197,12 @@
 			SSpoints.add_psy_points(hivenumber, 200)
 		xeno_message(nestburst_message, "xenoannounce", 5, hivenumber)
 
-/mob/living/carbon/xenomorph/larva/proc/burst(mob/living/carbon/victim)
+/mob/living/carbon/xenomorph/larva/proc/burst(mob/living/carbon/human/victim)
 	if(QDELETED(victim))
 		return
 
 	if(loc != victim)
-		victim.chestburst = 0
+		victim.chestburst = CARBON_NO_CHEST_BURST
 		return
 
 	victim.update_burst()
@@ -213,23 +220,21 @@
 	if(AE)
 		qdel(AE)
 
-	if(ishuman(victim))
-		var/mob/living/carbon/human/H = victim
-		H.apply_damage(200, BRUTE, H.get_limb("chest"), updating_health = TRUE) //lethal armor ignoring brute damage
-		var/datum/internal_organ/O
-		for(var/i in list(ORGAN_SLOT_HEART, ORGAN_SLOT_LUNGS, ORGAN_SLOT_LIVER, ORGAN_SLOT_KIDNEYS, ORGAN_SLOT_APPENDIX, ORGAN_SLOT_STOMACH)) //Bruise all torso internal organs
-			O = H.get_organ_slot(i)
+	victim.apply_damage(200, BRUTE, victim.get_limb("chest"), updating_health = TRUE) //lethal armor ignoring brute damage
+	var/datum/internal_organ/O
+	for(var/i in list(ORGAN_SLOT_HEART, ORGAN_SLOT_LUNGS, ORGAN_SLOT_LIVER, ORGAN_SLOT_KIDNEYS, ORGAN_SLOT_APPENDIX, ORGAN_SLOT_STOMACH)) //Bruise all torso internal organs
+		O = victim.get_organ_slot(i)
 
-			if(!H.mind && !H.client) //If we have no client or mind, permadeath time; remove the organs. Mainly for the NPC colonist bodies
-				H.remove_organ_slot(O)
-			else
-				O.take_damage(O.min_bruised_damage, TRUE)
+		if(!victim.mind && !victim.client) //If we have no client or mind, permadeath time; remove the organs. Mainly for the NPC colonist bodies
+			victim.remove_organ_slot(O)
+		else
+			O.take_damage(O.min_bruised_damage, TRUE)
 
-		var/datum/limb/chest = H.get_limb("chest")
-		new /datum/wound/internal_bleeding(15, chest) //Apply internal bleeding to chest
-		chest.fracture()
+	var/datum/limb/chest = victim.get_limb("chest")
+	new /datum/wound/internal_bleeding(15, chest) //Apply internal bleeding to chest
+	chest.fracture()
 
-	victim.chestburst = 2
+	victim.chestburst = CARBON_CHEST_BURSTED
 	victim.update_burst()
 	log_combat(src, null, "chestbursted as a larva.")
 	log_game("[key_name(src)] chestbursted as a larva at [AREACOORD(src)].")

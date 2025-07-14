@@ -1,10 +1,9 @@
 /obj/item/limb
 	icon = 'icons/mob/human_races/r_human.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/bodyparts_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/bodyparts_right.dmi',
 	)
-
 	///Predators can flay limbs to eventually turn them into bones for their armor
 	var/flayed = FALSE
 	///What bone would be in this limb?
@@ -21,11 +20,14 @@
 	if(H.species && H.species.icobase)
 		base = icon(H.species.icobase)
 	else
-		base = icon('icons/mob/human_races/r_human.dmi') ///RUTGMC edit, icon redirect to module
-
+		base = icon('icons/mob/human_races/r_human.dmi')
 
 	icon = base
-	var/datum/ethnicity/E = GLOB.ethnicities_list[H.ethnicity]
+	var/datum/ethnicity/E
+	if(isyautja(H))
+		E = GLOB.yautja_ethnicities_list[H.ethnicity]
+	else
+		E = GLOB.ethnicities_list[H.ethnicity]
 
 	var/e_icon
 
@@ -38,47 +40,77 @@
 	setDir(SOUTH)
 	transform = turn(transform, rand(70,130))
 
-
-
 /obj/item/limb/l_arm
 	name = "left arm"
 	icon_state = "l_arm"
 	bone_type = /obj/item/armor_module/limb/skeleton/l_arm
+
+/obj/item/limb/l_arm/robotic
+	name = "robotic left arm"
+	icon = 'icons/mob/human_races/r_robot.dmi'
 
 /obj/item/limb/l_foot
 	name = "left foot"
 	icon_state = "l_foot"
 	bone_type = /obj/item/armor_module/limb/skeleton/l_foot
 
+/obj/item/limb/l_foot/robotic
+	name = "robotic left foot"
+	icon = 'icons/mob/human_races/r_robot.dmi'
+
 /obj/item/limb/l_hand
 	name = "left hand"
 	icon_state = "l_hand"
 	bone_type = /obj/item/armor_module/limb/skeleton/l_hand
+
+/obj/item/limb/l_hand/robotic
+	name = "robotic left hand"
+	icon = 'icons/mob/human_races/r_robot.dmi'
 
 /obj/item/limb/l_leg
 	name = "left leg"
 	icon_state = "l_leg"
 	bone_type = /obj/item/armor_module/limb/skeleton/l_leg
 
+/obj/item/limb/l_leg/robotic
+	name = "robotic left leg"
+	icon = 'icons/mob/human_races/r_robot.dmi'
+
 /obj/item/limb/r_arm
 	name = "right arm"
 	icon_state = "r_arm"
 	bone_type = /obj/item/armor_module/limb/skeleton/r_arm
+
+/obj/item/limb/r_arm/robotic
+	name = "robotic right arm"
+	icon = 'icons/mob/human_races/r_robot.dmi'
 
 /obj/item/limb/r_foot
 	name = "right foot"
 	icon_state = "r_foot"
 	bone_type = /obj/item/armor_module/limb/skeleton/r_foot
 
+/obj/item/limb/r_foot/robotic
+	name = "robotic right foot"
+	icon = 'icons/mob/human_races/r_robot.dmi'
+
 /obj/item/limb/r_hand
 	name = "right hand"
 	icon_state = "r_hand"
 	bone_type = /obj/item/armor_module/limb/skeleton/r_hand
 
+/obj/item/limb/r_hand/robotic
+	name = "robotic right hand"
+	icon = 'icons/mob/human_races/r_robot.dmi'
+
 /obj/item/limb/r_leg
 	name = "right leg"
 	icon_state = "r_leg"
 	bone_type = /obj/item/armor_module/limb/skeleton/r_leg
+
+/obj/item/limb/r_leg/robotic
+	name = "robotic right leg"
+	icon = 'icons/mob/human_races/r_robot.dmi'
 
 /obj/item/limb/head
 	name = "head"
@@ -86,8 +118,8 @@
 	resistance_flags = UNACIDABLE
 	bone_type = /obj/item/armor_module/limb/skeleton/head
 	var/mob/living/brain/brainmob
-	var/brain_item_type = /obj/item/organ/brain
-	var/braindeath_on_decap = 1 //whether the brainmob dies when head is decapitated (used by synthetics)
+	///whether the brainmob dies when head is decapitated (used by synthetics)
+	var/braindeath_on_decap = TRUE
 
 /obj/item/limb/head/Initialize(mapload, mob/living/carbon/human/H)
 	. = ..()
@@ -106,7 +138,7 @@
 
 			overlays.Add(facial) // icon.Blend(facial, ICON_OVERLAY)
 
-	if(H.h_style && !(H.head && (H.head.flags_inv_hide & HIDETOPHAIR)))
+	if(H.h_style && !(H.head && (H.head.inv_hide_flags & HIDETOPHAIR)))
 		var/datum/sprite_accessory/hair_style = GLOB.hair_styles_list[H.h_style]
 		if(hair_style)
 			var/icon/hair = new/icon("icon" = hair_style.icon, "icon_state" = "[hair_style.icon_state]_s")
@@ -145,9 +177,13 @@
 
 //synthetic head, allowing brain mob inside to talk
 /obj/item/limb/head/synth
-	brain_item_type = null
-	braindeath_on_decap = 0
+	braindeath_on_decap = FALSE
 
 /obj/item/limb/head/robotic
-	brain_item_type = null
-	braindeath_on_decap = 0
+	braindeath_on_decap = FALSE
+
+/obj/item/limb/head/zombie
+	braindeath_on_decap = FALSE
+
+/obj/item/limb/head/zombie/transfer_identity(mob/living/carbon/human/H)
+	return

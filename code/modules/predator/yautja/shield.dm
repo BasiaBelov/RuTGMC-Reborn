@@ -3,27 +3,26 @@
 	desc = "A large tribal shield made of a strange metal alloy. The face of the shield bears three skulls, two human, one alien."
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "shield"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi',
 		slot_back_str = 'icons/mob/hunter/pred_gear.dmi'
 	)
-	item_state = "shield"
-	flags_item = ITEM_PREDATOR
-	flags_equip_slot = ITEM_SLOT_BACK
+	worn_icon_state = "shield"
+	item_flags = ITEM_PREDATOR
+	equip_slot_flags = ITEM_SLOT_BACK
 	resistance_flags = UNACIDABLE
 
 	base_icon_state = "shield"
+
+	max_integrity = 400
+	integrity_failure = 0
 
 	var/passive_block = 15
 	var/readied_block = 45
 
 	var/readied_slowdown = 0.5 // Walking around in a readied shield stance slows you! The armor defs are a useful existing reference point.
 	var/shield_readied = FALSE
-	var/blocks_on_back = TRUE
-
-	max_integrity = 400
-	integrity_failure = 0
 
 	var/last_attack = 0
 	var/last_lowered = 0
@@ -54,7 +53,7 @@
 	user.visible_message(span_blue("\The [user] raises \the [src]."))
 	shield_readied = TRUE
 	icon_state = "[base_icon_state]_ready"
-	item_state = "[base_icon_state]_ready"
+	worn_icon_state = "[base_icon_state]_ready"
 	user.shield_slowdown = max(readied_slowdown, user.shield_slowdown)
 
 	if(user.r_hand == src)
@@ -66,7 +65,7 @@
 	user.visible_message(span_blue("\The [user] lowers \the [src]."))
 	shield_readied = FALSE
 	icon_state = base_icon_state
-	item_state = base_icon_state
+	worn_icon_state = base_icon_state
 
 	var/mob/living/carbon/human/H = user
 	var/set_shield_slowdown = 0
@@ -112,12 +111,12 @@
 	if(. && (world.time > last_attack + cooldown_time))
 		last_attack = world.time
 		M.throw_at(get_step(M, user.dir), 1, 5, user, FALSE)
-		M.apply_effect(3, EYE_BLUR)
-		M.apply_effect(5, WEAKEN)
+		M.apply_effect(3, EFFECT_EYE_BLUR)
+		M.apply_effect(5, EFFECT_PARALYZE)
 
 /obj/item/weapon/shield/riot/yautja/attackby(obj/item/I, mob/user)
 	if(cooldown < world.time - 25)
-		if(istype(I, /obj/item/weapon) && (I.flags_item & ITEM_PREDATOR))
+		if(istype(I, /obj/item/weapon) && (I.item_flags & ITEM_PREDATOR))
 			user.visible_message(span_warning("[user] bashes \the [src] with \the [I]!"))
 			playsound(user.loc, 'sound/effects/shieldbash.ogg', 25, 1)
 			cooldown = world.time

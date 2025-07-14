@@ -48,10 +48,6 @@
 /datum/atom_hud/xeno_reagents
 	hud_icons = list(XENO_REAGENT_HUD)
 
-///hud component for revealing tactical elements to xenos
-/datum/atom_hud/xeno_tactical
-	hud_icons = list(XENO_TACTICAL_HUD)
-
 ///hud component for revealing xeno specific status effect debuffs to xenos
 /datum/atom_hud/xeno_debuff
 	hud_icons = list(XENO_DEBUFF_HUD)
@@ -62,9 +58,6 @@
 
 /datum/atom_hud/xeno_heart
 	hud_icons = list(HEART_STATUS_HUD)
-
-/datum/atom_hud/security
-	hud_icons = list(WANTED_HUD)
 
 /datum/atom_hud/squad
 	hud_icons = list(SQUAD_HUD_TERRAGOV, MACHINE_HEALTH_HUD, MACHINE_AMMO_HUD)

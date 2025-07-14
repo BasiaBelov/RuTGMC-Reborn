@@ -19,6 +19,8 @@
 //attaching papers!!
 /obj/structure/noticeboard/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/paper))
 		if(notices >= 5)
@@ -31,7 +33,6 @@
 		icon_state = "nboard0[notices]"	//update sprite
 		to_chat(user, span_notice("You pin the paper to the noticeboard."))
 
-
 /obj/structure/noticeboard/interact(mob/user)
 	. = ..()
 	if(.)
@@ -39,12 +40,11 @@
 
 	var/dat
 	for(var/obj/item/paper/P in src)
-		dat += "<A href='?src=[text_ref(src)];read=[text_ref(P)]'>[P.name]</A> <A href='?src=[text_ref(src)];write=[text_ref(P)]'>Write</A> <A href='?src=[text_ref(src)];remove=[text_ref(P)]'>Remove</A><BR>"
+		dat += "<A href='byond://?src=[text_ref(src)];read=[text_ref(P)]'>[P.name]</A> <A href='byond://?src=[text_ref(src)];write=[text_ref(P)]'>Write</A> <A href='byond://?src=[text_ref(src)];remove=[text_ref(P)]'>Remove</A><BR>"
 
 	var/datum/browser/popup = new(user, "noticeboard", "<div align='center'>Noticeboard</div>")
 	popup.set_content(dat)
 	popup.open()
-
 
 /obj/structure/noticeboard/Topic(href, href_list)
 	. = ..()
@@ -73,8 +73,8 @@
 		var/obj/item/paper/P = locate(href_list["read"])
 		if((P?.loc == src))
 			if(!( ishuman(usr) ))
-				usr << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY><TT>[stars(P.info)]</TT></BODY></HTML>", "window=[P.name]")
+				usr << browse(HTML_SKELETON_TITLE(P.name, stars(P.info)), "window=[P.name]")
 				onclose(usr, "[P.name]")
 			else
-				usr << browse("<html><meta charset='UTF-8'><HEAD><TITLE>[P.name]</TITLE></HEAD><BODY><TT>[P.info]</TT></BODY></HTML>", "window=[P.name]")
+				usr << browse(HTML_SKELETON_TITLE(P.name, P.info), "window=[P.name]")
 				onclose(usr, "[P.name]")

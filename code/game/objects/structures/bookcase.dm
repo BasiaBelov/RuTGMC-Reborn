@@ -1,13 +1,16 @@
-
 /obj/structure/bookcase
 	name = "bookcase"
 	icon = 'icons/obj/structures/structures.dmi'
 	icon_state = "book-0"
+	max_integrity = 200
 	resistance_flags = XENO_DAMAGEABLE
 	anchored = TRUE
 	density = TRUE
 	opacity = TRUE
 	allow_pass_flags = PASS_AIR
+
+/obj/structure/bookcase/add_debris_element()
+	AddElement(/datum/element/debris, DEBRIS_PAPER, -40, 5)
 
 /obj/structure/bookcase/Initialize(mapload)
 	. = ..()
@@ -18,6 +21,8 @@
 
 /obj/structure/bookcase/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(istype(I, /obj/item/book))
 		user.drop_held_item()
@@ -56,7 +61,6 @@
 				our_book.forceMove(get_turf(src))
 		qdel(src)
 
-
 /obj/structure/bookcase/update_icon_state()
 	. = ..()
 	if(length(contents) < 5)
@@ -64,10 +68,8 @@
 	else
 		icon_state = "book-5"
 
-
 /obj/structure/bookcase/manuals/medical
 	name = "Medical Manuals bookcase"
-
 
 /obj/structure/bookcase/manuals/medical/Initialize(mapload)
 	. = ..()
@@ -77,10 +79,8 @@
 	new /obj/item/book/manual/medical_diagnostics_manual(src)
 	update_icon()
 
-
 /obj/structure/bookcase/manuals/engineering
 	name = "Engineering Manuals bookcase"
-
 
 /obj/structure/bookcase/manuals/engineering/Initialize(mapload)
 	. = ..()

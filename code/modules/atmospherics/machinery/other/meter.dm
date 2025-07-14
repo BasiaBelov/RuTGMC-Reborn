@@ -53,12 +53,6 @@
 	. = ..()
 	. += status()
 
-
-/obj/machinery/meter/attackby(obj/item/I, mob/user, params)
-	. = ..()
-	if(iswrench(I))
-		return wrench_act(user, I)
-
 /obj/machinery/meter/wrench_act(mob/user, obj/item/I)
 	to_chat(user, span_notice("You begin to unfasten \the [src]..."))
 	if(do_after(user, 4 SECONDS, NONE, src, BUSY_ICON_BUILD))
@@ -69,11 +63,10 @@
 		deconstruct()
 	return TRUE
 
-/obj/machinery/meter/deconstruct(disassembled = TRUE)
-	if(!(flags_atom & NODECONSTRUCT))
+/obj/machinery/meter/deconstruct(disassembled = TRUE, mob/living/blame_mob)
+	if(!(atom_flags & NODECONSTRUCT))
 		new /obj/item/pipe_meter(loc)
 	return ..()
-
 
 // TURF METER - REPORTS A TILE'S AIR CONTENTS
 //	why are you yelling?

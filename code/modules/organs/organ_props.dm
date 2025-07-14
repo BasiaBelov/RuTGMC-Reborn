@@ -2,7 +2,7 @@
 	name = "organ"
 	desc = "It looks like it probably just plopped out."
 	icon = 'icons/obj/items/organs.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/bodyparts_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/bodyparts_right.dmi',
 	)
@@ -10,6 +10,16 @@
 /obj/item/organ/heart
 	name = "heart"
 	icon_state = "heart-on"
+
+/obj/item/organ/heart/examine(mob/user)
+	. = ..()
+	if(iszombiecrashgamemode(SSticker.mode))
+		. += span_notice("It looks like it could be sold to requisitions for supply points.")
+
+/obj/item/organ/heart/get_export_value()
+	if(iszombiecrashgamemode(SSticker.mode))
+		return 50
+	return 0
 
 /obj/item/organ/lungs
 	name = "lungs"

@@ -22,7 +22,7 @@
 	max_rounds = 10
 	w_class = WEIGHT_CLASS_SMALL
 	default_ammo = /datum/ammo/energy/plasma_pistol
-	flags_magazine = NONE
+	magazine_flags = NONE
 	icon_state_mini = "mag_tx7"
 
 //-------------------------------------------------------
@@ -190,11 +190,6 @@
 	ammo_band_color = AMMO_BAND_COLOR_AP
 	max_rounds = 18
 
-/obj/item/ammo_magazine/pistol/vp70/hp
-	name = "\improper 88M4 HP magazine (9mm)"
-	default_ammo = /datum/ammo/bullet/pistol/hp
-	ammo_band_color = AMMO_BAND_COLOR_HOLLOWPOINT
-
 /obj/item/ammo_magazine/pistol/vp70/incendiary
 	name = "\improper 88M4 incendiary magazine (9mm)"
 	default_ammo = /datum/ammo/bullet/pistol/incendiary
@@ -288,3 +283,23 @@
 	caliber = CALIBER_ALIEN
 	icon_state = "knife"
 	max_rounds = 1
+
+//XM104 cylinder placed in pistols
+/obj/item/ammo_magazine/pistol/xmdivider
+	name = "\improper XM104 cylinder (.357)"
+	desc = "XM104 cylinder loaded with custom .357 incendiary rounds."
+	default_ammo = /datum/ammo/bullet/revolver/heavy/incendiary
+	max_rounds = 6
+	caliber = CALIBER_357
+	icon_state = "xm104"
+	icon_state_mini = "mag_revolver_red"
+
+//c96
+
+/obj/item/ammo_magazine/pistol/vsd_pistol
+	name = "\improper C96 'riot' magazine"
+	default_ammo = /datum/ammo/bullet/pistol/ap
+	caliber = CALIBER_9X19
+	icon_state = "c96"
+	icon_state_mini = "mag_pistol_normal"
+	max_rounds = 15

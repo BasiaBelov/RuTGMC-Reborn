@@ -14,6 +14,7 @@
 
 	soft_armor = list(MELEE = 50, BULLET = 50, LASER = 50, ENERGY = 100, BOMB = 10, BIO = 100, FIRE = 80, ACID = 50)
 	max_integrity = 250
+	resistance_flags = XENO_DAMAGEABLE
 
 	/// Used for determining if the sprite should be updated and how
 	var/update_flags = NONE
@@ -97,8 +98,8 @@
 		return
 
 
-/obj/machinery/portable_atmospherics/canister/deconstruct(disassembled = TRUE)
-	if(!(flags_atom & NODECONSTRUCT))
+/obj/machinery/portable_atmospherics/canister/deconstruct(disassembled = TRUE, mob/living/blame_mob)
+	if(!(atom_flags & NODECONSTRUCT))
 		if(!(machine_stat & BROKEN))
 			disconnect()
 			machine_stat |= BROKEN

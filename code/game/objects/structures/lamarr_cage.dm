@@ -9,8 +9,7 @@
 	max_integrity = 30
 	var/occupied = FALSE
 
-
-/obj/structure/lamarr/deconstruct(disassembled = TRUE)
+/obj/structure/lamarr/deconstruct(disassembled = TRUE, mob/living/blame_mob)
 	new /obj/item/shard(loc)
 	if(occupied)
 		new /obj/item/clothing/mask/facehugger/lamarr(loc)
@@ -36,8 +35,6 @@
 	desc = "The worst she might do is attempt to... couple with your head."//hope we don't get sued over a harmless reference, rite?
 	sterile = TRUE
 	gender = FEMALE
-	stat = DEAD
 
-
-/obj/item/clothing/mask/facehugger/lamarr/update_icon_state()
-	return
+/obj/item/clothing/mask/facehugger/lamarr/check_lifecycle()
+	return TRUE

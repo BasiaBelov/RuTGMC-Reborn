@@ -1,31 +1,26 @@
-/* First aid storage
-* Contains:
-*		First Aid Kits
-* 		Pill Bottles
-*/
-
-/*
-* First Aid Kits
-*/
 /obj/item/storage/firstaid
 	name = "first-aid kit"
 	desc = "It's an emergency medical kit for those serious boo-boos."
 	icon = 'icons/obj/items/storage/firstaid.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/medkits_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/medkits_right.dmi',
 	)
 	icon_state = "firstaid"
 	base_icon_state = "firstaid"
-	use_sound = 'sound/effects/toolbox.ogg'
 	w_class = WEIGHT_CLASS_BULKY
 	throw_speed = 2
 	throw_range = 8
-	cant_hold = list(
+	/// Whether the kit starts empty
+	var/empty = FALSE
+
+/obj/item/storage/firstaid/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.use_sound = 'sound/effects/toolbox.ogg'
+	storage_datum.set_holdable(cant_hold_list = list(
 		/obj/item/ammo_magazine,
 		/obj/item/explosive/grenade,
-	)
-	var/empty = FALSE //whether the kit starts empty
+	))
 
 /obj/item/storage/firstaid/update_icon_state()
 	. = ..()
@@ -44,7 +39,7 @@
 	desc = "It's an emergency medical kit for when the toxins lab <i>-spontaneously-</i> burns down."
 	icon_state = "firefirstaid"
 	base_icon_state = "firefirstaid"
-	item_state = "firefirstaid"
+	worn_icon_state = "firefirstaid"
 
 /obj/item/storage/firstaid/fire/PopulateContents()
 	. = ..()
@@ -58,7 +53,7 @@
 /obj/item/storage/firstaid/regular
 	icon_state = "firstaid"
 	base_icon_state = "firstaid"
-	item_state = "firstaid"
+	worn_icon_state = "firstaid"
 
 /obj/item/storage/firstaid/regular/PopulateContents()
 	. = ..()
@@ -74,7 +69,7 @@
 	desc = "Used to treat when you have a high amount of toxins in your body."
 	icon_state = "antitoxfirstaid"
 	base_icon_state = "antitoxfirstaid"
-	item_state = "antitoxfirstaid"
+	worn_icon_state = "antitoxfirstaid"
 
 /obj/item/storage/firstaid/toxin/PopulateContents()
 	. = ..()
@@ -88,7 +83,7 @@
 	desc = "A box full of oxygen goodies."
 	icon_state = "o2firstaid"
 	base_icon_state = "o2firstaid"
-	item_state = "o2firstaid"
+	worn_icon_state = "o2firstaid"
 
 /obj/item/storage/firstaid/o2/PopulateContents()
 	. = ..()
@@ -104,7 +99,7 @@
 	desc = "Contains advanced medical treatments."
 	icon_state = "advfirstaid"
 	base_icon_state = "advfirstaid"
-	item_state = "advfirstaid"
+	worn_icon_state = "advfirstaid"
 
 /obj/item/storage/firstaid/adv/PopulateContents()
 	. = ..()
@@ -120,7 +115,7 @@
 	desc = "Contains treatment for radiation exposure"
 	icon_state = "purplefirstaid"
 	base_icon_state = "purplefirstaid"
-	item_state = "purplefirstaid"
+	worn_icon_state = "purplefirstaid"
 
 /obj/item/storage/firstaid/rad/PopulateContents()
 	. = ..()
@@ -139,29 +134,36 @@
 	name = "syringe case"
 	desc = "It's a medical case for storing syringes and bottles."
 	icon_state = "syringe_case"
+	icon = 'icons/obj/items/storage/firstaid.dmi'
 	throw_speed = 2
 	throw_range = 8
-	storage_slots = 3
 	w_class = WEIGHT_CLASS_SMALL
-	can_hold = list(
+	/// The type of bottles we spawn in amount of 2
+	var/bottles_to_spawn
+
+/obj/item/storage/syringe_case/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.storage_slots = 3
+	storage_datum.set_holdable(can_hold_list = list(
 		/obj/item/reagent_containers/glass/bottle,
 		/obj/item/reagent_containers/syringe,
-	)
+	))
 
 /obj/item/storage/syringe_case/PopulateContents()
 	new /obj/item/reagent_containers/syringe(src)
+	if(!isnull(bottles_to_spawn))
+		new bottles_to_spawn(src)
+		new bottles_to_spawn(src)
 
-/obj/item/storage/syringe_case/empty/PopulateContents()
-	. = ..()
-	new /obj/item/reagent_containers/glass/bottle/empty(src)
-	new /obj/item/reagent_containers/glass/bottle/empty(src)
+/obj/item/storage/syringe_case/empty
+	bottles_to_spawn = /obj/item/reagent_containers/glass/bottle/empty
 
 /obj/item/storage/syringe_case/regular
 	name = "basic syringe case"
 	desc = "It's a medical case for storing syringes and bottles. This one contains basic meds."
 
 /obj/item/storage/syringe_case/regular/PopulateContents()
-	. = ..()
+	new /obj/item/reagent_containers/syringe(src)
 	new /obj/item/reagent_containers/glass/bottle/inaprovaline(src)
 	new /obj/item/reagent_containers/glass/bottle/tricordrazine(src)
 
@@ -170,7 +172,7 @@
 	desc = "It's a medical case for storing syringes and bottles. This one contains meds designed to treat burns."
 
 /obj/item/storage/syringe_case/burn/PopulateContents()
-	. = ..()
+	new /obj/item/reagent_containers/syringe(src)
 	new /obj/item/reagent_containers/glass/bottle/kelotane(src)
 	new /obj/item/reagent_containers/glass/bottle/oxycodone(src)
 
@@ -179,7 +181,7 @@
 	desc = "It's a medical case for storing syringes and bottles. This one contains meds designed to treat toxins."
 
 /obj/item/storage/syringe_case/tox/PopulateContents()
-	. = ..()
+	new /obj/item/reagent_containers/syringe(src)
 	new /obj/item/reagent_containers/glass/bottle/dylovene(src)
 	new /obj/item/reagent_containers/glass/bottle/hypervene(src)
 
@@ -188,54 +190,34 @@
 	desc = "It's a medical case for storing syringes and bottles. This one contains meds designed to treat oxygen deprivation."
 
 /obj/item/storage/syringe_case/oxy/PopulateContents()
-	. = ..()
+	new /obj/item/reagent_containers/syringe(src)
 	new /obj/item/reagent_containers/glass/bottle/inaprovaline(src)
 	new /obj/item/reagent_containers/glass/bottle/dexalin(src)
 
 /obj/item/storage/syringe_case/meralyne
 	name = "syringe case (meralyne)"
 	desc = "It's a medical case for storing syringes and bottles. This one contains Meralyne."
-
-/obj/item/storage/syringe_case/meralyne/PopulateContents()
-	. = ..()
-	new /obj/item/reagent_containers/glass/bottle/meralyne(src)
-	new /obj/item/reagent_containers/glass/bottle/meralyne(src)
+	bottles_to_spawn = /obj/item/reagent_containers/glass/bottle/meralyne
 
 /obj/item/storage/syringe_case/dermaline
 	name = "syringe case (dermaline)"
 	desc = "It's a medical case for storing syringes and bottles. This one contains Dermaline."
-
-/obj/item/storage/syringe_case/dermaline/PopulateContents()
-	. = ..()
-	new /obj/item/reagent_containers/glass/bottle/dermaline(src)
-	new /obj/item/reagent_containers/glass/bottle/dermaline(src)
+	bottles_to_spawn = /obj/item/reagent_containers/glass/bottle/dermaline
 
 /obj/item/storage/syringe_case/meraderm
 	name = "syringe case (meraderm)"
 	desc = "It's a medical case for storing syringes and bottles. This one contains Meraderm."
-
-/obj/item/storage/syringe_case/meraderm/PopulateContents()
-	. = ..()
-	new /obj/item/reagent_containers/glass/bottle/meraderm(src)
-	new /obj/item/reagent_containers/glass/bottle/meraderm(src)
+	bottles_to_spawn = /obj/item/reagent_containers/glass/bottle/meraderm
 
 /obj/item/storage/syringe_case/nanoblood
 	name = "syringe case (nanoblood)"
 	desc = "It's a medical case for storing syringes and bottles. This one contains nanoblood."
-
-/obj/item/storage/syringe_case/nanoblood/PopulateContents()
-	. = ..()
-	new /obj/item/reagent_containers/glass/bottle/nanoblood(src)
-	new /obj/item/reagent_containers/glass/bottle/nanoblood(src)
+	bottles_to_spawn = /obj/item/reagent_containers/glass/bottle/nanoblood
 
 /obj/item/storage/syringe_case/tricordrazine
 	name = "syringe case (tricordrazine)"
 	desc = "It's a medical case for storing syringes and bottles. This one contains Tricordrazine."
-
-/obj/item/storage/syringe_case/tricordrazine/PopulateContents()
-	. = ..()
-	new /obj/item/reagent_containers/glass/bottle/tricordrazine(src)
-	new /obj/item/reagent_containers/glass/bottle/tricordrazine(src)
+	bottles_to_spawn = /obj/item/reagent_containers/glass/bottle/tricordrazine
 
 /*
 * Pill Bottles
@@ -246,35 +228,24 @@
 	desc = "It's an airtight container for storing medication."
 	icon_state = "pill_canister"
 	icon = 'icons/obj/items/chemistry.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/equipment/medical_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/equipment/medical_right.dmi',
 	)
-	item_state = "contsolid"
+	worn_icon_state = "contsolid"
 	w_class = WEIGHT_CLASS_SMALL
-	can_hold = list(
-		/obj/item/reagent_containers/pill,
-		/obj/item/toy/dice,
-		/obj/item/paper,
-	)
-	allow_quick_gather = 1
-	use_to_pickup = 1
-	storage_slots = null
-	use_sound = 'sound/items/pillbottle.ogg'
-	max_storage_space = 16
-	flags_storage = BYPASS_CRYO_CHECK
+	storage_type = /datum/storage/pill_bottle
 	greyscale_config = /datum/greyscale_config/pillbottle
 	greyscale_colors = "#d9cd07#f2cdbb" //default colors
-	refill_types = list(/obj/item/storage/pill_bottle)
-	refill_sound = 'sound/items/pills.ogg'
-	var/pill_type_to_fill //type of pill to use to fill in the bottle in New()
+	/// Type of pill to use to fill in the bottle in New()
+	var/pill_type_to_fill
 	/// Short description in overlay
 	var/description_overlay = ""
 
 /obj/item/storage/pill_bottle/PopulateContents()
 	if(!pill_type_to_fill)
 		return
-	for(var/i in 1 to max_storage_space)
+	for(var/i in 1 to storage_datum.max_storage_space)
 		new pill_type_to_fill(src)
 	update_icon(UPDATE_OVERLAYS)
 
@@ -295,11 +266,29 @@
 		pill.reagents.trans_to(I, pill.reagents.total_volume)
 
 		to_chat(user, span_notice("You dissolve [pill] from [src] in [I]."))
-		remove_from_storage(pill, null, user)
+		storage_datum.remove_from_storage(pill, null, user)
 		qdel(pill)
 		return TRUE
 
-	return ..()
+	. = ..()
+	if(.)
+		return
+	if(!istype(I, /obj/item/facepaint) || isnull(greyscale_config))
+		return
+
+	var/obj/item/facepaint/paint = I
+	if(paint.uses < 1)
+		to_chat(user, span_warning("\the [paint] is out of color!"))
+		return
+	var/bottle_color = input(user, "Pick a color", "Pick color") as null|color
+	var/label_color = input(user, "Pick a color", "Pick color") as null|color
+
+	if(isnull(bottle_color) || isnull(label_color) || !do_after(user, 1 SECONDS, NONE, src, BUSY_ICON_GENERIC))
+		return
+
+	set_greyscale_colors(list(bottle_color,label_color))
+	paint.uses--
+	update_icon()
 
 /obj/item/storage/pill_bottle/attack_self(mob/living/user)
 	if(user.get_inactive_held_item())
@@ -307,7 +296,7 @@
 		return
 	if(length(contents))
 		var/obj/item/I = contents[1]
-		if(!remove_from_storage(I,user,user))
+		if(!storage_datum.remove_from_storage(I,user,user))
 			return
 		if(user.put_in_inactive_hand(I))
 			if(iscarbon(user))
@@ -317,11 +306,6 @@
 			user.dropItemToGround(I)
 			to_chat(user, span_notice("You fumble around with \the [src] and drop a pill on the floor."))
 		return
-
-/obj/item/storage/pill_bottle/remove_from_storage(obj/item/item, atom/new_location, mob/user)
-	. = ..()
-	if(. && user)
-		playsound(user, 'sound/items/pills.ogg', 15, 1)
 
 /obj/item/storage/pill_bottle/update_overlays()
 	. = ..()
@@ -543,55 +527,32 @@
 /obj/item/storage/pill_bottle/happy
 	name = "happy pill bottle"
 	desc = "Contains highly illegal drugs. When you want to see the rainbow."
-	max_storage_space = 7
 	pill_type_to_fill = /obj/item/reagent_containers/pill/happy
 	greyscale_colors = "#6C52BF#ffffff"
+
+/obj/item/storage/pill_bottle/happy/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.max_storage_space = 7
 
 /obj/item/storage/pill_bottle/zoom
 	name = "zoom pill bottle"
 	desc = "Containts highly illegal drugs. Trade heart for speed."
-	max_storage_space = 7
 	pill_type_to_fill = /obj/item/reagent_containers/pill/zoom
 	greyscale_colors = "#ef3ad4#ffffff"
 
-/obj/item/storage/pill_bottle/attackby(obj/item/I, mob/user, params)
+/obj/item/storage/pill_bottle/zoom/Initialize(mapload, ...)
 	. = ..()
-	if(.)
-		return
-	if(!istype(I, /obj/item/facepaint) || isnull(greyscale_config))
-		return
-
-	var/obj/item/facepaint/paint = I
-	if(paint.uses < 1)
-		to_chat(user, span_warning("\the [paint] is out of color!"))
-		return
-	var/bottle_color
-	var/label_color
-	bottle_color = input(user, "Pick a color", "Pick color") as null|color
-	label_color = input(user, "Pick a color", "Pick color") as null|color
-
-	if(!bottle_color || !label_color || !do_after(user, 1 SECONDS, NONE, src, BUSY_ICON_GENERIC))
-		return
-
-
-	set_greyscale_colors(list(bottle_color,label_color))
-	paint.uses--
-	update_icon()
+	storage_datum.max_storage_space = 7
 
 //АИ-2
 
 /obj/item/storage/ai2
 	name = "\"АИ-2\" first aid kit"
 	desc = "It's an individual medical kit with rare and useful reagents."
-	icon = 'icons/obj/items/storage/firstaidkit.dmi'
-	icon_state = "firstaidkit"
-	storage_slots = 8
+	icon = 'icons/obj/items/storage/firstaid.dmi'
+	icon_state = "ai2"
 	w_class = WEIGHT_CLASS_NORMAL
-	use_sound = 'sound/effects/toolbox.ogg'
-	can_hold = list(
-		/obj/item/storage/pill_bottle/penal,
-		/obj/item/reagent_containers/hypospray/autoinjector/pen,
-	)
+	storage_type = /datum/storage/ai2
 	var/is_open = FALSE
 
 /obj/item/storage/ai2/PopulateContents()
@@ -608,44 +569,37 @@
 	cut_overlays()
 
 	var/list/types_and_overlays = list(
-		/obj/item/storage/pill_bottle/penal/meralyne = "firstaidkit_meralyne_open",
-		/obj/item/storage/pill_bottle/penal/dermaline = "firstaidkit_dermaline_open",
-		/obj/item/storage/pill_bottle/penal/hyronalin = "firstaidkit_hyronalin_open",
-		/obj/item/storage/pill_bottle/penal/dexalin = "firstaidkit_dexalin_open",
-		/obj/item/reagent_containers/hypospray/autoinjector/pen/tramadol = "firstaidkit_tramadol_open",
-		/obj/item/reagent_containers/hypospray/autoinjector/pen/neuraline = "firstaidkit_neuraline_open",
-		/obj/item/reagent_containers/hypospray/autoinjector/pen/inaprovaline = "firstaidkit_inaprovaline_open",
-		/obj/item/reagent_containers/hypospray/autoinjector/pen/hypervene = "firstaidkit_hypervene_open",
+		/obj/item/storage/pill_bottle/penal/meralyne = "ai2_meralyne_open",
+		/obj/item/storage/pill_bottle/penal/dermaline = "ai2_dermaline_open",
+		/obj/item/storage/pill_bottle/penal/hyronalin = "ai2_hyronalin_open",
+		/obj/item/storage/pill_bottle/penal/dexalin = "ai2_dexalin_open",
+		/obj/item/reagent_containers/hypospray/autoinjector/pen/tramadol = "ai2_tramadol_open",
+		/obj/item/reagent_containers/hypospray/autoinjector/pen/neuraline = "ai2_neuraline_open",
+		/obj/item/reagent_containers/hypospray/autoinjector/pen/inaprovaline = "ai2_inaprovaline_open",
+		/obj/item/reagent_containers/hypospray/autoinjector/pen/hypervene = "ai2_hypervene_open",
 	)
 
-	if(is_open)
-		for(var/obj/item/W in contents)
-			if(types_and_overlays[W.type])
-				add_overlay(types_and_overlays[W.type])
-				types_and_overlays -= W.type
-
-/obj/item/storage/ai2/open(mob/user)
-	. = ..()
-	icon_state = "firstaidkit_empty"
-	is_open = TRUE
-	update_icon()
-
-/obj/item/storage/ai2/close(mob/user)
-	. = ..()
-	icon_state = "firstaidkit"
-	is_open = FALSE
-	update_icon()
+	if(!is_open)
+		return
+	for(var/obj/item/W in contents)
+		if(!types_and_overlays[W.type])
+			continue
+		add_overlay(types_and_overlays[W.type])
+		types_and_overlays -= W.type
 
 /obj/item/storage/ai2/attackby(obj/item/I, mob/user, params)
 	. = ..()
 	update_icon()
 
 /obj/item/storage/pill_bottle/penal
-	icon = 'icons/obj/items/storage/firstaidkit.dmi'
-	max_storage_space = 6
+	icon = 'icons/obj/items/storage/firstaid.dmi'
 	w_class = WEIGHT_CLASS_TINY
 	greyscale_config = null
 	greyscale_colors = null
+
+/obj/item/storage/pill_bottle/penal/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.max_storage_space = 6
 
 /obj/item/storage/pill_bottle/penal/meralyne
 	name = "Meralyne \"Пенал\" case"
@@ -672,9 +626,9 @@
 	pill_type_to_fill = /obj/item/reagent_containers/pill/dexalin
 
 /obj/item/reagent_containers/hypospray/autoinjector/pen
-	icon = 'icons/obj/items/storage/firstaidkit.dmi'
+	icon = 'icons/obj/items/storage/firstaid.dmi'
 	volume = 30
-	init_reagent_flags = null
+	reagent_flags = null
 
 /obj/item/reagent_containers/hypospray/autoinjector/pen/tramadol
 	name = "Tramadol pen"

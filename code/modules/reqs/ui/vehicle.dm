@@ -10,12 +10,25 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 	. = list()
 	for(var/obj/vehicle/sealed/armored/vehtype AS in typesof(/obj/vehicle/sealed/armored))
 		vehtype = new vehtype
-		GLOB.armored_modtypes[vehtype.type] = vehtype.permitted_mods
-		.[vehtype.type] = vehtype.permitted_weapons
+		GLOB.armored_modtypes[vehtype.type] = list()
+		for(var/obj/item/tank_module/module AS in vehtype.permitted_mods)
+			if(module::tank_mod_flags & TANK_MOD_NOT_FABRICABLE)
+				continue
+			GLOB.armored_modtypes[vehtype.type] += module
+
+		.[vehtype.type] = list()
+		for(var/obj/item/armored_weapon/weapon AS in vehtype.permitted_weapons)
+			if(weapon::armored_weapon_flags & MODULE_NOT_FABRICABLE)
+				continue
+			.[vehtype.type] += weapon
 		vehtype.Destroy()
 	for(var/obj/item/armored_weapon/gun AS in typesof(/obj/item/armored_weapon))
 		gun = new gun
-		GLOB.armored_gunammo[gun.type] = gun.accepted_ammo
+		GLOB.armored_gunammo[gun.type] = list()
+		for(var/obj/item/ammo_magazine/magazine AS in gun.accepted_ammo)
+			if(magazine::magazine_flags & MAGAZINE_NOT_FABRICABLE)
+				continue
+			GLOB.armored_gunammo[gun.type] += magazine
 		gun.Destroy()
 
 /datum/supply_ui/vehicles
@@ -40,7 +53,7 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 /datum/supply_ui/vehicles/ui_static_data(mob/user)
 	var/list/data = list()
 	for(var/obj/vehicle/sealed/armored/vehtype AS in typesof(/obj/vehicle/sealed/armored))
-		var/flags = vehtype::flags_armored
+		var/flags = vehtype::armored_flags
 
 		if(flags & ARMORED_PURCHASABLE_TRANSPORT)
 			if(user.skills.getRating(SKILL_LARGE_VEHICLE) < SKILL_LARGE_VEHICLE_EXPERIENCED)
@@ -57,7 +70,7 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 		for(var/obj/item/armored_weapon/gun AS in GLOB.armored_guntypes[vehtype])
 			var/primary_selected = (current_primary == gun)
 			var/secondary_selected = (current_secondary == gun)
-			if(initial(gun.weapon_slot) & MODULE_PRIMARY)
+			if(initial(gun.armored_weapon_flags) & MODULE_PRIMARY)
 				data["primaryWeapons"] += list(list(
 					"name" = initial(gun.name),
 					"desc" = initial(gun.desc),
@@ -73,7 +86,7 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 							"max" = DEFAULT_MAX_ARMORED_AMMO, //TODO make vehicle ammo dynamic instead of fixed number
 						))
 
-			if(initial(gun.weapon_slot) & MODULE_SECONDARY)
+			if(initial(gun.armored_weapon_flags) & MODULE_SECONDARY)
 				data["secondaryWeapons"] += list(list(
 					"name" = initial(gun.name),
 					"desc" = initial(gun.desc),
@@ -148,12 +161,12 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 			if(!ispath(newtype, /obj/vehicle/sealed/armored))
 				return
 			var/obj/vehicle/sealed/armored/tank_type = newtype
-			var/is_assault = initial(tank_type.flags_armored) & ARMORED_PURCHASABLE_ASSAULT
+			var/is_assault = initial(tank_type.armored_flags) & ARMORED_PURCHASABLE_ASSAULT
 			if(GLOB.purchased_tanks[usr.faction]?["[is_assault]"])
 				to_chat(usr, span_danger("A vehicle of this type has already been purchased!"))
 				return
 			current_veh_type = newtype
-			current_primary = null // set everything to null, to avoid bugs
+			current_primary = null
 			current_secondary = null
 			current_driver_mod = null
 			current_gunner_mod = null
@@ -164,8 +177,10 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 		if("setprimary")
 			if(!current_veh_type)
 				return
-			var/newtype = text2path(params["type"])
+			var/obj/item/armored_weapon/newtype = text2path(params["type"])
 			if(!(newtype in GLOB.armored_guntypes[current_veh_type]))
+				return
+			if(initial(newtype.armored_weapon_flags) & MODULE_NOT_FABRICABLE)
 				return
 			current_primary = newtype
 			var/list/assoc_cast = GLOB.armored_gunammo[newtype]
@@ -177,8 +192,10 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 		if("setsecondary")
 			if(!current_veh_type)
 				return
-			var/newtype = text2path(params["type"])
+			var/obj/item/armored_weapon/newtype = text2path(params["type"])
 			if(!(newtype in GLOB.armored_guntypes[current_veh_type]))
+				return
+			if(initial(newtype.armored_weapon_flags) & MODULE_NOT_FABRICABLE)
 				return
 			current_secondary = newtype
 			var/list/assoc_cast = GLOB.armored_gunammo[newtype]
@@ -238,25 +255,6 @@ GLOBAL_LIST_EMPTY(purchased_tanks)
 				return
 			current_gunner_mod = newtype
 			. = TRUE
-
-		if("deploy")
-			if(supply_shuttle.mode != SHUTTLE_IDLE)
-				to_chat(usr, span_danger("Elevator moving!"))
-				return
-			if(is_mainship_level(supply_shuttle.z))
-				to_chat(usr, span_danger("Elevator raised. Lower to deploy vehicle."))
-				return
-			supply_shuttle.buy(usr, src)
-			ui_act("send", params, ui, state)
-			SStgui.close_user_uis(usr, src)
-			current_veh_type = null
-			current_primary = null
-			current_secondary = null
-			current_driver_mod = null
-			current_gunner_mod = null
-			primary_ammo = list()
-			secondary_ammo = list()
-			update_static_data(usr)
 
 	if(.)
 		update_static_data(usr)

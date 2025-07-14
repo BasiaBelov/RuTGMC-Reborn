@@ -66,7 +66,7 @@
 	///how much damage airbursts do to mobs around the target, multiplier of the bullet's damage
 	var/airburst_multiplier = 0.1
 	///What kind of behavior the ammo has
-	var/flags_ammo_behavior = NONE
+	var/ammo_behavior_flags = NONE
 	///Determines what color our bullet will be when it flies
 	var/bullet_color = COLOR_WHITE
 	///If this ammo is hitscan, the icon of beam coming out from the gun
@@ -90,31 +90,31 @@
 	///Embeding shrapnel type
 	var/shrapnel_type = /obj/item/shard/shrapnel
 
-/datum/ammo/proc/do_at_max_range(turf/T, obj/projectile/proj)
+/datum/ammo/proc/do_at_max_range(turf/target_turf, obj/projectile/proj)
 	return
 
 ///Does it do something special when shield blocked? Ie. a flare or grenade that still blows up.
-/datum/ammo/proc/on_shield_block(mob/M, obj/projectile/proj)
+/datum/ammo/proc/on_shield_block(mob/target_mob, obj/projectile/proj)
 	return
 
 ///Special effects when hitting dense turfs.
-/datum/ammo/proc/on_hit_turf(turf/T, obj/projectile/proj)
+/datum/ammo/proc/on_hit_turf(turf/target_turf, obj/projectile/proj)
 	return
 
 ///Special effects when hitting mobs.
-/datum/ammo/proc/on_hit_mob(mob/M, obj/projectile/proj)
+/datum/ammo/proc/on_hit_mob(mob/target_mob, obj/projectile/proj)
 	return
 
 ///Special effects when hitting objects.
-/datum/ammo/proc/on_hit_obj(obj/O, obj/projectile/proj)
+/datum/ammo/proc/on_hit_obj(obj/target_object, obj/projectile/proj)
 	return
 
 ///Special effects for leaving a turf. Only called if the projectile has AMMO_LEAVE_TURF enabled
-/datum/ammo/proc/on_leave_turf(turf/T, obj/projectile/proj)
+/datum/ammo/proc/on_leave_turf(turf/target_turf, obj/projectile/proj)
 	return
 
 ///Handles CC application on the victim
-/datum/ammo/proc/staggerstun(mob/victim, obj/projectile/proj, max_range = 5, stun = 0, weaken = 0, stagger = 0, slowdown = 0, knockback = 0, soft_size_threshold = 3, hard_size_threshold = 2)
+/datum/ammo/proc/staggerstun(mob/victim, obj/projectile/proj, max_range = 5, stun = 0, paralyze = 0, stagger = 0, slowdown = 0, knockback = 0, soft_size_threshold = 3, hard_size_threshold = 2)
 	if(!victim)
 		CRASH("staggerstun called without a mob target")
 	if(!isliving(victim))
@@ -139,43 +139,43 @@
 			stun = 0
 
 	//Check for and apply hard CC.
-	if(hard_size_threshold >= victim.mob_size && (stun || weaken || knockback))
+	if(hard_size_threshold >= victim.mob_size && (stun || paralyze || knockback))
 		var/mob/living/living_victim = victim
 		if(living_victim.has_status_effect(STATUS_EFFECT_STUN) || living_victim.has_status_effect(STATUS_EFFECT_PARALYZED)) //Prevent chain stunning.
 			stun = 0
-			weaken = 0
+			paralyze = 0
 
-		if(stun || weaken)
-			var/list/stunlist = list(stun, weaken, stagger, slowdown)
+		if(stun || paralyze)
+			var/list/stunlist = list(stun, paralyze, stagger, slowdown)
 			if(SEND_SIGNAL(living_victim, COMSIG_LIVING_PROJECTILE_STUN, stunlist, armor_type, penetration))
 				stun = stunlist[1]
-				weaken = stunlist[2]
+				paralyze = stunlist[2]
 				stagger = stunlist[3]
 				slowdown = stunlist[4]
-			living_victim.apply_effects(stun,weaken)
+			living_victim.apply_effects(stun,paralyze)
 
 		if(knockback)
 			if(isxeno(victim))
 				impact_message += span_xenodanger("The blast knocks you off your feet!")
 			else
-				impact_message += span_highdanger("The blast knocks you off your feet!")
+				impact_message += span_userdanger("The blast knocks you off your feet!")
 			victim.knockback(proj, knockback, 5)
 
 	//Check for and apply soft CC
 	if(iscarbon(victim))
 		var/mob/living/carbon/carbon_victim = victim
 		#if DEBUG_STAGGER_SLOWDOWN
-		to_chat(world, span_debuginfo("Damage: Initial stagger is: <b>[target.has_status_effect(STATUS_EFFECT_STAGGER)]</b>"))
+		to_chat(world, span_debuginfo("Damage: Initial stagger is: <b>[carbon_victim.AmountStaggered()]</b>"))
 		#endif
 		if(!HAS_TRAIT(carbon_victim, TRAIT_STAGGER_RESISTANT)) //Some mobs like the Queen are immune to projectile stagger
-			carbon_victim.adjust_stagger(stagger)
+			carbon_victim.Stagger(stagger)
 		#if DEBUG_STAGGER_SLOWDOWN
-		to_chat(world, span_debuginfo("Damage: Final stagger is: <b>[target.has_status_effect(STATUS_EFFECT_STAGGER)]</b>"))
-		to_chat(world, span_debuginfo("Damage: Initial slowdown is: <b>[target.slowdown]</b>"))
+		to_chat(world, span_debuginfo("Damage: Final stagger is: <b>[carbon_victim.AmountStaggered()]</b>"))
+		to_chat(world, span_debuginfo("Damage: Initial slowdown is: <b>[carbon_victim.slowdown]</b>"))
 		#endif
 		carbon_victim.add_slowdown(slowdown)
 		#if DEBUG_STAGGER_SLOWDOWN
-		to_chat(world, span_debuginfo("Damage: Final slowdown is: <b>[target.slowdown]</b>"))
+		to_chat(world, span_debuginfo("Damage: Final slowdown is: <b>[carbon_victim.slowdown]</b>"))
 		#endif
 	to_chat(victim, "[impact_message]") //Summarize all the bad shit that happened
 
@@ -186,7 +186,7 @@
 		if(proj.firer == victim)
 			continue
 		victim.visible_message(span_danger("[victim] is hit by backlash from \a [proj.name]!"),
-			isxeno(victim) ? span_xenodanger("We are hit by backlash from \a </b>[proj.name]</b>!") : span_highdanger("You are hit by backlash from \a </b>[proj.name]</b>!"))
+			isxeno(victim) ? span_xenodanger("We are hit by backlash from \a </b>[proj.name]</b>!") : span_userdanger("You are hit by backlash from \a </b>[proj.name]</b>!"))
 		victim.apply_damage(proj.damage * airburst_multiplier, proj.ammo.damage_type, blocked = armor_type, updating_health = TRUE)
 
 ///handles the probability of a projectile hit to trigger fire_burst, based off actual damage done
@@ -212,7 +212,7 @@
 			victim.visible_message(span_danger("[victim] bursts into flames as they are deflagrated by \a [proj.name]!"))
 		else
 			victim.visible_message(span_danger("[victim] is scorched by [target] as they burst into flames!"),
-				isxeno(victim) ? span_xenodanger("We are scorched by [target] as they burst into flames!") : span_highdanger("you are scorched by [target] as they burst into flames!"))
+				isxeno(victim) ? span_xenodanger("We are scorched by [target] as they burst into flames!") : span_userdanger("you are scorched by [target] as they burst into flames!"))
 		//Damages the victims, inflicts brief stagger+slow, and ignites
 		victim.apply_damage(fire_burst_damage, BURN, blocked = FIRE, updating_health = TRUE)
 
@@ -252,7 +252,7 @@
 		new_proj.fire_at(target, shooter, source, range, speed, new_angle, TRUE, loc_override = origin_override)
 
 ///A variant of Fire_bonus_projectiles without fixed scatter and no link between gun and bonus_projectile accuracy
-/datum/ammo/proc/fire_directionalburst(obj/projectile/main_proj, mob/living/shooter, atom/source, projectile_amount, range, speed, angle, target)
+/datum/ammo/proc/fire_directionalburst(obj/projectile/main_proj, mob/living/shooter, atom/source, projectile_amount, angle, target, loc_override)
 	var/effect_icon = ""
 	var/proj_type = /obj/projectile
 	if(istype(main_proj, /obj/projectile/hitscan))
@@ -260,7 +260,10 @@
 		var/obj/projectile/hitscan/main_proj_hitscan = main_proj
 		effect_icon = main_proj_hitscan.effect_icon
 	for(var/i = 1 to projectile_amount) //Want to run this for the number of bonus projectiles.
-		var/obj/projectile/new_proj = new proj_type(main_proj.loc, effect_icon)
+		var/atom/used_loc = loc_override ? loc_override : main_proj.loc
+		var/obj/projectile/new_proj = new proj_type(used_loc, effect_icon)
+		// we do this so if we place inside something, we fly out of it instead of hitting it
+		new_proj.hit_atoms += used_loc.contents
 		if(bonus_projectiles_type)
 			new_proj.generate_bullet(bonus_projectiles_type)
 		else //If no bonus type is defined then the extra projectiles are the same as the main one.
@@ -277,17 +280,17 @@
 			new_angle += 360
 		if(new_angle > 360)
 			new_angle -= 360
-		new_proj.fire_at(target, shooter, main_proj.loc, range, speed, new_angle, TRUE)
+		new_proj.fire_at(target, shooter, loc_override ? loc_override : main_proj.loc, null, null, new_angle, TRUE, scan_loc = TRUE)
 
-/datum/ammo/proc/drop_flame(turf/T)
-	if(!istype(T))
+/datum/ammo/proc/drop_flame(turf/target_turf)
+	if(!istype(target_turf))
 		return
-	T.ignite(20, 20)
+	target_turf.ignite(20, 20)
 
 /datum/ammo/proc/set_smoke()
 	return
 
-/datum/ammo/proc/drop_nade(turf/T)
+/datum/ammo/proc/drop_nade(turf/target_turf)
 	return
 
 ///called on projectile process() when AMMO_SPECIAL_PROCESS flag is active
@@ -295,7 +298,7 @@
 	CRASH("ammo_process called with unimplemented process!")
 
 ///bounces the projectile by creating a new projectile and calculating an angle of reflection
-/datum/ammo/proc/reflect(turf/T, obj/projectile/proj, scatter_variance)
+/datum/ammo/proc/reflect(turf/target_turf, obj/projectile/proj, scatter_variance)
 	if(!bonus_projectiles_type) //while fire_bonus_projectiles does not require this var, it can cause infinite recursion in some cases, leading to death tiles
 		return
 
@@ -303,16 +306,16 @@
 	if(new_range <= 0)
 		return
 
-	var/dir_to_proj = get_dir(T, proj)
+	var/dir_to_proj = get_dir(target_turf, proj)
 	if(ISDIAGONALDIR(dir_to_proj))
 		var/list/cardinals = list(turn(dir_to_proj, 45), turn(dir_to_proj, -45))
 		for(var/direction in cardinals)
-			var/turf/turf_to_check = get_step(T, direction)
+			var/turf/turf_to_check = get_step(target_turf, direction)
 			if(turf_to_check.density)
 				cardinals -= direction
 		dir_to_proj = pick(cardinals)
 
-	var/perpendicular_angle = Get_Angle(T, get_step(T, dir_to_proj))
+	var/perpendicular_angle = Get_Angle(target_turf, get_step(target_turf, dir_to_proj))
 	var/new_angle = (perpendicular_angle + (perpendicular_angle - proj.dir_angle - 180) + rand(-scatter_variance, scatter_variance))
 
 	if(new_angle < -360)
@@ -323,5 +326,5 @@
 		new_angle -= 360
 
 	bonus_projectiles_amount = 1
-	fire_bonus_projectiles(proj, null, proj.shot_from, new_range, proj.projectile_speed, new_angle, null, get_step(T, dir_to_proj))
-	bonus_projectiles_amount = 0
+	fire_bonus_projectiles(proj, null, proj.shot_from, new_range, proj.projectile_speed, new_angle, null, get_step(target_turf, dir_to_proj))
+	bonus_projectiles_amount = initial(bonus_projectiles_amount)

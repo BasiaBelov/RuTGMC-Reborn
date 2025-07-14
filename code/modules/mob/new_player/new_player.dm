@@ -171,7 +171,7 @@
 			DIRECT_OUTPUT(usr, browse(null, "window=xenosunbalanced"))
 
 	if(href_list["showpoll"])
-		handle_playeR_DBRANKSing()
+		handle_playeR_POLLSing()
 		return
 
 	if(href_list["viewpoll"])
@@ -367,8 +367,10 @@
 		return FALSE
 	if(!(GLOB.roles_whitelist[ckey] && WHITELIST_PREDATOR) && job == /datum/job/predator)
 		return FALSE
+	#ifndef TESTING
 	if(job.boosty_job && SSdiscord.get_boosty_tier(ckey) < BOOSTY_TIER_2)
 		return FALSE
+	#endif
 	if(latejoin && !job.special_check_latejoin(client))
 		return FALSE
 	return TRUE
@@ -443,7 +445,7 @@
 		to_chat(src, span_warning("The round is either not ready, or has already finished."))
 		return
 
-	if(SSticker.mode.flags_round_type & MODE_NO_LATEJOIN)
+	if(SSticker.mode.round_type_flags & MODE_NO_LATEJOIN)
 		to_chat(src, span_warning("Sorry, you cannot late join during [SSticker.mode.name]. You have to start at the beginning of the round. You may observe or try to join as an alien, if possible."))
 		return
 

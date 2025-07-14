@@ -55,7 +55,7 @@
 		/obj/item/reagent_containers/food/drinks/cans/sodawater = -1,
 		/obj/item/reagent_containers/food/drinks/flask/barflask = -1,
 		/obj/item/reagent_containers/food/drinks/flask/vacuumflask = -1,
-		/obj/item/reagent_containers/food/drinks/drinkingglass = -1,
+		/obj/item/reagent_containers/cup/glass/drinking_glass = -1,
 		/obj/item/reagent_containers/food/drinks/ice = -1,
 		/obj/item/reagent_containers/food/drinks/bottle/melonliquor = -1,
 		/obj/item/reagent_containers/food/drinks/bottle/bluecuracao = -1,
@@ -112,7 +112,7 @@
 		/obj/item/reagent_containers/food/snacks/enrg_bar = -1,
 		/obj/item/reagent_containers/food/snacks/wrapped/booniebars = -1,
 		/obj/item/reagent_containers/food/snacks/wrapped/chunk = -1,
-		/obj/item/reagent_containers/food/snacks/wrapped/barcardine = -1,
+		/obj/item/reagent_containers/food/snacks/wrapped/barcaridine = -1,
 		/obj/item/reagent_containers/food/snacks/lollipop = -1,
 		/obj/item/reagent_containers/food/snacks/wrapped/berrybar = -1,
 	)
@@ -163,6 +163,7 @@
 			/obj/item/storage/pill_bottle/imidazoline = 6,
 			/obj/item/storage/pill_bottle/imialky = 6,
 			/obj/item/storage/pill_bottle/hypervene = 6,
+			/obj/item/storage/pill_bottle/russian_red = 4,
 		),
 		"Hypospray" = list (
 			/obj/item/reagent_containers/hypospray/autoinjector/dexalinplus = 10,
@@ -368,6 +369,7 @@
 /obj/machinery/vending/nanomed/tadpolemed
 	name = "Flight surgeon medical equipment dispenser"
 	desc = "Dedicated for the surgeon with wings, this humble box contains a lot for its size."
+	layer = ABOVE_OBJ_LAYER
 	products = list(
 		"Autoinjectors" = list(
 			/obj/item/reagent_containers/hypospray/autoinjector/bicaridine = 1,
@@ -516,11 +518,11 @@
 	icon_vend = "dinnerware-vend"
 	icon_deny = "dinnerware-deny"
 	products = list(
-		/obj/item/tool/kitchen/tray = 8,
+		/obj/item/storage/kitchen_tray = 8,
 		/obj/item/tool/kitchen/utensil/fork = 6,
 		/obj/item/tool/kitchen/knife = 3,
-		/obj/item/reagent_containers/food/drinks/drinkingglass = 8,
-		/obj/item/clothing/suit/chef/classic = 2,
+		/obj/item/reagent_containers/cup/glass/drinking_glass = 8,
+		/obj/item/clothing/suit/storage/chef/classic = 2,
 		/obj/item/tool/kitchen/utensil/spoon = 2,
 		/obj/item/tool/kitchen/utensil/knife = 2,
 		/obj/item/tool/kitchen/rollingpin = 2,
@@ -534,8 +536,8 @@
 	icon_state = "sovietsoda"
 	product_ads = "For Tsar and Country.;Have you fulfilled your nutrition quota today?;Very nice!;We are simple people, for this is all we eat.;If there is a person, there is a problem. If there is no person, then there is no problem."
 	products = list(
-		/obj/item/reagent_containers/food/drinks/drinkingglass/soda = 30,
-		/obj/item/reagent_containers/food/drinks/drinkingglass/cola = 20,
+		/obj/item/reagent_containers/cup/glass/drinking_glass/filled/soda = 30,
+		/obj/item/reagent_containers/cup/glass/drinking_glass/filled/cola = 20,
 	)
 	idle_power_usage = 211
 

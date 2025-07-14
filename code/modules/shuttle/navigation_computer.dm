@@ -8,7 +8,7 @@
 	/// Action of placing the shuttle custom landing zone
 	var/datum/action/innate/shuttledocker_place/place_action = new
 	/// The id of the shuttle linked to this console
-	var/shuttleId = ""
+	var/shuttle_id = ""
 	/// The id of the custom docking port placed by this console
 	var/shuttlePortId = ""
 	/// The name of the custom docking port placed by this console
@@ -30,7 +30,7 @@
 	/// Vertical offset from the console of the origin tile when using it
 	var/y_offset = 0
 	/// Turfs that can be landed on
-	var/list/whitelist_turfs = list(/turf/open/ground, /turf/open/floor, /turf/open/liquid/water)
+	var/list/whitelist_turfs = list(/turf/open/ground, /turf/open/floor, /turf/open/liquid/water, /turf/open/lavaland)
 	/// Are we able to see hidden ports when using the console
 	var/see_hidden = FALSE
 	/// Delay of the place_action
@@ -47,22 +47,22 @@
 	if(!mapload)
 		connect_to_shuttle(SSshuttle.get_containing_shuttle(src))
 
-		for(var/obj/docking_port/stationary/S AS in SSshuttle.stationary)
-			if(S.id == shuttleId)
-				jumpto_ports[S.id] = TRUE
+		for(var/obj/docking_port/stationary/S AS in SSshuttle.stationary_docking_ports)
+			if(S.shuttle_id == shuttle_id)
+				jumpto_ports[S.shuttle_id] = TRUE
 
-	for(var/V in SSshuttle.stationary)
+	for(var/V in SSshuttle.stationary_docking_ports)
 		if(!V)
 			continue
 		var/obj/docking_port/stationary/S = V
-		if(jumpto_ports[S.id])
+		if(jumpto_ports[S.shuttle_id])
 			z_lock |= S.z
 	whitelist_turfs = typecacheof(whitelist_turfs)
 
 /obj/machinery/computer/camera_advanced/shuttle_docker/Destroy()
 	if(my_port?.get_docked())
 		my_port.delete_after = TRUE
-		my_port.id = null
+		my_port.shuttle_id = null
 		my_port.name = "Old [my_port.name]"
 		my_port = null
 	else
@@ -73,7 +73,7 @@
 	if(jammed)
 		to_chat(user, span_warning("You can only see static on the console."))
 		return
-	if(!shuttle_port && !SSshuttle.getShuttle(shuttleId))
+	if(!shuttle_port && !SSshuttle.getShuttle(shuttle_id))
 		to_chat(user,span_warning("Warning: Shuttle connection severed!"))
 		return
 	return ..()
@@ -81,7 +81,7 @@
 /obj/machinery/computer/camera_advanced/shuttle_docker/interact(mob/user)
 	if(!allowed(user))
 		return
-	..()
+	return ..()
 
 ///Change the fly state of the shuttle, called when a new shuttle port is reached
 /obj/machinery/computer/camera_advanced/shuttle_docker/proc/shuttle_arrived()
@@ -90,7 +90,7 @@
 /obj/machinery/computer/camera_advanced/shuttle_docker/give_actions(mob/living/user)
 	if(length(jumpto_ports))
 		jump_action = new /datum/action/innate/camera_jump/shuttle_docker
-	..()
+	. = ..()
 	if(rotate_action)
 		rotate_action.target = user
 		rotate_action.give_action(user)
@@ -102,7 +102,7 @@
 		actions += place_action
 
 /obj/machinery/computer/camera_advanced/shuttle_docker/CreateEye()
-	shuttle_port = SSshuttle.getShuttle(shuttleId)
+	shuttle_port = SSshuttle.getShuttle(shuttle_id)
 	if(QDELETED(shuttle_port))
 		shuttle_port = null
 		return
@@ -161,7 +161,7 @@
 	if(designate_time && (landing_clear != SHUTTLE_DOCKER_BLOCKED))
 		to_chat(current_user, span_warning("Targeting transit location, please wait [DisplayTimeText(designate_time)]..."))
 		designating_target_loc = the_eye.loc
-		var/wait_completed = do_after(current_user, designate_time, NONE, designating_target_loc, extra_checks = CALLBACK(src, /obj/machinery/computer/camera_advanced/shuttle_docker/proc/canDesignateTarget))
+		var/wait_completed = do_after(current_user, designate_time, NONE, designating_target_loc, extra_checks = CALLBACK(src, PROC_REF(canDesignateTarget)))
 		designating_target_loc = null
 		if(!current_user)
 			return
@@ -182,7 +182,7 @@
 	if(my_port?.get_docked())
 		my_port.unregister()
 		my_port.delete_after = TRUE
-		my_port.id = null
+		my_port.shuttle_id = null
 		my_port.name = "Old [my_port.name]"
 		my_port = null
 
@@ -190,7 +190,7 @@
 		my_port = new()
 		my_port.unregister()
 		my_port.name = shuttlePortName
-		my_port.id = shuttlePortId
+		my_port.shuttle_id = shuttlePortId
 		my_port.height = shuttle_port.height
 		my_port.width = shuttle_port.width
 		my_port.dheight = shuttle_port.dheight
@@ -245,7 +245,7 @@
 /// Checks if the currently hovered area is accessible by the shuttle
 /obj/machinery/computer/camera_advanced/shuttle_docker/proc/check_hovering_spot(turf/next_turf)
 	if(!next_turf)
-		return
+		return FALSE
 	var/mob/camera/aiEye/remote/shuttle_docker/the_eye = eyeobj
 	var/list/image_cache = the_eye.placement_images
 	for(var/i in 1 to length(image_cache))
@@ -255,7 +255,7 @@
 		var/area/A = get_area(T)
 		if(!A)
 			return FALSE
-		if(A.ceiling == CEILING_NONE || A.ceiling == CEILING_GLASS || A.ceiling ==CEILING_METAL)
+		if(A.ceiling == CEILING_NONE || A.ceiling == CEILING_GLASS || A.ceiling == CEILING_METAL)
 			continue
 		return FALSE
 	return TRUE
@@ -334,16 +334,17 @@
 			else
 				return SHUTTLE_DOCKER_BLOCKED
 
-/obj/machinery/computer/camera_advanced/shuttle_docker/connect_to_shuttle(obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
+/obj/machinery/computer/camera_advanced/shuttle_docker/connect_to_shuttle(mapload, obj/docking_port/mobile/port, obj/docking_port/stationary/dock)
 	if(port)
-		shuttleId = port.id
-		shuttlePortId = "[port.id]_custom"
+		shuttle_id = port.shuttle_id
+		shuttlePortId = "[port.shuttle_id]_custom"
 	if(dock)
-		jumpto_ports[dock.id] = TRUE
+		jumpto_ports[dock.shuttle_id] = TRUE
 
 /mob/camera/aiEye/remote/shuttle_docker
 	visible_icon = FALSE
 	use_static = FALSE
+	atom_flags = PREVENT_CONTENTS_EXPLOSION|SHUTTLE_IMMUNE // tadpole seems to destroy the camera on landing and causes immense runtimes
 	var/list/placement_images = list()
 	var/list/placed_images = list()
 	/// If it is possible to have night vision, if false the user will get turf vision
@@ -363,13 +364,13 @@
 		setLoc(T)
 
 /mob/camera/aiEye/remote/shuttle_docker/setLoc(T)
-	..()
+	. = ..()
 	var/obj/machinery/computer/camera_advanced/shuttle_docker/console = origin
 	console?.checkLandingSpot()
 
 /mob/camera/aiEye/remote/shuttle_docker/update_remote_sight(mob/living/user)
 	var/obj/machinery/computer/camera_advanced/shuttle_docker/console = origin
-	if(nvg_vision_possible && console.nvg_vision_mode)
+	if(nvg_vision_possible && console?.nvg_vision_mode)
 		user.see_in_dark = 6
 		user.sight = 0
 		user.lighting_alpha = LIGHTING_PLANE_ALPHA_MOSTLY_VISIBLE
@@ -421,14 +422,14 @@
 	playsound(console, 'sound/machines/terminal_prompt_deny.ogg', 25, FALSE)
 
 	var/list/L = list()
-	for(var/V in SSshuttle.stationary)
+	for(var/V in SSshuttle.stationary_docking_ports)
 		if(!V)
 			stack_trace("SSshuttle.stationary have null entry!")
 			continue
 		var/obj/docking_port/stationary/S = V
 		if(length(console.z_lock) && !(S.z in console.z_lock))
 			continue
-		if(console.jumpto_ports[S.id])
+		if(console.jumpto_ports[S.shuttle_id])
 			L["([length(L)])[S.name]"] = S
 
 	playsound(console, 'sound/machines/terminal_prompt.ogg', 25, FALSE)

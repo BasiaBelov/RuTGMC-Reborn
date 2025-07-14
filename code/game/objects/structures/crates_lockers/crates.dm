@@ -18,6 +18,8 @@
 	. = ..()
 	var/static/list/connections = list(
 		COMSIG_OBJ_TRY_ALLOW_THROUGH = PROC_REF(can_climb_over),
+		COMSIG_FIND_FOOTSTEP_SOUND = TYPE_PROC_REF(/atom/movable, footstep_override),
+		COMSIG_TURF_CHECK_COVERED = TYPE_PROC_REF(/atom/movable, turf_cover_check),
 	)
 	AddElement(/datum/element/connect_loc, connections)
 
@@ -93,18 +95,9 @@
 	icon_opened = "open_explosives"
 	icon_closed = "closed_explosives"
 
-/obj/structure/closet/crate/explosives/whiskeyoutpost/Initialize(mapload)
-	. = ..()
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
-	new /obj/item/explosive/grenade/stick(src)
+/obj/structure/closet/crate/explosives/whiskeyoutpost/PopulateContents()
+	for(var/i in 1 to 10)
+		new /obj/item/explosive/grenade/stick(src)
 	new /obj/item/explosive/grenade/upp(src)
 	new /obj/item/explosive/grenade/upp(src)
 	new /obj/item/explosive/grenade/upp(src)
@@ -113,8 +106,7 @@
 	new /obj/item/explosive/grenade/phosphorus/upp(src)
 	new /obj/item/explosive/grenade/phosphorus/upp(src)
 
-/obj/structure/closet/crate/explosives/whiskeyoutposttwo/Initialize(mapload)
-	. = ..()
+/obj/structure/closet/crate/explosives/whiskeyoutposttwo/PopulateContents()
 	new /obj/structure/closet/crate/explosives(src)
 	new /obj/item/storage/box/visual/grenade/razorburn(src)
 	new /obj/item/storage/box/visual/grenade/razorburn(src)
@@ -132,7 +124,6 @@
 	var/target_temp = T0C - 40
 	var/cooling_power = 40
 
-
 /obj/structure/closet/crate/hydroponics
 	name = "hydroponics crate"
 	desc = "All you need to destroy those pesky weeds and pests."
@@ -140,8 +131,7 @@
 	icon_opened = "open_hydro"
 	icon_closed = "closed_hydro"
 
-/obj/structure/closet/crate/hydroponics/prespawned/Initialize(mapload)
-	. = ..()
+/obj/structure/closet/crate/hydroponics/prespawned/PopulateContents()
 	new /obj/item/reagent_containers/spray/plantbgone(src)
 	new /obj/item/reagent_containers/spray/plantbgone(src)
 	new /obj/item/tool/minihoe(src)
@@ -189,13 +179,11 @@
 	icon_opened = "open_plastic"
 	icon_closed = "closed_plastic"
 
-
 /obj/structure/closet/crate/rcd
 	name = "RCD crate"
 	desc = "A crate for the storage of the RCD."
 
-/obj/structure/closet/crate/rcd/Initialize(mapload)
-	. = ..()
+/obj/structure/closet/crate/rcd/PopulateContents()
 	new /obj/item/ammo_rcd(src)
 	new /obj/item/ammo_rcd(src)
 	new /obj/item/ammo_rcd(src)
@@ -204,13 +192,11 @@
 /obj/structure/closet/crate/solar
 	name = "Solar Pack crate"
 
-
 /obj/structure/closet/crate/freezer/rations //Fpr use in the escape shuttle
 	desc = "A crate of emergency rations."
 	name = "Emergency Rations"
 
-/obj/structure/closet/crate/freezer/rations/Initialize(mapload)
-	. = ..()
+/obj/structure/closet/crate/freezer/rations/PopulateContents()
 	new /obj/item/storage/box/donkpockets(src)
 	new /obj/item/storage/box/donkpockets(src)
 
@@ -221,8 +207,7 @@
 	icon_opened = "open_radioactive"
 	icon_closed = "closed_radioactive"
 
-/obj/structure/closet/crate/radiation/Initialize(mapload)
-	. = ..()
+/obj/structure/closet/crate/radiation/PopulateContents()
 	new /obj/item/clothing/suit/radiation(src)
 	new /obj/item/clothing/head/radiation(src)
 	new /obj/item/clothing/suit/radiation(src)
@@ -249,7 +234,6 @@
 /obj/structure/closet/crate/trashcart
 	name = "Trash Cart"
 	desc = "A heavy, metal trashcart with wheels."
-	icon = 'icons/obj/items/storage/storage.dmi'
 	icon_state = "closed_trashcart"
 	icon_opened = "open_trashcart"
 	icon_closed = "closed_trashcart"
@@ -268,8 +252,6 @@
 	icon_state = "closed_weapons"
 	icon_opened = "open_weapons"
 	icon_closed = "closed_weapons"
-
-
 
 /obj/structure/closet/crate/miningcar
 	desc = "A mining car. This one doesn't work on rails, but has to be dragged."
@@ -292,7 +274,6 @@
 	icon_closed = "closed_basic"
 	max_integrity = 5 //hopefully makes it so req crate spam can easily be destroyed
 	drop_material = null
-
 
 /obj/structure/closet/crate/mass_produced_crate/alpha
 	name = "Mass Produced Alpha Squad Crate"

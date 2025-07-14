@@ -29,19 +29,19 @@
 
 	switch(damagetype)
 		if(BRUTE)
-			adjustBruteLoss(damage)
+			adjust_brute_loss(damage)
 		if(BURN)
-			adjustFireLoss(damage)
+			adjust_fire_loss(damage)
 		if(TOX)
-			adjustToxLoss(damage)
+			adjust_tox_loss(damage)
 		if(OXY)
-			adjustOxyLoss(damage)
+			adjust_oxy_loss(damage)
 		if(CLONE)
-			adjustCloneLoss(damage)
+			adjust_clone_loss(damage)
 		if(STAMINA)
-			adjustStaminaLoss(damage)
+			adjust_stamina_loss(damage)
 	if(updating_health)
-		updatehealth()
+		update_health()
 	return damage
 
 ///Used to apply multiple types of damage to a mob at the same time
@@ -57,64 +57,64 @@
 	if(clone)
 		apply_damage(clone, CLONE, def_zone, blocked, sharp, edge, FALSE, penetration)
 	if(updating_health)
-		updatehealth()
+		update_health()
 	return TRUE
 
 
 /**
-Apply status effect to mob
-
-Arguments
-	*effect: duration or amount of effect
-	*effecttype which affect to apply
-	*updating_health if we should update health [/mob/living/updatehealth]
-*/
-/mob/living/proc/apply_effect(effect = 0, effecttype = STUN, updating_health = FALSE)
+ * Applies the specified effect
+ *
+ * Arguments:
+ * * effect: the amount of effect, duration for some, amount for others
+ * * effect_type: the type of effect to apply
+ * * updating_health: should we call the update_health proc?
+ */
+/mob/living/proc/apply_effect(effect = 0, effect_type = EFFECT_STUN, updating_health = FALSE)
 	if(status_flags & GODMODE)
 		return FALSE
 	if(effect <= 0)
 		return FALSE
 
-	switch(effecttype)
-		if(STUN)
+	switch(effect_type)
+		if(EFFECT_STUN)
 			Stun(effect)
-		if(WEAKEN)
+		if(EFFECT_PARALYZE)
 			Paralyze(effect)
-		if(PARALYZE)
+		if(EFFECT_UNCONSCIOUS)
 			Unconscious(effect)
-		if(STAGGER)
+		if(EFFECT_STAGGER)
 			Stagger(effect)
-		if(AGONY)
-			adjustStaminaLoss(effect)
-		if(STUTTER)
+		if(EFFECT_STAMLOSS)
+			adjust_stamina_loss(effect)
+		if(EFFECT_STUTTER)
 			if(status_flags & CANSTUN) // stun is usually associated with stutter
 				set_timed_status_effect(effect, /datum/status_effect/speech/stutter, only_if_higher = TRUE)
-		if(EYE_BLUR)
+		if(EFFECT_EYE_BLUR)
 			blur_eyes(effect)
-		if(DROWSY)
-			adjustDrowsyness(effect)
+		if(EFFECT_DROWSY)
+			adjust_drowsyness(effect)
 	if(updating_health)
-		updatehealth()
+		update_health()
 	return TRUE
 
 ///Applies multiple negative effects to a mob
-/mob/living/proc/apply_effects(stun = 0, weaken = 0, paralyze = 0, stagger = 0,stutter = 0, eyeblur = 0, drowsy = 0, agony = 0, updating_health = FALSE)
+/mob/living/proc/apply_effects(stun = 0, paralyze = 0, unconscious = 0, stagger = 0, stamloss = 0, stutter = 0, eye_blur = 0, drowsy = 0, updating_health = FALSE)
 	if(stun)
-		apply_effect(stun, STUN)
-	if(weaken)
-		apply_effect(weaken, WEAKEN)
+		apply_effect(stun, EFFECT_STUN)
 	if(paralyze)
-		apply_effect(paralyze, PARALYZE)
+		apply_effect(paralyze, EFFECT_PARALYZE)
+	if(unconscious)
+		apply_effect(unconscious, EFFECT_UNCONSCIOUS)
 	if(stagger)
-		apply_effect(stagger, STAGGER)
+		apply_effect(stagger, EFFECT_STAGGER)
+	if(stamloss)
+		apply_effect(stamloss, EFFECT_STAMLOSS)
 	if(stutter)
-		apply_effect(stutter, STUTTER)
-	if(eyeblur)
-		apply_effect(eyeblur, EYE_BLUR)
+		apply_effect(stutter, EFFECT_STAMLOSS)
+	if(eye_blur)
+		apply_effect(eye_blur, EFFECT_EYE_BLUR)
 	if(drowsy)
-		apply_effect(drowsy, DROWSY)
-	if(agony)
-		apply_effect(agony, AGONY)
+		apply_effect(drowsy, EFFECT_DROWSY)
 	if(updating_health)
-		updatehealth()
+		update_health()
 	return TRUE

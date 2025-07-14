@@ -4,8 +4,7 @@
 	typepath = /datum/round_event/hive_threat
 	weight = 10
 	earliest_start = 30 MINUTES
-
-	gamemode_blacklist = list("Combat Patrol","Sensor Capture", "Crash")
+	gamemode_blacklist = list("Zombie Crash")
 
 /datum/round_event/hive_threat
 	///The human target for this event

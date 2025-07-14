@@ -7,11 +7,11 @@
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "spike"
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
-	item_state = "harpoon"
+	worn_icon_state = "harpoon"
 
 	attack_verb = list("jabbed","stabbed","ripped", "skewered")
 	throw_range = 4
@@ -28,8 +28,8 @@
 
 	icon = 'icons/obj/hunter/pred_gear.dmi'
 	icon_state = "wrist"
-	item_state = "wristblade"
-	item_icons = list(
+	worn_icon_state = "wristblade"
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/hunter/items_lefthand.dmi',
 		slot_r_hand_str = 'icons/mob/hunter/items_righthand.dmi'
 	)
@@ -37,8 +37,8 @@
 	w_class = WEIGHT_CLASS_GIGANTIC
 	edge = TRUE
 	sharp = IS_SHARP_ITEM_ACCURATE
-	flags_item = ITEM_PREDATOR
-	flags_equip_slot = NONE
+	item_flags = ITEM_PREDATOR
+	equip_slot_flags = NONE
 	hitsound = 'sound/weapons/wristblades_hit.ogg'
 	attack_speed = 6
 	force = 25
@@ -120,7 +120,7 @@
 	name = "\proper wrist scimitar"
 	desc = "A huge, serrated blade extending from metal gauntlets."
 	icon_state = "scim"
-	item_state = "scim"
+	worn_icon_state = "scim"
 	attack_speed = 5
 	penetration = 15
 	attack_verb = list("sliced", "slashed", "jabbed", "torn", "gored")

@@ -1,12 +1,12 @@
 //Darude sandstorm starts playing
 /datum/weather/ash_storm/sand
 	name = "severe sandstorm"
-	telegraph_message = span_highdanger("You see a dust cloud rising over the horizon. That can't be good...")
+	telegraph_message = span_userdanger("You see a dust cloud rising over the horizon. That can't be good...")
 	telegraph_duration = 300
 	telegraph_overlay = "dust_med"
 	telegraph_sound = 'sound/effects/siren.ogg'
 
-	weather_message = span_highdanger("<i>Hot sand and wind batter you! Get inside!</i>")
+	weather_message = span_userdanger("<i>Hot sand and wind batter you! Get inside!</i>")
 	weather_duration_lower = 600
 	weather_duration_upper = 1200
 	weather_overlay = "dust_high"
@@ -25,7 +25,7 @@
 		return
 	if(is_storm_immune(L))
 		return
-	L.adjustBruteLoss(6)
+	L.adjust_brute_loss(6)
 	to_chat(L, span_danger("You are battered by the coarse sand!"))
 
 /datum/weather/ash_storm/sand/harmless

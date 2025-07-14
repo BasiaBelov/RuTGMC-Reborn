@@ -42,24 +42,6 @@
 	current_rounds = 120
 	max_rounds = 120
 
-/obj/item/ammo_magazine/packet/groza/ap
-	name = "box of AP 7.62x39mm"
-	desc = "A box containing 120 AP rounds of 7.62x39mm."
-	caliber = CALIBER_762X39
-	icon_state = "box_76239mm"
-	default_ammo = /datum/ammo/bullet/rifle/mpi_km/ap
-	current_rounds = 120
-	max_rounds = 120
-
-/obj/item/ammo_magazine/packet/groza/hp
-	name = "box of HP 7.62x39mm"
-	desc = "A box containing 120 HP rounds of 7.62x39mm."
-	caliber = CALIBER_762X39
-	icon_state = "box_76239mm"
-	default_ammo = /datum/ammo/bullet/rifle/mpi_km/hp
-	current_rounds = 120
-	max_rounds = 120
-
 /obj/item/ammo_magazine/packet/p10x265mm
 	name = "box of 10x26.5mm"
 	desc = "A box containing 100 rounds of 10x26.5mm caseless."
@@ -118,7 +100,7 @@
 
 /obj/item/ammo_magazine/packet/scout_rifle
 	name = "Box of A19 high velocity bullets"
-	desc = "A box containing 150 rounds of A19 overpressuered high velocity."
+	desc = "A box containing 150 rounds of A19 overpressured high velocity."
 	icon_state = "box_tx8"
 	default_ammo = /datum/ammo/bullet/rifle/tx8
 	caliber = CALIBER_10X28_CASELESS
@@ -176,6 +158,7 @@
 
 /obj/item/ammo_magazine/packet/magnum
 	name = "packet of .44 magnum"
+	desc = "A packet containing 49 rounds of .44 magnum."
 	icon_state = "box_44mag" //Maybe change this
 	default_ammo = /datum/ammo/bullet/revolver/r44
 	caliber = CALIBER_44
@@ -185,6 +168,7 @@
 
 /obj/item/ammo_magazine/packet/mateba
 	name = "packet of .454 casull"
+	desc = "A packet containing 42 rounds of .454 casull."
 	icon_state = "box_454"
 	default_ammo = /datum/ammo/bullet/revolver/highimpact
 	caliber = CALIBER_454
@@ -192,23 +176,14 @@
 	max_rounds = 42
 
 /obj/item/ammo_magazine/packet/acp
-	name = "box of .45 ACP"
+	name = "box of pistol .45 ACP"
+	desc = "A packet containing 50 rounds of pistol .45 ACP."
 	icon_state = "box_.45acp"
 	default_ammo = /datum/ammo/bullet/smg/acp
 	w_class = WEIGHT_CLASS_NORMAL
 	caliber = CALIBER_45ACP
 	current_rounds = 160
 	max_rounds = 160
-
-/obj/item/ammo_magazine/packet/acp/ap
-	name = "box of .45 ACP(AP)"
-	icon_state = "box_.45acp_ap"
-	default_ammo = /datum/ammo/bullet/smg/acp/ap
-
-/obj/item/ammo_magazine/packet/acp/hp
-	name = "box of .45 ACP(HP)"
-	icon_state = "box_.45acp_hp"
-	default_ammo = /datum/ammo/bullet/smg/acp/hp
 
 /obj/item/ammo_magazine/packet/rifle762X39
 	name = "box of 7.62X39"
@@ -227,18 +202,6 @@
 	caliber = CALIBER_762X54
 	current_rounds = 50
 	max_rounds = 50
-
-/obj/item/ammo_magazine/packet/p9mm/ap
-	name = "packet of 9mm AP"
-	desc = "A packet containing 70 rounds of 9mm armor-piercing."
-	ammo_band_color = AMMO_BAND_COLOR_AP
-	default_ammo = /datum/ammo/bullet/pistol/ap
-
-/obj/item/ammo_magazine/packet/p9mm/hp
-	name = "packet of 9mm HP"
-	desc = "A packet containing 70 rounds of 9mm hollow-point."
-	ammo_band_color = AMMO_BAND_COLOR_HOLLOWPOINT
-	default_ammo = /datum/ammo/bullet/pistol/hp
 
 /obj/item/ammo_magazine/packet/p9mm/incendiary
 	name = "packet of 9mm incendiary"
@@ -388,47 +351,6 @@
 	current_rounds = 50
 	max_rounds = 50
 	used_casings = 5
-
-/obj/item/ammo_magazine/packet/p10x24mm/ap
-	name = "box of 10x24mm AP"
-	desc = "A box containing 150 armor piercing rounds of 10x24mm caseless."
-	ammo_band_color = AMMO_BAND_COLOR_AP
-	default_ammo = /datum/ammo/bullet/rifle/ap
-
-/obj/item/ammo_magazine/packet/p10x24mm/incendiary
-	name = "box of 10x24mm incendiary"
-	desc = "A box containing 150 incendiary rounds of 10x24mm caseless."
-	ammo_band_color = AMMO_BAND_COLOR_INCENDIARY
-	default_ammo = /datum/ammo/bullet/rifle/incendiary
-
-/obj/item/ammo_magazine/packet/p10x24mm/hp
-	name = "box of 10x24mm HP"
-	desc = "A box containing 150 hollow-point rounds of 10x24mm caseless."
-	ammo_band_color = AMMO_BAND_COLOR_HOLLOWPOINT
-	default_ammo = /datum/ammo/bullet/rifle/hp
-
-/obj/item/ammo_magazine/packet/p10x25mm/ap
-	name = "box of 10x25mm AP"
-	desc = "A box containing 125 armor piercing rounds of 10x25mm caseless."
-	ammo_band_color = AMMO_BAND_COLOR_AP
-	default_ammo = /datum/ammo/bullet/rifle/heavy/ap
-
-/obj/item/ammo_magazine/packet/p10x25mm/hp
-	name = "box of 10x25mm HP"
-	desc = "A box containing 125 hollow-point rounds of 10x25mm caseless."
-	ammo_band_color = AMMO_BAND_COLOR_HOLLOWPOINT
-	default_ammo = /datum/ammo/bullet/rifle/heavy/hp
-
-/obj/item/ammo_magazine/packet/p10x25mm/incendiary
-	name = "box of 10x25mm incendiary"
-	desc = "A box containing 125 incendiary rounds of 10x25mm caseless."
-	ammo_band_color = AMMO_BAND_COLOR_INCENDIARY
-	default_ammo = /datum/ammo/bullet/rifle/heavy/incendiary
-
-/obj/item/ammo_magazine/packet/p10x265mm/ap
-	desc = "A box containing 100 armor piercing rounds of 10x26.5mm caseless."
-	icon_state = "box_10x265mm_ap"
-	default_ammo = /datum/ammo/bullet/rifle/br64/ap
 
 /obj/item/ammo_magazine/packet/p10x20mm/ap
 	desc = "A packet containing 125 rounds of 10x20mm caseless."

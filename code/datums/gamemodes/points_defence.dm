@@ -40,7 +40,7 @@
 
 	var/can_hunt = FALSE
 
-	flags_round_type = MODE_INFESTATION|MODE_LATE_OPENING_SHUTTER_TIMER|MODE_XENO_RULER|MODE_PSY_POINTS|MODE_PSY_POINTS_ADVANCED|MODE_DEAD_GRAB_FORBIDDEN|MODE_HIJACK_POSSIBLE|MODE_SILO_RESPAWN|MODE_SILOS_SPAWN_MINIONS|MODE_ALLOW_XENO_QUICKBUILD|MODE_XENO_DEN
+	round_type_flags = MODE_INFESTATION|MODE_LATE_OPENING_SHUTTER_TIMER|MODE_XENO_RULER|MODE_PSY_POINTS|MODE_PSY_POINTS_ADVANCED|MODE_DEAD_GRAB_FORBIDDEN|MODE_HIJACK_POSSIBLE|MODE_SILO_RESPAWN|MODE_SILOS_SPAWN_MINIONS|MODE_ALLOW_XENO_QUICKBUILD|MODE_XENO_DEN|MODE_HAS_EXCAVATION
 
 /datum/game_mode/infestation/distress/points_defence/post_setup()
 	. = ..()
@@ -212,7 +212,7 @@
 		can_hunt = TRUE
 		for(var/mob/living/carbon/human/human AS in GLOB.alive_human_list)
 			if(human.faction == FACTION_TERRAGOV)
-				human.playsound_local(human, "sound/effects/CIC_order.ogg", 10, 1)
+				human.playsound_local(human, 'sound/effects/CIC_order.ogg', 10, 1)
 				human.play_screen_text("<span class='maptext' style=font-size:24pt;text-align:left valign='top'><u>OVERWATCH</u></span><br>" + "New Destination has been added to the Normandy, take off and destroy them to the end. Extra points awarded in cargo", /atom/movable/screen/text/screen_text/picture/potrait)
 				SSpoints.supply_points[FACTION_TERRAGOV] += 150
 
@@ -231,15 +231,15 @@
 	if(isobserver(source) || !isxeno(source))
 		items +="Marine victory points: [marine_victory_point]"
 
-/datum/game_mode/infestation/distress/points_defence/proc/start_hunt()
+/datum/game_mode/infestation/distress/points_defence/start_hunt()
 	//marine announce
 	for(var/mob/living/carbon/human/human AS in GLOB.alive_human_list)
 		if(human.faction == FACTION_TERRAGOV)
-			human.playsound_local(human, "sound/effects/CIC_order.ogg", 10, 1)
+			human.playsound_local(human, 'sound/effects/CIC_order.ogg', 10, 1)
 			human.play_screen_text("<span class='maptext' style=font-size:24pt;text-align:left valign='top'><u>OVERWATCH</u></span><br>" + "Xeno den has been added to the Normandy destonation, destroy them to the end", /atom/movable/screen/text/screen_text/picture/potrait)
 	round_stage = INFESTATION_MARINE_DEN_RUSH
 
-/datum/game_mode/infestation/distress/points_defence/proc/can_hunt()
+/datum/game_mode/infestation/distress/points_defence/can_hunt()
 	return can_hunt && round_stage != INFESTATION_MARINE_DEN_RUSH
 
 #undef XENO_DEN_LEVEL_PATH

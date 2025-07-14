@@ -24,8 +24,6 @@
 
 	var/list/categories
 	var/list/listed_products
-	///The faction of that vendor, can be null
-	var/faction
 
 /obj/machinery/marine_selector/Initialize(mapload)
 	. = ..()
@@ -144,7 +142,7 @@
 			var/item_category = L[1]
 			var/cost = L[3]
 
-			if(!(user_id.flags_id & CAN_BUY_LOADOUT)) //If you use the quick-e-quip, you cannot also use the GHMMEs
+			if(!(user_id.id_flags & CAN_BUY_LOADOUT)) //If you use the quick-e-quip, you cannot also use the GHMMEs
 				to_chat(usr, span_warning("Access denied. You have already vended a loadout."))
 				return FALSE
 			if(use_points && (item_category in user_id.marine_points) && user_id.marine_points[item_category] < cost)
@@ -198,7 +196,7 @@
 			if(use_points && (item_category in user_id.marine_points))
 				user_id.marine_points[item_category] -= cost
 			. = TRUE
-			user_id.flags_id |= USED_GHMME
+			user_id.id_flags |= USED_GHMME
 
 /obj/machinery/marine_selector/clothes
 	name = "GHMME Automated Closet"
@@ -480,7 +478,7 @@
 
 /obj/effect/vendor_bundle/basic
 	gear_to_spawn = list(
-		/obj/item/storage/box/MRE,
+		/obj/item/storage/box/mre,
 		/obj/item/paper/tutorial/medical,
 		/obj/item/paper/tutorial/mechanics,
 	)
@@ -501,7 +499,7 @@
 	)
 
 /obj/effect/vendor_bundle/stretcher
-	desc = "A collapsed medevac stretcher that can be carried around, beacon included."
+	desc = "A standard-issue TerraGov Marine Corps corpsman medivac stretcher. Comes with an extra beacon, but multiple beds can be linked to one beacon."
 	gear_to_spawn = list(
 		/obj/item/roller/medevac,
 		/obj/item/medevac_beacon,
@@ -511,7 +509,7 @@
 	gear_to_spawn = list(
 		/obj/item/weapon/gun/sentry/basic,
 		/obj/item/explosive/plastique,
-		/obj/item/explosive/grenade/chem_grenade/razorburn_smol,
+		/obj/item/explosive/grenade/chem_grenade/razorburn_small,
 		/obj/item/clothing/gloves/marine/insulated,
 		/obj/item/cell/high,
 		/obj/item/lightreplacer,
@@ -527,9 +525,9 @@
 /obj/effect/vendor_bundle/leader
 	gear_to_spawn = list(
 		/obj/item/explosive/plastique,
-		/obj/item/beacon/supply_beacon,
-		/obj/item/beacon/supply_beacon,
-		/obj/item/beacon/orbital_bombardment_beacon,
+		/obj/item/supply_beacon,
+		/obj/item/supply_beacon,
+		/obj/item/orbital_bombardment_beacon,
 		/obj/item/whistle,
 		/obj/item/compass,
 		/obj/item/binoculars/tactical,
@@ -540,8 +538,8 @@
 /obj/effect/vendor_bundle/commander
 	gear_to_spawn = list(
 		/obj/item/explosive/plastique,
-		/obj/item/beacon/supply_beacon,
-		/obj/item/beacon/orbital_bombardment_beacon,
+		/obj/item/supply_beacon,
+		/obj/item/orbital_bombardment_beacon,
 		/obj/item/healthanalyzer,
 		/obj/item/roller/medevac,
 		/obj/item/medevac_beacon,
@@ -555,7 +553,6 @@
 		/obj/item/stack/sheet/metal/large_stack,
 		/obj/item/tool/weldingtool/hugetank,
 		/obj/item/lightreplacer,
-		/obj/item/healthanalyzer,
 		/obj/item/tool/handheld_charger,
 		/obj/item/defibrillator,
 		/obj/item/medevac_beacon,
@@ -566,6 +563,8 @@
 		/obj/item/tweezers,
 		/obj/item/tool/surgery/solderingtool,
 		/obj/item/supplytablet,
+		/obj/item/cell/high,
+		/obj/item/circuitboard/apc,
 	)
 
 /obj/effect/vendor_bundle/white_dress

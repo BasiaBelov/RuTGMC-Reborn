@@ -9,7 +9,7 @@
 	reload_delay = 2 SECONDS
 	w_class = WEIGHT_CLASS_NORMAL //making sure you can't sneak this onto your belt.
 	caliber = CALIBER_FUEL_THICK //Ultra Thick Napthal Fuel, from the lore book.
-	flags_magazine = NONE
+	magazine_flags = NONE
 	icon_state_mini = "tank_light"
 
 	default_ammo = /datum/ammo/flamethrower
@@ -72,7 +72,7 @@
 
 /obj/item/ammo_magazine/flamer_tank/large/X
 	name = "large flamethrower tank (X)"
-	desc = "A large fuel tank of ultra thick napthal Fuel type X, a sticky combustable liquid chemical that burns extremely hot, for use in the FL-84 flamethrower. Handle with care."
+	desc = "A large fuel tank of ultra thick napthal fuel type X, a sticky combustable liquid chemical that burns extremely hot, for use in the FL-84 flamethrower. Handle with care."
 	icon_state = "flametank_large_blue"
 	default_ammo = /datum/ammo/flamethrower/blue
 	icon_state_mini = "tank_blue"
@@ -80,7 +80,7 @@
 
 /obj/item/ammo_magazine/flamer_tank/mini/X
 	name = "mini incinerator tank (X)"
-	desc = "A large fuel tank of ultra thick napthal Fuel type X, a sticky combustable liquid chemical that burns extremely hot, for use in the underail incinerator unit. Handle with care."
+	desc = "A large fuel tank of ultra thick napthal fuel type X, a sticky combustable liquid chemical that burns extremely hot, for use in the underail incinerator unit. Handle with care."
 	icon_state = "flametank_mini_blue"
 	default_ammo = /datum/ammo/flamethrower/blue
 	reload_delay = 0 SECONDS
@@ -118,29 +118,29 @@
 	reload_delay = 2 SECONDS
 
 /obj/item/ammo_magazine/flamer_tank/backtank
-	name = "back fuel tank"
+	name = "backpack fuel tank"
 	desc = "A specialized fuel tank for use with the FL-84 flamethrower and FL-240 incinerator unit."
 	icon_state = "flamethrower_tank"
-	flags_equip_slot = ITEM_SLOT_BACK
+	equip_slot_flags = ITEM_SLOT_BACK
 	w_class = WEIGHT_CLASS_BULKY
 	max_rounds = 500
 	current_rounds = 500
 	reload_delay = 1 SECONDS
 	caliber = CALIBER_FUEL_THICK
-	flags_magazine = MAGAZINE_WORN
+	magazine_flags = MAGAZINE_WORN
 	icon_state_mini = "tank"
 
 	default_ammo = /datum/ammo/flamethrower
 
 /obj/item/ammo_magazine/flamer_tank/backtank/X
-	name = "back fuel tank (X)"
+	name = "backpack fuel tank (X)"
 	desc = "A specialized fuel tank of ultra thick napthal type X for use with the FL-84 flamethrower and FL-240 incinerator unit."
 	icon_state = "x_flamethrower_tank"
 	default_ammo = /datum/ammo/flamethrower/blue
 	dispenser_type = /obj/structure/reagent_dispensers/fueltank/xfuel
 
 /obj/item/ammo_magazine/flamer_tank/backtank/G
-	name = "back fuel tank (G)"
+	name = "backpack fuel tank (G)"
 	desc = "A specialized fuel tank of plasma type G for use with the FL-84 flamethrower and FL-240 incinerator unit."
 	icon_state = "g_flamethrower_tank"
 	default_ammo = /datum/ammo/flamethrower/green
@@ -155,7 +155,7 @@
 	reload_delay = 0 SECONDS
 	w_class = WEIGHT_CLASS_NORMAL
 	caliber = CALIBER_WATER //Deep lore
-	flags_magazine = NONE
+	magazine_flags = NONE
 	icon_state_mini = "tank_water"
 
 	default_ammo = /datum/ammo/water

@@ -13,11 +13,11 @@
 	name = "cap gun"
 	desc = "Looks almost like the real thing! Ages 8 and up. Please recycle in an autolathe when you're out of caps!"
 	icon_state = "capgun"
-	item_state = "gun"
-	flags_equip_slot = ITEM_SLOT_BELT
+	worn_icon_state = "gun"
+	equip_slot_flags = ITEM_SLOT_BELT
 	w_class = WEIGHT_CLASS_NORMAL
 
-	attack_verb = list("struck", "pistol whipped", "hit", "bashed")
+	attack_verb = list("strikes", "pistol whips", "hits", "bashes")
 	var/bullets = 7
 
 /obj/item/toy/gun/examine(mob/user)
@@ -46,7 +46,7 @@
 		return 1
 	return
 
-/obj/item/toy/gun/afterattack(atom/target as mob|obj|turf|area, mob/user as mob, flag)
+/obj/item/toy/gun/afterattack(atom/target, mob/user, flag)
 	if (flag)
 		return
 	if (src.bullets < 1)
@@ -81,9 +81,9 @@
 	name = "foam dart crossbow"
 	desc = "A weapon favored by many overactive children. Ages 8 and up."
 	icon_state = "foamcrossbow"
-	item_state = "crossbow"
+	worn_icon_state = "crossbow"
 	w_class = WEIGHT_CLASS_SMALL
-	attack_verb = list("attacked", "struck", "hit")
+	attack_verb = list("attacks", "strikes", "hits")
 	var/bullets = 5
 
 /obj/item/toy/crossbow/examine(mob/user)
@@ -101,8 +101,7 @@
 		else
 			to_chat(usr, span_warning("It's already fully loaded."))
 
-
-/obj/item/toy/crossbow/afterattack(atom/target as mob|obj|turf|area, mob/user as mob, flag)
+/obj/item/toy/crossbow/afterattack(atom/target, mob/user, flag)
 	if(!isturf(target.loc) || target == user) return
 	if(flag) return
 
@@ -196,9 +195,9 @@
 	desc = "A cheap, plastic replica of an energy sword. Realistic sounds! Ages 8 and up."
 	icon = 'icons/obj/items/weapons.dmi'
 	icon_state = "sword0"
-	item_state = "sword0"
+	worn_icon_state = "sword0"
 	w_class = WEIGHT_CLASS_SMALL
-	attack_verb = list("attacked", "struck", "hit")
+	attack_verb = list("attacks", "strikes", "hits")
 
 /obj/item/toy/sword/attack_self(mob/user as mob)
 	src.active = !( src.active )
@@ -206,13 +205,13 @@
 		to_chat(user, span_notice("You extend the plastic blade with a quick flick of your wrist."))
 		playsound(user, 'sound/weapons/saberon.ogg', 15, 1)
 		src.icon_state = "swordblue"
-		src.item_state = "swordblue"
+		src.worn_icon_state = "swordblue"
 		src.w_class = WEIGHT_CLASS_BULKY
 	else
 		to_chat(user, span_notice("You push the plastic blade back down into the handle."))
 		playsound(user, 'sound/weapons/saberoff.ogg', 15, 1)
 		src.icon_state = "sword0"
-		src.item_state = "sword0"
+		src.worn_icon_state = "sword0"
 		src.w_class = WEIGHT_CLASS_SMALL
 
 	if(istype(user,/mob/living/carbon/human))
@@ -227,11 +226,11 @@
 	desc = "Woefully underpowered in D20."
 	icon = 'icons/obj/items/weapons.dmi'
 	icon_state = "katana"
-	flags_atom = CONDUCT
-	flags_equip_slot = ITEM_SLOT_BELT|ITEM_SLOT_BACK
+	atom_flags = CONDUCT
+	equip_slot_flags = ITEM_SLOT_BELT|ITEM_SLOT_BACK
 	force = 5
 	throwforce = 5
 	w_class = WEIGHT_CLASS_NORMAL
-	attack_verb = list("attacked", "slashed", "stabbed", "sliced")
+	attack_verb = list("attacks", "slashes", "stabs", "slices")
 
 

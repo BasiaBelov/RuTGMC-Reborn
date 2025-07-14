@@ -34,26 +34,23 @@
 	if(severity >= max(health, EXPLOSION_THRESHOLD_GIB + get_soft_armor(BOMB) * 2))
 		var/oldloc = loc
 		gib()
-		create_shrapnel(oldloc, rand(16, 24), direction, shrapnel_type = /datum/ammo/bullet/shrapnel/light/xeno)
+		if(mob_size > MOB_SIZE_SMALL) // cause the size is 0 and will cause errors
+			create_shrapnel(oldloc, rand(4, 8) * mob_size, direction, shrapnel_type = /datum/ammo/bullet/shrapnel/light/xeno)
 		return
 
-	var/sunder_amount = severity * modify_by_armor(1, BOMB) / 8
-
 	apply_damages(severity * 0.5, severity * 0.5, blocked = BOMB, updating_health = TRUE)
+
+	var/sunder_amount = severity * 0.125
 	adjust_sunder(sunder_amount)
 
-	var/powerfactor_value = round(severity * 0.05, 1)
-	powerfactor_value = min(powerfactor_value, 20)
-	if(powerfactor_value > 10)
-		powerfactor_value /= 5
-	else if(powerfactor_value > 0)
-		explosion_throw(severity, direction)
+	var/modified_severity = modify_by_armor(severity, BOMB)
+	explosion_throw(modified_severity, direction)
 
+	var/powerfactor_value = modified_severity * 0.01
 	if(mob_size < MOB_SIZE_BIG)
-		adjust_slowdown(powerfactor_value / 3)
-		adjust_stagger(powerfactor_value * 0.5)
-	else
-		adjust_slowdown(powerfactor_value / 3)
+		adjust_stagger(powerfactor_value SECONDS * 0.5)
+	adjust_slowdown(powerfactor_value)
+
 	TIMER_COOLDOWN_START(src, COOLDOWN_MOB_EX_ACT, 0.1 SECONDS) // this is to prevent x2 damage from mob getting thrown into the explosions wave
 
 /mob/living/carbon/xenomorph/apply_damage(damage = 0, damagetype = BRUTE, def_zone, blocked = 0, sharp = FALSE, edge = FALSE, updating_health = FALSE, penetration)
@@ -65,6 +62,10 @@
 		damage -= clamp(damage * (blocked - penetration) * 0.01, 0, damage)
 	else
 		damage = modify_by_armor(damage, blocked, penetration, def_zone)
+
+	// WARDING PHEROMONES EFFECT
+	if(warding_aura)
+		damage *= (1 - warding_aura * 0.025) // %damage decrease per level. Max base level is 6 (king)
 
 	if(!damage) //no damage
 		return FALSE
@@ -79,80 +80,75 @@
 
 	switch(damagetype)
 		if(BRUTE)
-			adjustBruteLoss(damage)
+			adjust_brute_loss(damage)
 		if(BURN)
-			adjustFireLoss(damage)
+			adjust_fire_loss(damage)
 
 	last_damage_source = usr
 
 	if(updating_health)
-		updatehealth()
+		update_health()
 
 	regen_power = -xeno_caste.regen_delay //Remember, this is in deciseconds.
 
 	if(isobj(pulling))
 		stop_pulling()
 
-
-	if(!COOLDOWN_CHECK(src, xeno_health_alert_cooldown))
-		return
-	//If we're alive and health is less than either the alert threshold, or the alert trigger percent, whichever is greater, and we're not on alert cooldown, trigger the hive alert
-	if(stat == DEAD || (health > max(XENO_HEALTH_ALERT_TRIGGER_THRESHOLD, maxHealth * XENO_HEALTH_ALERT_TRIGGER_PERCENT)) || xeno_caste.caste_flags & CASTE_DO_NOT_ALERT_LOW_LIFE)
-		return
-
-	var/list/filter_list = list()
-	for(var/i in hive.get_all_xenos())
-
-		var/mob/living/carbon/xenomorph/X = i
-		if(!X.client) //Don't bother if they don't have a client; also runtime filters
-			continue
-
-		if(X == src) //We don't need an alert about ourself.
-			filter_list += X //Add the xeno to the filter list
-
-		if(X.client.prefs.mute_xeno_health_alert_messages) //Build the filter list; people who opted not to receive health alert messages
-			filter_list += X //Add the xeno to the filter list
-
-	xeno_message("Our sister [name] is badly hurt with <font color='red'>([health]/[maxHealth])</font> health remaining at [AREACOORD_NO_Z(src)]!", "xenoannounce", 5, hivenumber, FALSE, src, 'sound/voice/alien/help1.ogg', TRUE, filter_list, /atom/movable/screen/arrow/silo_damaged_arrow)
-	COOLDOWN_START(src, xeno_health_alert_cooldown, XENO_HEALTH_ALERT_COOLDOWN) //set the cooldown.
-
 	return damage
 
-///Handles overheal for xeno receiving damage
-#define HANDLE_OVERHEAL(amount) \
-	if(overheal && amount > 0) { \
-		var/reduction = min(amount, overheal); \
-		amount -= reduction; \
-		adjustOverheal(src, -reduction); \
-	} \
+/// Handles overheal for xeno receiving damage
+/mob/living/carbon/xenomorph/proc/handle_overheal(amount)
+	if(overheal && amount > 0)
+		var/reduction = min(amount, overheal)
+		amount -= reduction
+		adjust_overheal(-reduction)
 
-/mob/living/carbon/xenomorph/adjustBruteLoss(amount, updating_health = FALSE, passive = FALSE)
+/// Adjusts overheal and returns the amount by which it was adjusted
+/mob/living/carbon/xenomorph/proc/adjust_overheal(amount)
+	overheal = max(min(overheal + amount, xeno_caste.overheal_max), 0)
+	if(overheal > 0)
+		add_filter("overheal_vis", 1, outline_filter(4 * (overheal / xeno_caste.overheal_max), "#60ce6f60"))
+	else
+		remove_filter("overheal_vis")
+
+/// Heals a xeno, respecting different types of damage
+/mob/living/carbon/xenomorph/proc/heal_xeno_damage(amount, passive)
+	var/fire_loss = get_fire_loss()
+	if(fire_loss)
+		var/fire_heal = min(fire_loss, amount)
+		amount -= fire_heal
+		adjust_fire_loss(-fire_heal, TRUE, passive)
+	var/brute_loss = get_brute_loss()
+	if(brute_loss)
+		var/brute_heal = min(brute_loss, amount)
+		amount -= brute_heal
+		adjust_brute_loss(-brute_heal, TRUE, passive)
+
+/mob/living/carbon/xenomorph/adjust_brute_loss(amount, updating_health = FALSE, passive = FALSE)
 	var/list/amount_mod = list()
 	SEND_SIGNAL(src, COMSIG_XENOMORPH_BRUTE_DAMAGE, amount, amount_mod, passive)
 	for(var/i in amount_mod)
 		amount -= i
 
-	HANDLE_OVERHEAL(amount)
+	handle_overheal(amount)
 
 	bruteloss = max(bruteloss + amount, 0)
 
 	if(updating_health)
-		updatehealth()
+		update_health()
 
-/mob/living/carbon/xenomorph/adjustFireLoss(amount, updating_health = FALSE, passive = FALSE)
+/mob/living/carbon/xenomorph/adjust_fire_loss(amount, updating_health = FALSE, passive = FALSE)
 	var/list/amount_mod = list()
 	SEND_SIGNAL(src, COMSIG_XENOMORPH_BURN_DAMAGE, amount, amount_mod, passive)
 	for(var/i in amount_mod)
 		amount -= i
 
-	HANDLE_OVERHEAL(amount)
+	handle_overheal(amount)
 
 	fireloss = max(fireloss + amount, 0)
 
 	if(updating_health)
-		updatehealth()
-
-#undef HANDLE_OVERHEAL
+		update_health()
 
 ///Splashes living mob in 1 tile radius with acid, spawns
 /mob/living/carbon/xenomorph/proc/check_blood_splash(damage = 0, damtype = BRUTE, chancemod = 0, sharp = FALSE, edge = FALSE)

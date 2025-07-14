@@ -479,6 +479,11 @@
 	icon_state = "hair_highandtight"
 	gender = MALE
 
+/datum/sprite_accessory/hair/highdrills
+	name = "Twin Drills"
+	icon_state = "hair_highdrills"
+	gender = FEMALE
+
 /datum/sprite_accessory/hair/highfade
 	name = "High Fade"
 	icon_state = "hair_highfade"
@@ -573,6 +578,11 @@
 	name = "Long Hair Alternate 2"
 	icon_state = "hair_longalt2"
 
+/datum/sprite_accessory/hair/longdtails
+	name = "Big Tails"
+	icon_state = "hair_longdtails"
+	gender = FEMALE
+
 /datum/sprite_accessory/hair/longstraight
 	name = "Long Straight Hair"
 	icon_state = "hair_longstraight"
@@ -603,11 +613,6 @@
 	name = "Marine Flat Top"
 	icon_state = "hair_mflattop"
 	gender = FEMALE
-
-/datum/sprite_accessory/hair/marine_mohawk
-	name = "Marine Mohawk"
-	icon_state = "hair_mmarinemohawk"
-	gender = MALE
 
 /datum/sprite_accessory/hair/marysue
 	name = "Mary Sue"
@@ -1316,8 +1321,8 @@
 	icon_state = "facial_brokenman_s"
 	greyscale_config = /datum/greyscale_config/broken_man
 
-	
-	
+
+
 //skin styles - WIP
 //going to have to re-integrate this with surgery
 //let the icon_state hold an icon preview for now

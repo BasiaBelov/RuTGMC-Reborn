@@ -39,12 +39,19 @@
 	light_power = 0.5
 	light_color = LIGHT_COLOR_BLUE
 	dir = EAST
+
+	//It uses power
+	use_power = ACTIVE_POWER_USE
+	idle_power_usage = 15
+	active_power_usage = 120000 // It rebuilds you from nothing...
+
 	var/locked = FALSE
 	var/mob/living/carbon/human/occupant = null
-	var/list/surgery_todo_list = list() //a list of surgeries to do.
-	///var/surgery_t = 0 //Surgery timer in seconds.
+	///a list of surgeries to do.
+	var/list/surgery_todo_list = list()
 	var/surgery = FALSE
-	var/surgery_mod = 1 //What multiple to increase the surgery timer? This is used for any non-WO maps or events that are done.
+	///What multiple to increase the surgery timer? This is used for any non-WO maps or events that are done.
+	var/surgery_mod = 1
 	var/filtering = 0
 	var/blood_transfer = 0
 	var/heal_brute = 0
@@ -56,12 +63,8 @@
 
 	var/obj/machinery/computer/autodoc_console/connected
 
-	//It uses power
-	use_power = ACTIVE_POWER_USE
-	idle_power_usage = 15
-	active_power_usage = 120000 // It rebuilds you from nothing...
-
-	var/stored_metal = 1000 // starts with 500 metal loaded
+	/// starts with 500 metal loaded
+	var/stored_metal = 1000
 	var/stored_metal_max = 2000
 
 /obj/machinery/autodoc/Initialize(mapload)
@@ -133,8 +136,8 @@
 
 	// keep them alive
 	var/updating_health = FALSE
-	occupant.adjustToxLoss(-0.5) // pretend they get IV dylovene
-	occupant.adjustOxyLoss(-occupant.getOxyLoss()) // keep them breathing, pretend they get IV dexalinplus
+	occupant.adjust_tox_loss(-0.5) // pretend they get IV dylovene
+	occupant.adjust_oxy_loss(-occupant.get_oxy_loss()) // keep them breathing, pretend they get IV dexalinplus
 	if(filtering)
 		var/filtered = 0
 		for(var/datum/reagent/x in occupant.reagents.reagent_list)
@@ -159,7 +162,7 @@
 			blood_transfer = 0
 			say("Blood transfer complete.")
 	if(heal_brute)
-		if(occupant.getBruteLoss() > 0)
+		if(occupant.get_brute_loss() > 0)
 			occupant.heal_limb_damage(3, 0)
 			updating_health = TRUE
 			if(prob(10))
@@ -169,7 +172,7 @@
 			heal_brute = 0
 			say("Trauma repair surgery complete.")
 	if(heal_burn)
-		if(occupant.getFireLoss() > 0)
+		if(occupant.get_fire_loss() > 0)
 			occupant.heal_limb_damage(0, 3)
 			updating_health = TRUE
 			if(prob(10))
@@ -179,8 +182,8 @@
 			heal_burn = 0
 			say("Skin grafts complete.")
 	if(heal_toxin)
-		if(occupant.getToxLoss() > 0)
-			occupant.adjustToxLoss(-3)
+		if(occupant.get_tox_loss() > 0)
+			occupant.adjust_tox_loss(-3)
 			updating_health = TRUE
 			if(prob(10))
 				visible_message("[src] whirrs and gurgles as it kelates the occupant.")
@@ -189,7 +192,7 @@
 			heal_toxin = 0
 			say("Chelation complete.")
 	if(updating_health)
-		occupant.updatehealth()
+		occupant.update_health()
 
 /obj/machinery/autodoc/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount, damage_type, damage_flag, effects, armor_penetration, isrightclick)
 	if(!occupant)
@@ -235,15 +238,13 @@
 			if(length(L.wounds))
 				surgery_list += create_autodoc_surgery(L,LIMB_SURGERY,ADSURGERY_INTERNAL)
 
-			var/organdamagesurgery = 0
 			for(var/datum/internal_organ/I in L.internal_organs)
-				if(I.damage > 0)
-					if(I.slot == ORGAN_SLOT_EYES) // treat eye surgery differently
-						continue
-					if(organdamagesurgery > 0)
-						continue // avoid duplicates
-					surgery_list += create_autodoc_surgery(L,ORGAN_SURGERY,ADSURGERY_DAMAGE,0,I)
-					organdamagesurgery++
+				if(I.damage <= 0)
+					continue
+				if(I.slot == ORGAN_SLOT_EYES) // treat eye surgery differently
+					continue
+				surgery_list += create_autodoc_surgery(L,ORGAN_SURGERY,ADSURGERY_DAMAGE,0,I)
+				break
 
 			if(istype(L,/datum/limb/head))
 				var/datum/limb/head/H = L
@@ -259,11 +260,12 @@
 				surgery_list += create_autodoc_surgery(L,LIMB_SURGERY,ADSURGERY_NECRO)
 			var/skip_embryo_check = FALSE
 			if(length(L.implants))
-				for(var/I in L.implants)
-					if(!is_type_in_list(I,GLOB.known_implants))
-						surgery_list += create_autodoc_surgery(L,LIMB_SURGERY,ADSURGERY_SHRAPNEL)
-						if(L.body_part == CHEST)
-							skip_embryo_check = TRUE
+				for(var/obj/item/embedded AS in L.implants)
+					if(embedded.is_beneficial_implant())
+						continue
+					surgery_list += create_autodoc_surgery(L,LIMB_SURGERY,ADSURGERY_SHRAPNEL)
+					if(L.body_part == CHEST)
+						skip_embryo_check = TRUE
 			var/obj/item/alien_embryo/A = locate() in M
 			if(A && L.body_part == CHEST && !skip_embryo_check) //If we're not already doing a shrapnel removal surgery on the chest, add an extraction surgery to remove it
 				surgery_list += create_autodoc_surgery(L,LIMB_SURGERY,ADSURGERY_SHRAPNEL)
@@ -274,11 +276,11 @@
 	var/datum/internal_organ/I = M.get_organ_slot(ORGAN_SLOT_EYES)
 	if(I && (M.disabilities & NEARSIGHTED || M.disabilities & BLIND || I.damage > 0))
 		surgery_list += create_autodoc_surgery(null,ORGAN_SURGERY,ADSURGERY_EYES,0,I)
-	if(M.getBruteLoss() > 0)
+	if(M.get_brute_loss() > 0)
 		surgery_list += create_autodoc_surgery(null,EXTERNAL_SURGERY,ADSURGERY_BRUTE)
-	if(M.getFireLoss() > 0)
+	if(M.get_fire_loss() > 0)
 		surgery_list += create_autodoc_surgery(null,EXTERNAL_SURGERY,ADSURGERY_BURN)
-	if(M.getToxLoss() > 0)
+	if(M.get_tox_loss() > 0)
 		surgery_list += create_autodoc_surgery(null,EXTERNAL_SURGERY,ADSURGERY_TOXIN)
 	var/overdose = FALSE
 	for(var/datum/reagent/x in M.reagents.reagent_list)
@@ -520,7 +522,7 @@
 							break
 						S.limb_ref.robotize()
 						occupant.update_body()
-						occupant.updatehealth()
+						occupant.update_health()
 						occupant.UpdateDamageIcon()
 
 					if(ADSURGERY_NECRO)
@@ -564,12 +566,13 @@
 										occupant.status_flags &= ~XENO_HOST
 									qdel(A)
 						if(length(S.limb_ref.implants))
-							for(var/obj/item/I in S.limb_ref.implants)
+							for(var/obj/item/embedded AS in S.limb_ref.implants)
 								if(!surgery)
 									break
-								if(!is_type_in_list(I, GLOB.known_implants))
-									sleep(HEMOSTAT_REMOVE_MAX_DURATION*surgery_mod)
-									I.unembed_ourself(TRUE)
+								if(embedded.is_beneficial_implant())
+									continue
+								sleep(HEMOSTAT_REMOVE_MAX_DURATION*surgery_mod)
+								embedded.unembed_ourself(TRUE)
 						if(S.limb_ref.body_part == CHEST || S.limb_ref.body_part == HEAD)
 							close_encased(occupant, S.limb_ref)
 						if(!surgery)
@@ -655,7 +658,7 @@
 		L.createwound(CUT, 1)
 		L.clamp_bleeder() //Hemostat function, clamp bleeders
 		L.surgery_open_stage = 2 //Can immediately proceed to other surgery steps
-		target.updatehealth()
+		target.update_health()
 
 /obj/machinery/autodoc/proc/close_incision(mob/living/carbon/human/target, datum/limb/L)
 	if(target && L && 0 < L.surgery_open_stage <= 2)
@@ -665,7 +668,7 @@
 		L.surgery_open_stage = 0
 		L.germ_level = 0
 		L.remove_limb_flags(LIMB_BLEEDING)
-		target.updatehealth()
+		target.update_health()
 
 /obj/machinery/autodoc/proc/open_encased(mob/living/carbon/human/target, datum/limb/L)
 	if(target && L && L.surgery_open_stage >= 2)
@@ -695,7 +698,7 @@
 
 /obj/machinery/autodoc/verb/eject()
 	set name = "Eject Med-Pod"
-	set category = "Object.Mob"
+	set category = "IC.Mob"
 	set src in oview(1)
 	if(usr.incapacitated())
 		return // nooooooooooo
@@ -802,7 +805,7 @@
 
 /obj/machinery/autodoc/verb/move_inside()
 	set name = "Enter Med-Pod"
-	set category = "Object.Mob"
+	set category = "IC.Mob"
 	set src in oview(1)
 
 	move_inside_wrapper(usr, usr)
@@ -842,6 +845,8 @@
 
 /obj/machinery/autodoc/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 
 	if(!ishuman(user))
 		return // no
@@ -861,66 +866,62 @@
 		J.attack(occupant, user)
 		return
 
-	else if(!istype(I, /obj/item/grab))
+/obj/machinery/autodoc/grab_interact(obj/item/grab/grab, mob/user, base_damage = BASE_OBJ_SLAM_DAMAGE, is_sharp = FALSE)
+	. = ..()
+	if(.)
+		return
+	if(!ishuman(user))
 		return
 
 	if(machine_stat & (NOPOWER|BROKEN))
-		to_chat(user, span_notice("[src] is non-functional!"))
+		to_chat(user, span_notice("\ [src] is non-functional!"))
 		return
 
-	else if(occupant)
-		to_chat(user, span_notice("[src] is already occupied!"))
+	if(occupant)
+		to_chat(user, span_notice("\ [src] is already occupied!"))
 		return
 
-	if(!istype(I, /obj/item/grab))
-		return
+	var/mob/grabbed_mob
 
-	var/obj/item/grab/G = I
-
-	var/mob/M
-	if(ismob(G.grabbed_thing))
-		M = G.grabbed_thing
-	else if(istype(G.grabbed_thing, /obj/structure/closet/bodybag/cryobag))
-		var/obj/structure/closet/bodybag/cryobag/C = G.grabbed_thing
-		if(!C.bodybag_occupant)
+	if(ismob(grab.grabbed_thing))
+		grabbed_mob = grab.grabbed_thing
+	else if(istype(grab.grabbed_thing,/obj/structure/closet/bodybag/cryobag))
+		var/obj/structure/closet/bodybag/cryobag/cryobag = grab.grabbed_thing
+		if(!cryobag.bodybag_occupant)
 			to_chat(user, span_warning("The stasis bag is empty!"))
 			return
-		M = C.bodybag_occupant
-		C.open()
-		user.start_pulling(M)
+		grabbed_mob = cryobag.bodybag_occupant
+		cryobag.open()
+		user.start_pulling(grabbed_mob)
 
-	if(!M)
+	if(!grabbed_mob)
 		return
 
-	else if(!ishuman(M)) // stop fucking monkeys and xenos being put in. // MONKEEY IS FREE
-		to_chat(user, span_notice("[src] is compatible with humanoid anatomies only!"))
-		return
-
-	else if(M.abiotic())
+	if(grabbed_mob.abiotic())
 		to_chat(user, span_warning("Subject cannot have abiotic items on."))
 		return
 
 	if(user.skills.getRating(SKILL_SURGERY) < SKILL_SURGERY_TRAINED && !event)
-		user.visible_message(span_notice("[user] fumbles around figuring out how to put [M] into [src]."),
-		span_notice("You fumble around figuring out how to put [M] into [src]."))
+		user.visible_message(span_notice("[user] fumbles around figuring out how to put [grabbed_mob] into [src]."),
+		span_notice("You fumble around figuring out how to put [grabbed_mob] into [src]."))
 		var/fumbling_time = max(0 , SKILL_TASK_TOUGH - ( SKILL_TASK_EASY * user.skills.getRating(SKILL_SURGERY) ))// 8 secs non-trained, 5 amateur
-		if(!do_after(user, fumbling_time, NONE, M, BUSY_ICON_UNSKILLED) || QDELETED(src))
+		if(!do_after(user, fumbling_time, NONE, grabbed_mob, BUSY_ICON_UNSKILLED) || QDELETED(src))
 			return
 
-	visible_message("[user] starts putting [M] into [src].", 3)
+	visible_message("[user] starts putting [grabbed_mob] into [src].", 3)
 
-	if(!do_after(user, 10, IGNORE_HELD_ITEM, M, BUSY_ICON_GENERIC) || QDELETED(src))
+	if(!do_after(user, 10, IGNORE_HELD_ITEM, grabbed_mob, BUSY_ICON_GENERIC) || QDELETED(src))
 		return
 
 	if(occupant)
 		to_chat(user, span_notice("[src] is already occupied!"))
 		return
 
-	if(!M || !G)
+	if(!grabbed_mob || !grab)
 		return
 
-	M.forceMove(src)
-	occupant = M
+	grabbed_mob.forceMove(src)
+	occupant = grabbed_mob
 	update_icon()
 	var/implants = list(/obj/item/implant/neurostim)
 	var/mob/living/carbon/human/H = occupant
@@ -990,19 +991,19 @@
 	var/dat = ""
 
 	if(locked)
-		dat += "<hr>Lock Console</span> | <a href='?src=[text_ref(src)];locktoggle=1'>Unlock Console</a><BR>"
+		dat += "<hr>Lock Console</span> | <a href='byond://?src=[text_ref(src)];locktoggle=1'>Unlock Console</a><BR>"
 	else
-		dat += "<hr><a href='?src=[text_ref(src)];locktoggle=1'>Lock Console</a> | Unlock Console<BR>"
+		dat += "<hr><a href='byond://?src=[text_ref(src)];locktoggle=1'>Lock Console</a> | Unlock Console<BR>"
 
 	if(release_notice)
-		dat += "<hr>Notifications On</span> | <a href='?src=[text_ref(src)];noticetoggle=1'>Notifications Off</a><BR>"
+		dat += "<hr>Notifications On</span> | <a href='byond://?src=[text_ref(src)];noticetoggle=1'>Notifications Off</a><BR>"
 	else
-		dat += "<hr><a href='?src=[text_ref(src)];noticetoggle=1'>Notifications On</a> | Notifications Off<BR>"
+		dat += "<hr><a href='byond://?src=[text_ref(src)];noticetoggle=1'>Notifications On</a> | Notifications Off<BR>"
 
 	if(connected.automaticmode)
-		dat += "<hr>[span_notice("Automatic Mode")] | <a href='?src=[text_ref(src)];automatictoggle=1'>Manual Mode</a>"
+		dat += "<hr>[span_notice("Automatic Mode")] | <a href='byond://?src=[text_ref(src)];automatictoggle=1'>Manual Mode</a>"
 	else
-		dat += "<hr><a href='?src=[text_ref(src)];automatictoggle=1'>Automatic Mode</a> | Manual Mode"
+		dat += "<hr><a href='byond://?src=[text_ref(src)];automatictoggle=1'>Automatic Mode</a> | Manual Mode"
 
 	dat += "<hr><font color='#487553'><B>Occupant Statistics:</B></FONT><BR>"
 	if(!connected.occupant)
@@ -1030,10 +1031,10 @@
 	dat += "[health_ratio > 50 ? "<font color='#487553'>" : "<font color='#b54646'>"]\tHealth %: [round(health_ratio)] ([t1])</FONT><BR>"
 	var/pulse = connected.occupant.handle_pulse()
 	dat += "[pulse == PULSE_NONE || pulse == PULSE_THREADY ? "<font color='#b54646'>" : "<font color='#487553'>"]\t-Pulse, bpm: [connected.occupant.get_pulse(GETPULSE_TOOL)]</FONT><BR>"
-	dat += "[connected.occupant.getBruteLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Brute Damage %: [connected.occupant.getBruteLoss()]</FONT><BR>"
-	dat += "[connected.occupant.getOxyLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Respiratory Damage %: [connected.occupant.getOxyLoss()]</FONT><BR>"
-	dat += "[connected.occupant.getToxLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Toxin Content %: [connected.occupant.getToxLoss()]</FONT><BR>"
-	dat += "[connected.occupant.getFireLoss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Burn Severity %: [connected.occupant.getFireLoss()]</FONT><BR>"
+	dat += "[connected.occupant.get_brute_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Brute Damage %: [connected.occupant.get_brute_loss()]</FONT><BR>"
+	dat += "[connected.occupant.get_oxy_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Respiratory Damage %: [connected.occupant.get_oxy_loss()]</FONT><BR>"
+	dat += "[connected.occupant.get_tox_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Toxin Content %: [connected.occupant.get_tox_loss()]</FONT><BR>"
+	dat += "[connected.occupant.get_fire_loss() < 60 ? "<font color='#487553'>" : "<font color='#b54646'>"]\t-Burn Severity %: [connected.occupant.get_fire_loss()]</FONT><BR>"
 
 	dat += "<hr> Surgery Queue:<br>"
 
@@ -1114,10 +1115,10 @@
 				dat += "<br>"
 
 	dat += "<hr> Med-Pod Status: [operating] "
-	dat += "<hr><a href='?src=[text_ref(src)];clear=1'>Clear Surgery Queue</a>"
-	dat += "<hr><a href='?src=[text_ref(src)];refresh=1'>Refresh Menu</a>"
-	dat += "<hr><a href='?src=[text_ref(src)];surgery=1'>Begin Surgery Queue</a>"
-	dat += "<hr><a href='?src=[text_ref(src)];ejectify=1'>Eject Patient</a>"
+	dat += "<hr><a href='byond://?src=[text_ref(src)];clear=1'>Clear Surgery Queue</a>"
+	dat += "<hr><a href='byond://?src=[text_ref(src)];refresh=1'>Refresh Menu</a>"
+	dat += "<hr><a href='byond://?src=[text_ref(src)];surgery=1'>Begin Surgery Queue</a>"
+	dat += "<hr><a href='byond://?src=[text_ref(src)];ejectify=1'>Eject Patient</a>"
 	if(!connected.surgery)
 		if(connected.automaticmode)
 			dat += "<hr>Manual Surgery Interface Unavaliable, Automatic Mode Engaged."
@@ -1126,45 +1127,45 @@
 			dat += "<b>Trauma Surgeries</b>"
 			dat += "<br>"
 			if(isnull(surgeryqueue["brute"]))
-				dat += "<a href='?src=[text_ref(src)];brute=1'>Surgical Brute Damage Treatment</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];brute=1'>Surgical Brute Damage Treatment</a><br>"
 			if(isnull(surgeryqueue["burn"]))
-				dat += "<a href='?src=[text_ref(src)];burn=1'>Surgical Burn Damage Treatment</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];burn=1'>Surgical Burn Damage Treatment</a><br>"
 			dat += "<b>Orthopedic Surgeries</b>"
 			dat += "<br>"
 			if(isnull(surgeryqueue["broken"]))
-				dat += "<a href='?src=[text_ref(src)];broken=1'>Broken Bone Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];broken=1'>Broken Bone Surgery</a><br>"
 			if(isnull(surgeryqueue["internal"]))
-				dat += "<a href='?src=[text_ref(src)];internal=1'>Internal Bleeding Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];internal=1'>Internal Bleeding Surgery</a><br>"
 			if(isnull(surgeryqueue["shrapnel"]))
-				dat += "<a href='?src=[text_ref(src)];shrapnel=1'>Foreign Body Removal Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];shrapnel=1'>Foreign Body Removal Surgery</a><br>"
 			if(isnull(surgeryqueue["missing"]))
-				dat += "<a href='?src=[text_ref(src)];missing=1'>Limb Replacement Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];missing=1'>Limb Replacement Surgery</a><br>"
 			dat += "<b>Organ Surgeries</b>"
 			dat += "<br>"
 			if(isnull(surgeryqueue["organdamage"]))
-				dat += "<a href='?src=[text_ref(src)];organdamage=1'>Surgical Organ Damage Treatment</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];organdamage=1'>Surgical Organ Damage Treatment</a><br>"
 			if(isnull(surgeryqueue["organgerms"]))
-				dat += "<a href='?src=[text_ref(src)];organgerms=1'>Organ Infection Treatment</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];organgerms=1'>Organ Infection Treatment</a><br>"
 			if(isnull(surgeryqueue["eyes"]))
-				dat += "<a href='?src=[text_ref(src)];eyes=1'>Corrective Eye Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];eyes=1'>Corrective Eye Surgery</a><br>"
 			dat += "<b>Hematology Treatments</b>"
 			dat += "<br>"
 			if(isnull(surgeryqueue["blood"]))
-				dat += "<a href='?src=[text_ref(src)];blood=1'>Blood Transfer</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];blood=1'>Blood Transfer</a><br>"
 			if(isnull(surgeryqueue["toxin"]))
-				dat += "<a href='?src=[text_ref(src)];toxin=1'>Toxin Damage Chelation</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];toxin=1'>Toxin Damage Chelation</a><br>"
 			if(isnull(surgeryqueue["dialysis"]))
-				dat += "<a href='?src=[text_ref(src)];dialysis=1'>Dialysis</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];dialysis=1'>Dialysis</a><br>"
 			if(isnull(surgeryqueue["necro"]))
-				dat += "<a href='?src=[text_ref(src)];necro=1'>Necrosis Removal Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];necro=1'>Necrosis Removal Surgery</a><br>"
 			if(isnull(surgeryqueue["limbgerm"]))
-				dat += "<a href='?src=[text_ref(src)];limbgerm=1'>Limb Disinfection Procedure</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];limbgerm=1'>Limb Disinfection Procedure</a><br>"
 			dat += "<b>Special Surgeries</b>"
 			dat += "<br>"
 			if(isnull(surgeryqueue["facial"]))
-				dat += "<a href='?src=[text_ref(src)];facial=1'>Facial Reconstruction Surgery</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];facial=1'>Facial Reconstruction Surgery</a><br>"
 			if(isnull(surgeryqueue["open"]))
-				dat += "<a href='?src=[text_ref(src)];open=1'>Close Open Incision</a><br>"
+				dat += "<a href='byond://?src=[text_ref(src)];open=1'>Close Open Incision</a><br>"
 
 	var/datum/browser/popup = new(user, "autodoc", "<div align='center'>Autodoc Console</div>", 600, 600)
 	popup.set_content(dat)
@@ -1263,8 +1264,8 @@
 				var/datum/limb/L = i
 				var/skip_embryo_check = FALSE
 				var/obj/item/alien_embryo/A = locate() in connected.occupant
-				for(var/I in L.implants)
-					if(is_type_in_list(I, GLOB.known_implants))
+				for(var/obj/item/embedded AS in L.implants)
+					if(embedded.is_beneficial_implant())
 						continue
 					N.fields["autodoc_manual"] += create_autodoc_surgery(L, LIMB_SURGERY,ADSURGERY_SHRAPNEL)
 					needed++
@@ -1362,7 +1363,7 @@
 		if(!(R.fields["last_scan_time"]))
 			. += span_deptradio("No scan report on record")
 		else
-			. += span_deptradio("<a href='?src=[text_ref(src)];scanreport=1'>It contains [occupant]: Scan from [R.fields["last_scan_time"]].[active]</a>")
+			. += span_deptradio("<a href='byond://?src=[text_ref(src)];scanreport=1'>It contains [occupant]: Scan from [R.fields["last_scan_time"]].[active]</a>")
 		break
 
 /obj/machinery/autodoc/Topic(href, href_list)

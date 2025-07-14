@@ -125,9 +125,9 @@
 	REMOVE_TRAIT(owner, TRAIT_KNOCKEDOUT, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
-/datum/status_effect/incapacitating/unconscious/tick()
-	if(owner.getStaminaLoss())
-		owner.adjustStaminaLoss(-0.3) //reduce stamina loss by 0.3 per tick, 6 per 2 seconds
+/datum/status_effect/incapacitating/unconscious/tick(delta_time)
+	if(owner.get_stamina_loss())
+		owner.adjust_stamina_loss(-0.3) //reduce stamina loss by 0.3 per tick, 6 per 2 seconds
 
 //SLEEPING
 /datum/status_effect/incapacitating/sleeping
@@ -159,25 +159,25 @@
 	REMOVE_TRAIT(owner, TRAIT_KNOCKEDOUT, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
-/datum/status_effect/incapacitating/sleeping/tick()
-	if(owner.maxHealth)
-		var/health_ratio = owner.health / owner.maxHealth
-		var/healing = BASE_HEAL_RATE //set for a base of 0.25 healed per 2-second interval asleep in a bed with covers.
-		if((locate(/obj/structure/bed) in owner.loc))
-			healing += (2 * BASE_HEAL_RATE)
-		else if((locate(/obj/structure/table) in owner.loc))
-			healing += BASE_HEAL_RATE
-		for(var/obj/item/bedsheet/bedsheet in range(owner.loc,0))
-			if(bedsheet.loc != owner.loc) //bedsheets in your backpack/neck don't give you comfort
-				continue
-			healing += BASE_HEAL_RATE
-			break //Only count the first bedsheet
-		if(health_ratio > -0.5)
-			owner.adjustBruteLoss(healing)
-			owner.adjustFireLoss(healing)
-			owner.adjustToxLoss(healing * 0.5, TRUE, TRUE)
-			owner.adjustStaminaLoss(healing * 100)
-			owner.adjustCloneLoss(healing * health_ratio * 0.8)
+/datum/status_effect/incapacitating/sleeping/tick(delta_time)
+	if(!owner.maxHealth)
+		return
+	var/health_ratio = owner.health / owner.maxHealth
+	var/healing = BASE_HEAL_RATE //set for a base of 0.25 healed per 2-second interval asleep in a bed with covers.
+	if((locate(/obj/structure/bed) in owner.loc))
+		healing += (2 * BASE_HEAL_RATE)
+	else if((locate(/obj/structure/table) in owner.loc))
+		healing += BASE_HEAL_RATE
+	if(locate(/obj/item/bedsheet) in owner.loc)
+		healing += BASE_HEAL_RATE
+		if((locate(/obj/item/toy/plush) in owner.loc)) // plushie bonus in bed with a blanket
+			healing += 0.75 * BASE_HEAL_RATE // plushie bonus in bed with a blanket
+	if(health_ratio > -0.5)
+		owner.adjust_brute_loss(healing)
+		owner.adjust_fire_loss(healing)
+		owner.adjust_tox_loss(healing * 0.5, TRUE, TRUE)
+		owner.adjust_stamina_loss(healing * 100)
+		owner.adjust_clone_loss(healing * health_ratio * 0.8)
 	if(human_owner?.drunkenness)
 		human_owner.drunkenness *= 0.997 //reduce drunkenness by 0.3% per tick, 6% per 2 seconds
 	if(prob(20))
@@ -210,12 +210,12 @@
 	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
-/datum/status_effect/incapacitating/repair_mode/tick()
+/datum/status_effect/incapacitating/repair_mode/tick(delta_time)
 	var/sound_to_play
-	if(owner.getBruteLoss())
+	if(owner.get_brute_loss())
 		owner.heal_limb_damage(healing_per_tick, 0, TRUE, TRUE)
 		sound_to_play = 'sound/effects/robotrepair.ogg'
-	else if(owner.getFireLoss())
+	else if(owner.get_fire_loss())
 		owner.heal_limb_damage(0, healing_per_tick, TRUE, TRUE)
 		sound_to_play = 'sound/effects/robotrepair2.ogg'
 	if(!sound_to_play || last_sound)
@@ -364,7 +364,7 @@
 	else
 		CRASH("something applied plasmadrain on a nonxeno, dont do that")
 
-/datum/status_effect/plasmadrain/tick()
+/datum/status_effect/plasmadrain/tick(delta_time)
 	var/mob/living/carbon/xenomorph/xenoowner = owner
 	if(xenoowner.plasma_stored >= 0)
 		var/remove_plasma_amount = xenoowner.xeno_caste.plasma_max * 0.1
@@ -394,7 +394,7 @@
 	REMOVE_TRAIT(owner, TRAIT_NOPLASMAREGEN, TRAIT_STATUS_EFFECT(id))
 	return ..()
 
-/datum/status_effect/noplasmaregen/tick()
+/datum/status_effect/noplasmaregen/tick(delta_time)
 	to_chat(owner, span_warning("You feel too weak to summon new plasma..."))
 
 /datum/status_effect/incapacitating/harvester_slowdown
@@ -450,8 +450,8 @@
 	. = ..()
 	to_chat(new_owner, span_danger("The cold vacuum instantly freezes you, maybe this was a bad idea?"))
 
-/datum/status_effect/spacefreeze/tick()
-	owner.adjustFireLoss(40)
+/datum/status_effect/spacefreeze/tick(delta_time)
+	owner.adjust_fire_loss(40)
 
 /atom/movable/screen/alert/status_effect/spacefreeze
 	name = "Spacefreeze"
@@ -460,10 +460,11 @@
 /datum/status_effect/spacefreeze/light
 	id = "spacefreeze_light"
 
-/datum/status_effect/spacefreeze/light/tick()
+/datum/status_effect/spacefreeze/light/tick(delta_time)
+	owner.fire_stacks = max(owner.fire_stacks - 6, 0)
 	if(owner.stat == DEAD)
 		return
-	owner.adjustFireLoss(10)
+	owner.adjust_fire_loss(10)
 
 ///irradiated mob
 /datum/status_effect/incapacitating/irradiated
@@ -475,6 +476,9 @@
 	var/mob/living/carbon/carbon_owner
 
 /datum/status_effect/incapacitating/irradiated/on_creation(mob/living/new_owner, set_duration)
+	if(new_owner.status_flags & GODMODE || new_owner.stat == DEAD)
+		qdel(src)
+		return
 	. = ..()
 	if(.)
 		if(iscarbon(owner))
@@ -484,14 +488,14 @@
 	carbon_owner = null
 	return ..()
 
-/datum/status_effect/incapacitating/irradiated/tick()
+/datum/status_effect/incapacitating/irradiated/tick(delta_time)
 	var/mob/living/living_owner = owner
 	//Roulette of bad things
 	if(prob(15))
-		living_owner.adjustCloneLoss(2)
+		living_owner.adjust_clone_loss(2)
 		to_chat(living_owner, span_warning("You feel like you're burning from the inside!"))
 	else
-		living_owner.adjustToxLoss(3)
+		living_owner.adjust_tox_loss(3)
 	if(prob(15))
 		living_owner.adjust_Losebreath(5)
 	if(carbon_owner && prob(15))
@@ -521,19 +525,19 @@
 	var/obj/effect/abstract/particle_holder/particle_holder
 
 /datum/status_effect/stacking/intoxicated/can_gain_stacks()
-	if(owner.status_flags & GODMODE)
+	if(owner.status_flags & GODMODE || owner.stat == DEAD)
 		return FALSE
 	return ..()
 
 /datum/status_effect/stacking/intoxicated/on_creation(mob/living/new_owner, stacks_to_apply)
-	if(new_owner.status_flags & GODMODE)
+	if(new_owner.status_flags & GODMODE || new_owner.stat == DEAD)
 		qdel(src)
 		return
 	. = ..()
 	debuff_owner = new_owner
 	RegisterSignal(debuff_owner, COMSIG_LIVING_DO_RESIST, PROC_REF(call_resist_debuff))
 	debuff_owner.balloon_alert(debuff_owner, "Intoxicated")
-	playsound(debuff_owner.loc, "sound/bullets/acid_impact1.ogg", 30)
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 30)
 	particle_holder = new(debuff_owner, /particles/toxic_slash)
 	particle_holder.particles.spawning = 1 + round(stacks * 0.5)
 	particle_holder.pixel_x = -2
@@ -547,15 +551,15 @@
 	QDEL_NULL(particle_holder)
 	return ..()
 
-/datum/status_effect/stacking/intoxicated/tick()
+/datum/status_effect/stacking/intoxicated/tick(delta_time)
 	. = ..()
 	if(!debuff_owner)
 		return
 	if(HAS_TRAIT(debuff_owner, TRAIT_INTOXICATION_RESISTANT) || (debuff_owner.get_soft_armor(BIO) > 65))
 		stack_decay = 2
 	var/debuff_damage = SENTINEL_INTOXICATED_BASE_DAMAGE + round(stacks * 0.1)
-	debuff_owner.adjustFireLoss(debuff_damage)
-	playsound(debuff_owner.loc, "sound/bullets/acid_impact1.ogg", 4)
+	debuff_owner.adjust_fire_loss(debuff_damage)
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 4)
 	particle_holder.particles.spawning = 1 + round(stacks * 0.5)
 	if(stacks >= 20)
 		debuff_owner.adjust_slowdown(1)
@@ -582,6 +586,91 @@
 		resist_debuff() // We repeat ourselves as long as the debuff persists.
 		return
 
+// ***************************************
+// *********** Melting fire
+// ***************************************
+/datum/status_effect/stacking/melting_fire
+	id = "melting_fire"
+	tick_interval = 2 SECONDS
+	stack_decay = 1
+	stacks = 1
+	max_stacks = 10
+	consumed_on_threshold = FALSE
+	/// Owner of the debuff is limited to carbons.
+	var/mob/living/carbon/debuff_owner
+	/// Pyrogen creator of the debuff.
+	var/mob/living/carbon/xenomorph/debuff_creator
+	/// Used for the fire effect.
+	var/obj/vis_melt_fire/visual_fire
+
+/obj/vis_melt_fire
+	name = "ouch ouch ouch"
+	icon = 'icons/mob/OnFire.dmi'
+	layer = ABOVE_MOB_LAYER
+	vis_flags = VIS_INHERIT_DIR | VIS_INHERIT_ID | VIS_INHERIT_PLANE
+
+/datum/status_effect/stacking/melting_fire/on_creation(mob/living/new_owner, stacks_to_apply, atom/new_creator)
+	if(new_owner.status_flags & GODMODE || new_owner.stat == DEAD || new_owner.soft_armor.getRating(FIRE) >= 100)
+		qdel(src)
+		return
+	. = ..()
+	visual_fire = new
+	visual_fire.icon_state = "melting_low_stacks"
+	debuff_owner = new_owner
+	debuff_owner.vis_contents += visual_fire
+	debuff_owner.balloon_alert(debuff_owner, "Melting fire")
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 30)
+	RegisterSignal(debuff_owner, COMSIG_LIVING_DO_RESIST, PROC_REF(call_resist_debuff))
+
+/// on remove has owner set to null
+/datum/status_effect/stacking/melting_fire/on_remove()
+	owner.vis_contents -= visual_fire
+	debuff_owner = null
+	QDEL_NULL(visual_fire)
+	return ..()
+
+/datum/status_effect/stacking/melting_fire/tick(delta_time)
+	. = ..()
+	if(!debuff_owner)
+		qdel(src)
+		return
+	if(debuff_owner.stat == DEAD || debuff_owner.status_flags & GODMODE)
+		qdel(src)
+		return
+	debuff_owner.take_overall_damage(2.5 * stacks, BURN, FIRE, updating_health = TRUE)
+	if(stacks > 4)
+		visual_fire.icon_state = "melting_high_stacks"
+	else
+		visual_fire.icon_state = "melting_low_stacks"
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 4)
+
+	if(QDELETED(debuff_creator) || debuff_creator.stat == DEAD)
+		return
+	debuff_creator.heal_xeno_damage(2, FALSE)
+	debuff_creator.gain_plasma(5, TRUE)
+
+/// Called when the debuff's owner uses the Resist action for this debuff.
+/datum/status_effect/stacking/melting_fire/proc/call_resist_debuff()
+	SIGNAL_HANDLER
+	INVOKE_ASYNC(src, PROC_REF(resist_debuff)) // grilled cheese sandwich
+
+/// Resisting the debuff will allow the debuff's owner to remove some stacks from themselves.
+/datum/status_effect/stacking/melting_fire/proc/resist_debuff()
+	if(!debuff_owner)
+		qdel(src)
+		return
+	if(length(debuff_owner.do_actions))
+		return
+	debuff_owner.spin(30, 1.5)
+	add_stacks(-4)
+	debuff_owner.Paralyze(3 SECONDS)
+	if(stacks > 0)
+		debuff_owner.visible_message(span_danger("[debuff_owner] rolls on the floor, trying to put themselves out!"), \
+		span_notice("You stop, drop, and roll!"), null, 5)
+		return
+	debuff_owner.visible_message(span_danger("[debuff_owner] has successfully extinguished themselves!"), \
+	span_notice("You extinguish yourself."), null, 5)
+	qdel(src)
 
 // ***************************************
 // *********** dread
@@ -602,7 +691,7 @@
 	duration = set_duration
 	return ..()
 
-/datum/status_effect/dread/tick()
+/datum/status_effect/dread/tick(delta_time)
 	. = ..()
 	var/mob/living/living_owner = owner
 	living_owner.do_jitter_animation(250)
@@ -637,12 +726,12 @@
 	var/obj/effect/abstract/particle_holder/particle_holder
 
 /datum/status_effect/stacking/melting/can_gain_stacks()
-	if(owner.status_flags & GODMODE)
+	if(owner.status_flags & GODMODE || owner.stat == DEAD)
 		return FALSE
 	return ..()
 
 /datum/status_effect/stacking/melting/on_creation(mob/living/new_owner, stacks_to_apply)
-	if(new_owner.status_flags & GODMODE)
+	if(new_owner.status_flags & GODMODE || new_owner.stat == DEAD)
 		qdel(src)
 		return
 	if(new_owner.has_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING))
@@ -651,7 +740,7 @@
 	. = ..()
 	debuff_owner = new_owner
 	debuff_owner.balloon_alert(debuff_owner, "Melting!")
-	playsound(debuff_owner.loc, "sound/bullets/acid_impact1.ogg", 30)
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 30)
 	particle_holder = new(debuff_owner, /particles/melting_status)
 	particle_holder.particles.spawning = 1 + round(stacks * 0.5)
 
@@ -660,12 +749,12 @@
 	QDEL_NULL(particle_holder)
 	return ..()
 
-/datum/status_effect/stacking/melting/tick()
+/datum/status_effect/stacking/melting/tick(delta_time)
 	. = ..()
 	if(!debuff_owner)
 		return
 
-	playsound(debuff_owner.loc, "sound/bullets/acid_impact1.ogg", 4)
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 4)
 	particle_holder.particles.spawning = 1 + round(stacks * 0.5)
 
 	debuff_owner.apply_damage(STATUS_EFFECT_MELTING_DAMAGE, BURN, null, FIRE)
@@ -719,17 +808,17 @@
 	COOLDOWN_DECLARE(cooldown_microwave_status)
 
 /datum/status_effect/stacking/microwave/can_gain_stacks()
-	if(owner.status_flags & GODMODE)
+	if(owner.status_flags & GODMODE || owner.stat == DEAD)
 		return FALSE
 	return ..()
 
 /datum/status_effect/stacking/microwave/on_creation(mob/living/new_owner, stacks_to_apply)
-	if(new_owner.status_flags & GODMODE)
+	if(new_owner.status_flags & GODMODE || new_owner.stat == DEAD)
 		qdel(src)
 		return
 	debuff_owner = new_owner
 	debuff_owner.balloon_alert(debuff_owner, "microwaved!")
-	playsound(debuff_owner.loc, "sound/bullets/acid_impact1.ogg", 30)
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 30)
 	particle_holder = new(debuff_owner, /particles/microwave_status)
 	COOLDOWN_START(src, cooldown_microwave_status, MICROWAVE_STATUS_DURATION)
 	return ..()
@@ -745,7 +834,7 @@
 	if(stacks_added > 0 && stacks >= max_stacks) //proc is run even if stacks are not actually added
 		COOLDOWN_START(src, cooldown_microwave_status, MICROWAVE_STATUS_DURATION)
 
-/datum/status_effect/stacking/microwave/tick()
+/datum/status_effect/stacking/microwave/tick(delta_time)
 	. = ..()
 	if(COOLDOWN_CHECK(src, cooldown_microwave_status))
 		return qdel(src)
@@ -753,9 +842,9 @@
 	if(!debuff_owner)
 		return
 
-	playsound(debuff_owner.loc, "sound/bullets/acid_impact1.ogg", 4)
+	playsound(debuff_owner.loc, 'sound/bullets/acid_impact1.ogg', 4)
 
-	debuff_owner.adjustFireLoss(stacks * MICROWAVE_STATUS_DAMAGE_MULT * (debuff_owner.mob_size > MOB_SIZE_HUMAN ? 1 : 0.5)) //this shreds humans otherwise
+	debuff_owner.adjust_fire_loss(stacks * MICROWAVE_STATUS_DAMAGE_MULT * (debuff_owner.mob_size > MOB_SIZE_HUMAN ? 1 : 0.5)) //this shreds humans otherwise
 
 /atom/movable/screen/alert/status_effect/microwave
 	name = "Microwave"
@@ -797,7 +886,7 @@
 	var/obj/effect/abstract/particle_holder/particle_holder
 
 /datum/status_effect/shatter/on_creation(mob/living/new_owner, set_duration)
-	if(new_owner.status_flags & GODMODE)
+	if(new_owner.status_flags & GODMODE || new_owner.stat == DEAD)
 		qdel(src)
 		return
 

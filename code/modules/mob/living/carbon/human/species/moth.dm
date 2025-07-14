@@ -1,14 +1,11 @@
 /datum/species/moth
 	name = "Moth"
-	name_plural = "Moth"
 	icobase = 'icons/mob/human_races/r_moth.dmi'
 	default_language_holder = /datum/language_holder/moth
 	eyes = "blank_eyes"
-	speech_verb_override = "flutters"
 	count_human = TRUE
 
 	species_flags = HAS_LIPS|HAS_NO_HAIR
-	preferences = list("moth_wings" = "Wings")
 
 	screams = list(NEUTER = 'sound/voice/moth_scream.ogg')
 	paincries = list(NEUTER = 'sound/voice/human/male/pain_3.ogg')
@@ -61,3 +58,7 @@
 	. = ..()
 	H.remove_overlay(MOTH_WINGS_LAYER)
 	H.remove_underlay(MOTH_WINGS_BEHIND_LAYER)
+
+/datum/species/moth/handle_post_spawn(mob/living/carbon/human/H)
+	. = ..()
+	H.moth_wings = pick(GLOB.moth_wings_list - "Burnt Off")

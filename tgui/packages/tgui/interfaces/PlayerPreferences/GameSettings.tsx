@@ -1,11 +1,12 @@
-import { useBackend } from '../../backend';
 import {
   Button,
   ColorBox,
   LabeledList,
   Section,
   Stack,
-} from '../../components';
+} from 'tgui-core/components';
+
+import { useBackend } from '../../backend';
 import {
   LoopingSelectionPreference,
   SelectFieldPreference,
@@ -62,18 +63,18 @@ export const GameSettings = (props) => {
                 rightLabel={'Use on both hands'}
               />
               <ToggleFieldPreference
-                label="Mute xeno health alert messages"
-                value="mute_xeno_health_alert_messages"
-                action="mute_xeno_health_alert_messages"
-                leftLabel={'Muted'}
-                rightLabel={'Enabled'}
-              />
-              <ToggleFieldPreference
                 label="Fullscreen mode"
                 value="fullscreen_mode"
                 action="fullscreen_mode"
                 leftLabel={'Fullscreen'}
                 rightLabel={'Windowed'}
+              />
+              <ToggleFieldPreference
+                label="Status Bar (Bottom left text)"
+                value="show_status_bar"
+                action="show_status_bar"
+                leftLabel={'Show'}
+                rightLabel={'Hide'}
               />
               <ToggleFieldPreference
                 label="TGUI Window Mode"
@@ -203,6 +204,15 @@ export const GameSettings = (props) => {
                 leftValue={0}
                 leftLabel={'Enabled'}
                 rightValue={1}
+                rightLabel={'Disabled'}
+              />
+              <ToggleFieldPreference
+                label="Show xeno rank"
+                value="show_xeno_rank"
+                action="show_xeno_rank"
+                leftValue={1}
+                leftLabel={'Enabled'}
+                rightValue={0}
                 rightLabel={'Disabled'}
               />
             </LabeledList>

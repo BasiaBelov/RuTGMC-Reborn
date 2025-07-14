@@ -1,15 +1,13 @@
-
-
 //turfs with density = TRUE
 /turf/closed
 	density = TRUE
 	opacity = TRUE
-
-///Base state, for icon_state updates.
+	baseturfs = /turf/open/floor/plating
+	/// Base state, for icon_state updates.
 	var/walltype
-	///The neighbours
+	/// The neighbours
 	var/junctiontype = NONE
-	///used for plasmacutter deconstruction
+	/// used for plasmacutter deconstruction
 	var/open_turf_type = /turf/open/floor/plating
 
 /turf/closed/Initialize(mapload)
@@ -24,35 +22,52 @@
 	AM.turf_collision(src, speed)
 	return TRUE
 
+/// Cordon turf marking z-level boundaries and surrounding reservations
+/turf/closed/cordon
+	name = "world border"
+	icon = 'icons/turf/shuttle.dmi'
+	icon_state = "pclosed"
+	layer = ABOVE_TURF_LAYER
+	baseturfs = /turf/closed/cordon
+
+/// Used as placeholder turf when something went really wrong, as per /tg/ string lists handler
+/turf/closed/cordon/debug
+	name = "debug turf"
+	desc = "This turf shouldn't be here and probably result of incorrect turf replacement. Adminhelp about it or report it in an issue."
+	color = "#660088"
+	baseturfs = /turf/closed/cordon/debug
+
 /turf/closed/mineral
 	name = "rock"
 	icon = 'icons/turf/walls.dmi'
 	icon_state = "rock"
+	baseturfs = /turf/open/floor/plating/ground/desertdam/cave/inner_cave_floor
 	open_turf_type = /turf/open/floor/plating/ground/desertdam/cave/inner_cave_floor
 	minimap_color = MINIMAP_BLACK
 	resistance_flags = UNACIDABLE
 
 /turf/closed/mineral/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_ROCK, -10, 5, 1)
+	AddElement(/datum/element/debris, DEBRIS_ROCK, -40, 5, 1)
 
 /turf/closed/mineral/Initialize(mapload)
 	. = ..()
 	for(var/direction in GLOB.cardinals)
 		var/turf/turf_to_check = get_step(src, direction)
-		if(!isnull(turf_to_check) && !turf_to_check.density)
-			var/image/rock_side = image(icon, "[icon_state]_side", dir = REVERSE_DIR(direction))
-			switch(direction)
-				if(NORTH)
-					rock_side.pixel_y += world.icon_size
-				if(SOUTH)
-					rock_side.pixel_y -= world.icon_size
-				if(EAST)
-					rock_side.pixel_x += world.icon_size
-				if(WEST)
-					rock_side.pixel_x -= world.icon_size
-			if(!isspaceturf(turf_to_check))
-				minimap_color = MINIMAP_SOLID
-			overlays += rock_side
+		if(isnull(turf_to_check) || turf_to_check.density)
+			continue
+		var/image/rock_side = image(icon, "[icon_state]_side", dir = REVERSE_DIR(direction))
+		switch(direction)
+			if(NORTH)
+				rock_side.pixel_y += world.icon_size
+			if(SOUTH)
+				rock_side.pixel_y -= world.icon_size
+			if(EAST)
+				rock_side.pixel_x += world.icon_size
+			if(WEST)
+				rock_side.pixel_x -= world.icon_size
+		if(!isspaceturf(turf_to_check))
+			minimap_color = MINIMAP_SOLID
+		overlays += rock_side
 
 /turf/closed/mineral/attack_alien(mob/living/carbon/xenomorph/xeno_user, isrightclick = FALSE)
 	. = ..()
@@ -77,7 +92,7 @@
 	if(CHECK_BITFIELD(resistance_flags, PLASMACUTTER_IMMUNE) || CHECK_BITFIELD(resistance_flags, INDESTRUCTIBLE))
 		to_chat(user, span_warning("[I] can't cut through this!"))
 		return FALSE
-	if(!I.powered || (I.flags_item & NOBLUDGEON))
+	if(!I.powered || (I.item_flags & NOBLUDGEON))
 		return FALSE
 	if(!I.start_cut(user, name, src))
 		return FALSE
@@ -86,7 +101,7 @@
 
 	I.cut_apart(user, name, src)
 	// Change targetted turf to a new one to simulate deconstruction.
-	ChangeTurf(open_turf_type)
+	change_turf(open_turf_type)
 	return TRUE
 
 /turf/closed/mineral/smooth
@@ -100,6 +115,7 @@
 	canSmoothWith = list(SMOOTH_GROUP_MINERAL_STRUCTURES)
 
 /turf/closed/mineral/smooth/outdoor
+	baseturfs = /turf/open/floor/plating/ground/mars/random/dirt
 	open_turf_type = /turf/open/floor/plating/ground/mars/random/dirt
 
 /turf/closed/mineral/smooth/indestructible
@@ -162,12 +178,10 @@
 
 /turf/closed/mineral/bigred
 	name = "rock"
-	icon = 'icons/turf/walls.dmi'
 	icon_state = "redrock" //big red does not currently have its own 3/4ths cave tileset, so it uses the old one without smoothing
 
 /turf/closed/mineral/indestructible
 	name = "impenetrable rock"
-	icon = 'icons/turf/walls.dmi'
 	icon_state = "rock_dark"
 	resistance_flags = RESIST_ALL
 
@@ -179,15 +193,34 @@
 	color = "#c9a37b"
 	walltype = "cave"
 	base_icon_state = "cave"
+
 /turf/closed/mineral/smooth/desertdamrockwall/indestructible
 	resistance_flags = RESIST_ALL
 	icon_state = "wall-invincible"
 
-/turf/closed/mineral/brock
-	name = "basalt rock"
-	icon = 'icons/turf/lava.dmi'
-	icon_state = "brock"
-	open_turf_type = /turf/open/lavaland/basalt
+//basalt mineral wall
+/turf/closed/mineral/smooth/basalt
+	icon = 'icons/turf/walls/basaltwall.dmi'
+	icon_state = "basaltwall-0"
+	base_icon_state = "basaltwall"
+
+/turf/closed/mineral/smooth/basalt/indestructible
+	resistance_flags = RESIST_ALL
+	icon_state = "wall-invincible"
+
+//new wall for lava maps
+/turf/closed/mineral/smooth/lavawall
+	icon = 'icons/turf/walls/lava_wall.dmi'
+	icon_state = "lava_wall-0"
+	walltype = "lava_wall"
+	base_icon_state = "lava_wall"
+
+/turf/closed/mineral/smooth/lavawall/indestructible
+	resistance_flags = RESIST_ALL
+	icon_state = "wall-invincible"
+
+/turf/closed/mineral/smooth/lavawall/outdoor
+	open_turf_type = /turf/open/floor/plating/ground/mars/random/dirt
 
 //Ground map dense jungle
 /turf/closed/gm
@@ -200,20 +233,20 @@
 	canSmoothWith = list(SMOOTH_GROUP_FLORA)
 	base_icon_state = "junglewall"
 	walltype = "junglewall"
+	baseturfs = /turf/open/ground/jungle/clear
 	open_turf_type = /turf/open/ground/jungle/clear
 
 /turf/closed/gm/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_LEAF, -10, 5)
+	AddElement(/datum/element/debris, DEBRIS_LEAF, -40, 5)
 
 /turf/closed/gm/tree
 	name = "dense jungle trees"
 	icon_state = "jungletree"
 	desc = "Some thick jungle trees."
 
-	//Not yet
 /turf/closed/gm/ex_act(severity)
 	if(severity >= EXPLODE_DEVASTATE)
-		ChangeTurf(/turf/open/ground/grass)
+		change_turf(/turf/open/ground/grass/weedable)
 
 /turf/closed/gm/dense
 	name = "dense jungle wall"
@@ -235,7 +268,6 @@
 	base_icon_state = "pwall"
 	icon_state = "pwall"
 	icon = 'icons/turf/shuttle.dmi'
-
 
 /turf/closed/brock/Initialize(mapload)
 	. = ..()
@@ -261,10 +293,11 @@
 	icon = 'icons/turf/icewall.dmi'
 	icon_state = "Single"
 	desc = "It is very thick."
+	baseturfs = /turf/open/floor/plating/ground/ice
 	open_turf_type = /turf/open/floor/plating/ground/ice
 
 /turf/closed/ice/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_SNOW, -10, 5, 1)
+	AddElement(/datum/element/debris, DEBRIS_SNOW, -40, 5, 1)
 
 /turf/closed/ice/single
 	icon_state = "Single"
@@ -343,10 +376,11 @@
 	name = "Icy rock"
 	icon = 'icons/turf/rockwall.dmi'
 	resistance_flags = PLASMACUTTER_IMMUNE|UNACIDABLE
+	baseturfs = /turf/open/floor/plating/ground/ice
 	open_turf_type = /turf/open/floor/plating/ground/ice
 
 /turf/closed/ice_rock/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_SNOW, -10, 5, 1)
+	AddElement(/datum/element/debris, DEBRIS_SNOW, -40, 5, 1)
 
 /turf/closed/ice_rock/single
 	icon_state = "single"
@@ -408,7 +442,7 @@
 	resistance_flags = PLASMACUTTER_IMMUNE
 
 /turf/closed/shuttle/add_debris_element()
-	AddElement(/datum/element/debris, DEBRIS_SPARKS, -15, 8, 1)
+	AddElement(/datum/element/debris, DEBRIS_SPARKS, -40, 8, 1)
 
 /turf/closed/shuttle/re_corner/notdense
 	icon_state = "re_cornergrass"
@@ -461,6 +495,9 @@
 	icon = 'icons/turf/ert_shuttle.dmi'
 	icon_state = "stan4"
 	plane = GAME_PLANE
+
+/turf/closed/shuttle/ert/engines
+	name = "engine"
 
 /turf/closed/shuttle/ert/engines/left
 	icon_state = "leftengine_1"
@@ -830,6 +867,7 @@
 	opacity = FALSE
 
 /turf/closed/shuttle/dropship2/rearcorner/tadpole
+	name = "\improper Tadpole"
 	icon_state = "shuttle_rearcorner"
 	resistance_flags = NONE
 
@@ -837,8 +875,19 @@
 	icon_state = "shuttle_rearcorner_alt"
 
 /turf/closed/shuttle/dropship2/rearcorner/alt/tadpole
+	name = "\improper Tadpole"
 	icon_state = "shuttle_rearcorner_alt"
 	resistance_flags = NONE
+
+/turf/closed/shuttle/dropship2/cornersalt/tadpole
+	name = "\improper Tadpole"
+	icon_state = "tadpole_interior_corner"
+	icon = 'icons/turf/tadpole.dmi'
+	resistance_flags = NONE
+	opacity = FALSE
+
+/turf/closed/shuttle/dropship2/cornersalt/tadpole/alt
+	icon_state = "tadpole_interior_corner_alt"
 
 /turf/closed/shuttle/dropship2/transparent
 	opacity = FALSE

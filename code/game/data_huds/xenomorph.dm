@@ -13,6 +13,16 @@
 		hud.remove_from_hud(src)
 
 /mob/living/carbon/xenomorph/med_hud_set_health()
+	if(hud_used?.healths)
+		if(stat != DEAD)
+			if(health < 0)
+				hud_used.healths.icon_state = "health0"
+			else
+				var/amount = round(health * 100 / maxHealth, 5)
+				hud_used.healths.icon_state = "health[amount]"
+		else
+			hud_used.healths.icon_state = "health_dead"
+
 	var/image/holder = hud_list[HEALTH_HUD_XENO]
 	if(!holder)
 		return
@@ -26,28 +36,8 @@
 		amount = -1 //don't want the 'zero health' icon when we are crit
 	holder.icon_state = "xenohealth[amount]"
 
-/mob/living/carbon/xenomorph/hivemind/med_hud_set_health()
-	var/image/holder = hud_list[HEALTH_HUD_XENO]
-	if(!holder)
-		return
-
-	holder.icon = 'icons/mob/hud/xeno_health.dmi'
-	if(status_flags & INCORPOREAL)
-		holder.icon_state = "xenohealth0"
-		return
-
-	var/amount = round(health * 100 / maxHealth, 10)
-	if(!amount)
-		amount = 1 //don't want the 'zero health' icon when we still have 4% of our health
-	holder.icon_state = "xenohealth0"
-	holder.icon_state = "xenohealth[amount]"
-
 /mob/living/carbon/xenomorph/med_hud_set_status()
 	hud_set_pheromone()
-
-/// Hiveminds specifically have no status hud element
-/mob/living/carbon/xenomorph/hivemind/med_hud_set_status()
-	return
 
 ///Set sunder on the hud
 /mob/living/carbon/xenomorph/proc/hud_set_sunder()
@@ -86,8 +76,15 @@
 			holder.icon_state = "firestack4"
 
 /mob/living/carbon/xenomorph/proc/hud_set_plasma()
-	if(!xeno_caste) // usually happens because hud ticks before New() finishes.
+	if(!xeno_caste) // this is cringe that we need this but currently its called before caste is set on init
 		return
+	if(hud_used?.alien_plasma_display)
+		if(stat != DEAD)
+			var/amount = round(plasma_stored * 100 / xeno_caste.plasma_max, 5)
+			hud_used.alien_plasma_display.icon_state = "power_display_[amount]"
+		else
+			hud_used.alien_plasma_display.icon_state = "power_display_0"
+
 	var/image/holder = hud_list[PLASMA_HUD]
 	if(!holder)
 		return
@@ -142,7 +139,7 @@
 	if(hive.living_xeno_queen.observed_xeno == src)
 		holder.icon = 'icons/mob/hud/xeno_misc.dmi'
 		holder.icon_state = "queen_overwatch"
-	if(queen_chosen_lead)
+	if(xeno_flags & XENO_LEADER)
 		var/image/I = image('icons/mob/hud/xeno_misc.dmi',src, "leader")
 		holder.overlays += I
 	hud_list[QUEEN_OVERWATCH_HUD] = holder
@@ -163,10 +160,12 @@
 	holder.icon_state = ""
 	if(stat == DEAD)
 		return
-	if(playtime_as_number() > 0)
-		holder.icon = 'icons/mob/hud/xeno_misc.dmi'
-		holder.icon_state = "upgrade[playtime_as_number()]"
-
+	if(playtime_as_number() <= 0)
+		return
+	if(!client.prefs.show_xeno_rank)
+		return
+	holder.icon = 'icons/mob/hud/xeno_misc.dmi'
+	holder.icon_state = "upgrade[playtime_as_number()]"
 	hud_list[XENO_RANK_HUD] = holder
 
 /mob/living/carbon/xenomorph/proc/hud_update_primo()

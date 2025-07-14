@@ -2,13 +2,15 @@
 	name = "equipment attach point"
 	desc = "A place where heavy equipment can be installed with a powerloader."
 	anchored = TRUE
-	icon = 'icons/Marine/mainship_props.dmi'
+	icon = 'icons/obj/structures/mainship_props.dmi'
 	icon_state = "equip_base"
 	layer = ABOVE_OBJ_LAYER
 	dir = NORTH
 	density = TRUE
-	var/base_category //what kind of equipment this base accepts.
-	var/ship_tag //used to associate the base to a dropship.
+	/// what kind of equipment this base accepts.
+	var/base_category
+	/// used to associate the base to a dropship.
+	var/ship_tag
 	/// offset in pixels when equipment is attached
 	var/equipment_offset_x = 0
 	///y offset in pixels when attached
@@ -49,15 +51,15 @@
 	installed_equipment = loaded_equipment
 	loaded_equipment.ship_base = src
 
-	for(var/obj/docking_port/mobile/marine_dropship/S in SSshuttle.dropships)
-		if(S.id == ship_tag)
+	for(var/obj/docking_port/mobile/marine_dropship/S in SSshuttle.dropship_list)
+		if(S.shuttle_id == ship_tag)
 			loaded_equipment.linked_shuttle = S
 			S.equipments += loaded_equipment
 			break
 
 	loaded_equipment.pixel_x = equipment_offset_x
 	loaded_equipment.pixel_y = equipment_offset_y
-	loaded_equipment.shuttleRotate(dir2angle(dir)) // i dont know why rotation wasnt taken in account when this was made
+	loaded_equipment.shuttle_rotate(dir2angle(dir)) // i dont know why rotation wasnt taken in account when this was made
 
 	loaded_equipment.update_equipment()
 
@@ -77,7 +79,7 @@
 /obj/effect/attach_point/weapon/cas
 	ship_tag = SHUTTLE_CAS_DOCK
 	base_category = DROPSHIP_WEAPON_CAS
-	icon = 'icons/Marine/casship.dmi'
+	icon = 'icons/obj/structures/cas/ship.dmi'
 	icon_state = "15"
 
 /obj/effect/attach_point/weapon/cas/left
@@ -127,7 +129,7 @@
 
 /obj/effect/attach_point/fuel
 	name = "engine system attach point"
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	icon_state = "fuel_base"
 	base_category = DROPSHIP_FUEL_EQP
 
@@ -155,7 +157,7 @@
 /obj/structure/dropship_equipment
 	density = TRUE
 	anchored = TRUE
-	icon = 'icons/Marine/mainship_props.dmi'
+	icon = 'icons/obj/structures/mainship_props.dmi'
 	climbable = TRUE
 	layer = ABOVE_OBJ_LAYER //so they always appear above attach points when installed
 	resistance_flags = XENO_DAMAGEABLE
@@ -262,7 +264,7 @@
 				linked_console.selected_equipment = null
 	update_equipment()
 
-/obj/structure/dropship_equipment/beforeShuttleMove(turf/newT, rotation, move_mode, obj/docking_port/mobile/moving_dock)
+/obj/structure/dropship_equipment/before_shuttle_move(turf/newT, rotation, move_mode, obj/docking_port/mobile/moving_dock)
 	. = ..()
 	on_launch()
 
@@ -312,6 +314,8 @@
 
 /obj/structure/dropship_equipment/shuttle/flare_launcher/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(istype(I, /obj/item/explosive/grenade/flare) && stored_amount < max_amount)
 		stored_amount++
 		user.balloon_alert(user, "You insert a flare, remaining flares [stored_amount].")
@@ -360,6 +364,7 @@
 		var/obj/new_gun = new sentry_type(src)
 		deployed_turret = new_gun.loc
 		RegisterSignal(deployed_turret, COMSIG_QDELETING, PROC_REF(clean_refs))
+	deployed_turret.set_on(FALSE)
 
 /obj/structure/dropship_equipment/shuttle/sentry_holder/Destroy()
 	deployed_turret = null
@@ -405,7 +410,7 @@
 		if(deployed_turret)
 			deployed_turret.setDir(dir)
 			if(linked_shuttle && deployed_turret.camera)
-				if(linked_shuttle.id == SHUTTLE_ALAMO)
+				if(linked_shuttle.shuttle_id == SHUTTLE_ALAMO)
 					deployed_turret.camera.network.Add("dropship1") //accessible via the dropship camera console
 				else
 					deployed_turret.camera.network.Add("dropship2")
@@ -507,12 +512,12 @@
 
 /obj/structure/dropship_equipment/shuttle/weapon_holder/CanAllowThrough(atom/movable/mover, turf/target)
 	. = ..()
-	if(held_deployable.loc != src)
+	if(held_deployable?.loc != src)
 		return TRUE
 
 /obj/structure/dropship_equipment/shuttle/weapon_holder/machinegun
 	name = "machinegun deployment system"
-	desc = "A box that deploys a modified M56D crewserved machine gun. Fits on the crewserved weapon attach points of dropships. You need a powerloader to lift it."
+	desc = "A box that deploys a modified HSG-102 crewserved machine gun. Fits on the crewserved weapon attach points of dropships. You need a powerloader to lift it."
 	icon_state = "mg_system"
 	point_cost = 250
 	deployable_type = /obj/item/weapon/gun/hsg102/hsg_nest
@@ -543,7 +548,7 @@
 ////////////////////////////////// FUEL EQUIPMENT /////////////////////////////////
 
 /obj/structure/dropship_equipment/fuel
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	equip_category = DROPSHIP_FUEL_EQP
 
 
@@ -558,7 +563,6 @@
 		bound_width = initial(bound_width)
 		bound_height = initial(bound_height)
 		icon_state = initial(icon_state)
-
 
 ///////////////////////////////////// ELECTRONICS /////////////////////////////////////////
 
@@ -630,7 +634,7 @@
 
 /obj/structure/dropship_equipment/cas/weapon
 	name = "abstract weapon"
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	equip_category = DROPSHIP_WEAPON_CAS
 	bound_width = 32
 	bound_height = 64
@@ -664,8 +668,6 @@
 		. += ammo_equipped.show_loaded_desc(user)
 		return
 	. += "It's empty."
-
-
 
 /obj/structure/dropship_equipment/cas/weapon/proc/deplete_ammo()
 	if(ammo_equipped)
@@ -753,7 +755,7 @@
 	name = "unguided rocket pod"
 	icon_state = "unguided_rocket"
 	desc = "an unguided high-explosive rocket pod. Moving this will require some sort of lifter."
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	firing_sound = 'sound/weapons/unguided_rocket.ogg'
 	firing_delay = 2
 	point_cost = 450
@@ -780,7 +782,7 @@
 	name = "minirocket pod"
 	icon_state = "minirocket_pod"
 	desc = "A mini rocket pod capable of launching six laser-guided mini rockets. Moving this will require some sort of lifter."
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	firing_sound = 'sound/weapons/gunship_rocketpod.ogg'
 	firing_delay = 10 //1 seconds
 	point_cost = 450
@@ -805,7 +807,7 @@
 	name = "laser beam gun"
 	icon_state = "laser_beam"
 	desc = "State of the art technology recently acquired by the TGMC, it fires a battery-fed pulsed laser beam at near lightspeed setting on fire everything it touches. Moving this will require some sort of lifter."
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	firing_sound = 'sound/weapons/gunship_laser.ogg'
 	firing_delay = 50 //5 seconds
 	point_cost = 750
@@ -822,13 +824,11 @@
 		else
 			icon_state = "laser_beam"
 
-
-
 /obj/structure/dropship_equipment/cas/weapon/launch_bay //This isn't printable, so having it under CAS shouldn't cause issues
 	name = "launch bay"
 	icon_state = "launch_bay"
 	desc = "A launch bay to drop special ordnance. Fits inside the dropship's crew weapon emplacement. Moving this will require some sort of lifter."
-	icon = 'icons/Marine/mainship_props.dmi'
+	icon = 'icons/obj/structures/mainship_props.dmi'
 	firing_sound = 'sound/weapons/guns/fire/gunshot.ogg'
 	firing_delay = 10 //1 seconds
 	equip_category = DROPSHIP_CREW_WEAPON //fits inside the central spot of the dropship
@@ -838,11 +838,10 @@
 	. = ..()
 	if(ammo_equipped?.ammo_count)
 		icon_state = "launch_bay_loaded"
+	else if(ship_base)
+		icon_state = "launch_bay"
 	else
-		if(ship_base)
-			icon_state = "launch_bay"
-		else
-			icon_state = "launch_bay"
+		icon_state = "launch_bay"
 
 //////////////// OTHER EQUIPMENT /////////////////
 
@@ -886,7 +885,7 @@
 	name = "bomb pod"
 	icon_state = "bomb_pod"
 	desc = "A bomb pod capable of launching several large bombs. Moving this will require some sort of lifter."
-	icon = 'icons/Marine/mainship_props64.dmi'
+	icon = 'icons/obj/structures/mainship_props64.dmi'
 	firing_sound = 'sound/weapons/bombdrop_sound.ogg'
 	firing_delay = 2 SECONDS
 	point_cost = 450

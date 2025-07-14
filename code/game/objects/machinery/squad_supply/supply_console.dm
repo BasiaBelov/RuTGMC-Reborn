@@ -7,6 +7,7 @@
 	screen_overlay = "supplydrop_screen"
 	interaction_flags = INTERACT_MACHINE_TGUI
 	circuit = /obj/item/circuitboard/computer/supplydrop
+	faction = FACTION_TERRAGOV
 	///Time between two supply drops
 	var/launch_cooldown = 30 SECONDS
 	///The beacon we will send the supplies
@@ -19,8 +20,6 @@
 	var/x_offset = 0
 	///Y offset of the drop, relative to the supply beacon loc
 	var/y_offset = 0
-	///Faction of this drop console
-	var/faction = FACTION_TERRAGOV
 	COOLDOWN_DECLARE(next_fire)
 	///Reference to the balloon vis obj effect
 	var/atom/movable/vis_obj/fulton_balloon/balloon
@@ -30,6 +29,7 @@
 	. = ..()
 	balloon = new()
 	holder_obj = new()
+	RegisterSignal(SSdcs, COMSIG_GLOB_SUPPLY_BEACON_CREATED, PROC_REF(ping_beacon))
 	return INITIALIZE_HINT_LATELOAD
 
 /obj/machinery/computer/supplydrop_console/LateInitialize()
@@ -38,6 +38,11 @@
 		if(_supply_pad.faction == faction)
 			supply_pad = _supply_pad
 			return
+
+/// Used to notify of a new beacon target
+/obj/machinery/computer/supplydrop_console/proc/ping_beacon()
+	SIGNAL_HANDLER
+	playsound(src,'sound/machines/terminal_prompt_confirm.ogg', 50, TRUE)
 
 /obj/machinery/computer/supplydrop_console/Destroy()
 	supply_beacon = null
@@ -73,7 +78,13 @@
 
 	switch(action)
 		if("select_beacon")
-			var/datum/supply_beacon/supply_beacon_choice = GLOB.supply_beacon[tgui_input_list(ui.user, "Select the beacon to send supplies", "Beacon choice", GLOB.supply_beacon)]
+			var/list/beacon_list = GLOB.supply_beacon.Copy()
+			for(var/beacon_name in beacon_list)
+				var/datum/supply_beacon/beacon = beacon_list[beacon_name]
+				if(!is_ground_level(beacon.drop_location.z))
+					beacon_list -= beacon_name
+					continue
+			var/datum/supply_beacon/supply_beacon_choice = beacon_list[tgui_input_list(ui.user, "Select the beacon to send supplies", "Beacon choice", beacon_list)]
 			if(!istype(supply_beacon_choice))
 				return
 			supply_beacon = supply_beacon_choice
@@ -180,7 +191,7 @@
 		visible_message("[icon2html(supply_pad, usr)] [span_warning("Launch aborted! No deployable object detected on the drop pad.")]")
 		return
 
-	supply_beacon.drop_location.visible_message(span_boldnotice("A supply drop appears suddendly!"))
+	supply_beacon.drop_location.visible_message(span_boldnotice("A supply drop appears suddenly!"))
 	playsound(supply_beacon.drop_location,'sound/effects/tadpolehovering.ogg', 30, TRUE)
 	playsound(supply_pad.loc,'sound/effects/phasein.ogg', 50, TRUE)
 	for(var/obj/C in supplies)

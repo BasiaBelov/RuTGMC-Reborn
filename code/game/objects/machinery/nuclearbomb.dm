@@ -13,10 +13,10 @@
 	density = TRUE
 	anchored = TRUE
 	coverage = 20
-	flags_atom = CRITICAL_ATOM
+	atom_flags = CRITICAL_ATOM
 	resistance_flags = RESIST_ALL
 	layer = BELOW_MOB_LAYER
-	interaction_flags = INTERACT_OBJ_UI
+	interaction_flags = INTERACT_MACHINE_TGUI
 	var/deployable = TRUE
 	var/extended = FALSE
 	var/lighthack = FALSE
@@ -50,27 +50,32 @@
 
 /obj/machinery/nuclearbomb/Destroy()
 	if(timer_enabled)
-		disable()
+		disable("[src] deletion" )
 	GLOB.nuke_list -= src
 	QDEL_NULL(countdown)
 	return ..()
 
 ///Enables nuke timer
-/obj/machinery/nuclearbomb/proc/enable()
+/obj/machinery/nuclearbomb/proc/enable(mob/reason)
 	GLOB.active_nuke_list += src
 	countdown.start()
-	notify_ghosts("[usr] enabled the [src], it has [round(time MILLISECONDS)] seconds on the timer.", source = src, action = NOTIFY_ORBIT, extra_large = TRUE)
+	notify_ghosts("[reason] enabled the [src], it has [round(time MILLISECONDS)] seconds on the timer.", source = src, action = NOTIFY_ORBIT, extra_large = TRUE)
 	timer_enabled = TRUE
 	timer = addtimer(CALLBACK(src, PROC_REF(explode)), time, TIMER_STOPPABLE)
 	update_minimap_icon()
 	// The timer is needed for when the signal is sent
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_NUKE_START, src)
+	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_AI_MINION_RALLY, src)
+	log_game("[key_name(reason)] has enabled the nuke at [AREACOORD(src)]")
 
 ///Disables nuke timer
-/obj/machinery/nuclearbomb/proc/disable()
+/obj/machinery/nuclearbomb/proc/disable(mob/reason)
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_NUKE_STOP, src)
 	countdown.stop()
 	GLOB.active_nuke_list -= src
+	if(timer_enabled)
+		log_game("[key_name(reason)] has disabled the nuke at [AREACOORD(src)]")
+		message_admins("[key_name(reason)] has disabled the nuke at [ADMIN_VERBOSEJMP(src)]") //Incase disputes show up about marines griefing and the like.
 	timer_enabled = FALSE
 	if(timer)
 		deltimer(timer)
@@ -79,7 +84,7 @@
 
 ///Handles the boom
 /obj/machinery/nuclearbomb/proc/explode()
-	disable()
+	disable("[src] explosion")
 
 	if(safety)
 		return
@@ -99,10 +104,12 @@
 	machine_stat |= BROKEN
 	anchored = FALSE
 	if(timer_enabled)
-		disable()
+		disable("Alamo hijack")
 
 /obj/machinery/nuclearbomb/attackby(obj/item/I, mob/user, params)
 	. = ..()
+	if(.)
+		return
 	if(!extended)
 		return
 	if(!istype(I, /obj/item/disk/nuclear))
@@ -134,7 +141,7 @@
 	xeno_attacker.visible_message("[xeno_attacker] disabled the nuke",
 	"You disabled the nuke.")
 
-	disable()
+	disable(key_name(xeno_attacker))
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_NUKE_DIFFUSED, src, xeno_attacker)
 
 /obj/machinery/nuclearbomb/can_interact(mob/user)
@@ -257,10 +264,10 @@
 		return
 
 	if(!timer_enabled)
-		enable()
+		enable(user)
 		balloon_alert(user, "timer started")
 	else
-		disable()
+		disable(user)
 		balloon_alert(user, "timer stopped")
 
 	if(!lighthack)
@@ -276,7 +283,7 @@
 	safety = !safety
 	if(safety)
 		balloon_alert(user, "safety enabled")
-		disable()
+		disable(key_name(user))
 	else
 		balloon_alert(user, "safety disabled")
 
@@ -294,10 +301,12 @@
 	if(anchored)
 		balloon_alert(user, "anchored")
 		visible_message(span_warning("With a steely snap, bolts slide out of [src] and anchor it to the flooring."))
+		log_game("[user] has anchored the nuke at [AREACOORD(src)]")
 	else
 		balloon_alert(user, "unanchored")
 		visible_message(span_warning("The anchoring bolts slide back into the depths of [src]."))
-		disable()
+		disable(key_name(user))
+		log_game("[user] has unanchored the nuke at [AREACOORD(src)]")
 
 ///Handles disk insertion and removal
 /obj/machinery/nuclearbomb/proc/toggle_disk(mob/user, disk_colour)
@@ -361,14 +370,14 @@
 	density = TRUE
 	anchored = TRUE
 	coverage = 20
-	flags_atom = CRITICAL_ATOM
+	atom_flags = CRITICAL_ATOM
 	max_integrity = 1000
 	resistance_flags = XENO_DAMAGEABLE|PROJECTILE_IMMUNE|UNACIDABLE
 	layer = BELOW_MOB_LAYER
 
 /obj/structure/nuclearbomb/Initialize(mapload)
 	. = ..()
-	GLOB.last_stand_nukes += src
+	GLOB.nuclear_bombs += src
 
 /obj/structure/nuclearbomb/attacked_by(obj/item/I, mob/living/user, def_zone)
 	return FALSE
@@ -381,7 +390,7 @@
 	return ..()
 
 /obj/structure/nuclearbomb/Destroy()
-	GLOB.last_stand_nukes -= src
+	GLOB.nuclear_bombs -= src
 	return ..()
 
 #undef NUKE_STAGE_NONE

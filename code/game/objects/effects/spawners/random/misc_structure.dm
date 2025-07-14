@@ -20,7 +20,7 @@
 	spawn_loot_chance = 30
 	loot = list(
 		/obj/effect/spawner/random/engineering/wood = 6,
-		/obj/structure/barricade/wooden = 4,
+		/obj/structure/barricade/wood = 4,
 	)
 
 /obj/effect/spawner/random/misc/structure/closet
@@ -141,7 +141,7 @@
 		/obj/structure/closet/secure_closet/miner = 50,
 		/obj/structure/closet/secure_closet/scientist = 50,
 		/obj/structure/closet/secure_closet/engineering_electrical = 30,
-		/obj/structure/closet/secure_closet/CMO = 10,
+		/obj/structure/closet/secure_closet/cmo = 10,
 		/obj/structure/closet/secure_closet/RD = 10,
 		/obj/structure/closet/secure_closet/engineering_chief = 10,
 	)
@@ -300,7 +300,7 @@
 	icon_state = "random_wood_table"
 	spawn_loot_chance = 95
 	loot = list(
-		/obj/structure/table/woodentable = 99,
+		/obj/structure/table/wood = 99,
 		/obj/effect/spawner/random/engineering/wood = 1,
 	)
 

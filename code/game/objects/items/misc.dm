@@ -8,7 +8,7 @@
 	throw_speed = 1
 	throw_range = 4
 	w_class = WEIGHT_CLASS_SMALL
-	attack_verb = list("called", "rang")
+	attack_verb = list("calls", "rings")
 	hitsound = 'sound/weapons/ring.ogg'
 
 /obj/item/clock
@@ -31,7 +31,7 @@
 	desc = "A peel from a banana."
 	icon = 'icons/obj/items/harvest.dmi'
 	icon_state = "banana_peel"
-	item_state = "banana_peel"
+	worn_icon_state = "banana_peel"
 	w_class = WEIGHT_CLASS_TINY
 	throw_speed = 4
 	throw_range = 20
@@ -44,21 +44,21 @@
 	name = "gift"
 	desc = "A wrapped item."
 	icon = 'icons/obj/items/items.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/containers_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/containers_right.dmi',
 	)
 	icon_state = "gift3"
 	var/size = 3
 	var/obj/item/gift = null
-	item_state = "gift"
+	worn_icon_state = "gift"
 	w_class = WEIGHT_CLASS_BULKY
 
 /obj/item/staff
 	name = "wizards staff"
 	desc = "Apparently a staff used by the wizard."
 	icon = 'icons/obj/wizard.dmi'
-	item_icons = list(
+	worn_icon_list = list(
 		slot_l_hand_str = 'icons/mob/inhands/items/toys_left.dmi',
 		slot_r_hand_str = 'icons/mob/inhands/items/toys_right.dmi',
 	)
@@ -68,7 +68,7 @@
 	throw_speed = 1
 	throw_range = 5
 	w_class = WEIGHT_CLASS_SMALL
-	attack_verb = list("bludgeoned", "whacked", "disciplined")
+	attack_verb = list("bludgeons", "whacks", "disciplines")
 
 /obj/item/staff/broom
 	name = "broom"
@@ -82,7 +82,7 @@
 	icon = 'icons/obj/items/items.dmi'
 	icon_state = "skub"
 	w_class = WEIGHT_CLASS_BULKY
-	attack_verb = list("skubbed")
+	attack_verb = list("skubs")
 
 /obj/item/ectoplasm
 	name = "ectoplasm"
@@ -168,15 +168,18 @@
 	icon_state = "Koran"
 	deity_name = "Allah"
 	actions_types = list(/datum/action/item_action)
-	max_w_class = 3
-	storage_slots = 1
+
+/obj/item/storage/bible/koran/Initialize(mapload, ...)
+	. = ..()
+	storage_datum.max_w_class = 3
+	storage_datum.storage_slots = 1
 
 /obj/item/storage/bible/koran/attack_self(mob/living/carbon/human/activator)
 	TIMER_COOLDOWN_START(activator, "KoranSpam", 5 SECONDS)
 	if(TIMER_COOLDOWN_CHECK(activator, "Koran"))
 		activator.balloon_alert(activator, "Allah has already helped you")
 		if(TIMER_COOLDOWN_CHECK(activator, "KoranSpam"))
-			activator.adjustBrainLoss(1, TRUE)
+			activator.adjust_brain_loss(1, TRUE)
 			return
 		return
 	if(!((activator.religion == "Islam (Shia)") || (activator.religion == "Islam (Sunni)")))
@@ -189,8 +192,15 @@
 			cell_explosion(activator, 150, 150)
 		if(prob(80))
 			activator.heal_limb_damage(50, 50, TRUE)
-			activator.adjustCloneLoss(-10)
+			activator.adjust_clone_loss(-10)
 			activator.playsound_local(loc, 'sound/hallucinations/im_here1.ogg', 50)
 	else
 		activator.balloon_alert(activator, "This place is not sacred")
 
+/obj/item/rosary
+	name = "Rosary"
+	desc = "A small hematite-beaded silver rosary"
+	icon = 'icons/obj/items/items.dmi'
+	icon_state = "rosary"
+	worn_icon_state = "rosary"
+	w_class = WEIGHT_CLASS_TINY

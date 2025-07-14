@@ -4,6 +4,10 @@
 	interaction_flags = INTERACT_OBJ_DEFAULT
 	resistance_flags = NONE
 
+	/// Icon to use as a 32x32 preview in crafting menus and such
+	var/icon_preview
+	var/icon_state_preview
+
 	///damage amount to deal when this obj is attacking something
 	var/force = 0
 	///damage type to deal when this obj is attacking something
@@ -13,30 +17,26 @@
 
 	/// %-reduction-based armor.
 	var/datum/armor/soft_armor
-	/// Flat-damage-reduction-based armor.
+	///Modifies the AP of incoming attacks
 	var/datum/armor/hard_armor
-
-	var/obj_integrity	//defaults to max_integrity
+	///Object HP
+	var/obj_integrity
+	///Max object HP
 	var/max_integrity = 500
-	var/integrity_failure = 0 //0 if we have no special broken behavior
-	var/reliability = 100	//Used by SOME devices to determine how reliable they are.
-	var/crit_fail = 0
-
-	///throwforce needs to be at least 1 else it causes runtimes with shields
+	///Integrety below this number causes special behavior
+	var/integrity_failure = 0
+	///Base throw damage. Throwforce needs to be at least 1 else it causes runtimes with shields
 	var/throwforce = 1
-
+	///Object behavior flags
 	var/obj_flags = NONE
-	var/hit_sound //Sound this object makes when hit, overrides specific item hit sound.
-	var/destroy_sound //Sound this object makes when destroyed.
-
-	var/item_fire_stacks = 0	//How many fire stacks it applies
-
+	///Sound when hit
+	var/hit_sound
+	///Sound this object makes when destroyed
+	var/destroy_sound
+	///ID access where all are required to access this object
 	var/list/req_access = null
+	///ID access where any one is required to access this object
 	var/list/req_one_access = null
-
-	///Optimization for dynamic explosion block values, for things whose explosion block is dependent on certain conditions.
-	var/real_explosion_block
-
 	///Odds of a projectile hitting the object, if the object is dense
 	var/coverage = 50
 
@@ -80,6 +80,25 @@
 	soft_armor = null
 	return ..()
 
+/obj/examine_tags(mob/user)
+	. = ..()
+	if(resistance_flags & INDESTRUCTIBLE)
+		.["indestructible"] = "It's completely invulnerable to damage or complete destruction. Some objects still have special interactions for xenos."
+		return // we do not want to say it's indestructible and then list 500 fucktillion things that are implied by the word "indestructible"
+	if(resistance_flags & UNACIDABLE)
+		.["[isxeno(user) ? span_xenonotice("acid-proof") : "acid-proof"]"] = "Acid does not stick to or affect this object."
+	if(resistance_flags & PLASMACUTTER_IMMUNE)
+		.["plasma cutter-proof"] = "Plasma cutters cannot destroy this object."
+	if(!isitem(src) && (resistance_flags & PROJECTILE_IMMUNE))
+		.["projectile immune"] = "Projectiles cannot damage this object."
+	if(!isxeno(user) && !isobserver(user))
+		return // humans can check the codex for most of these- xenos should be able to know them "in the moment"
+	if(resistance_flags & CRUSHER_IMMUNE)
+		.[span_xenonotice("crusher-proof")] = "Charging Crushers can't damage this object."
+	if(resistance_flags & XENO_DAMAGEABLE)
+		.[span_xenonotice("slashable")] = "Xenomorphs can slash this object."
+	else if(!isitem(src))
+		.[span_xenonotice("not slashable")] = "Xenomorphs can't slash this object. Some objects, like airlocks, have special interactions when attacked."
 
 /obj/proc/setAnchored(anchorvalue)
 	SEND_SIGNAL(src, COMSIG_OBJ_SETANCHORED, anchorvalue)
@@ -113,7 +132,7 @@
 	. = ..()
 	if(.)
 		return
-	if((flags_atom & ON_BORDER) && !(get_dir(loc, target) & dir))
+	if((atom_flags & ON_BORDER) && !(get_dir(loc, target) & dir))
 		return TRUE
 	if((allow_pass_flags & PASS_DEFENSIVE_STRUCTURE) && (mover.pass_flags & PASS_DEFENSIVE_STRUCTURE))
 		return TRUE
@@ -145,7 +164,7 @@
 		return TRUE
 	if((allow_pass_flags & PASS_GLASS) && (mover.pass_flags & PASS_GLASS))
 		return NONE
-	if(!density || !(flags_atom & ON_BORDER) || !(direction & dir) || (mover.status_flags & INCORPOREAL))
+	if(!density || !(atom_flags & ON_BORDER) || !(direction & dir) || (mover.status_flags & INCORPOREAL))
 		return NONE
 
 	knownblockers += src
@@ -154,7 +173,7 @@
 ///Signal handler to check if you can move from one low object to another
 /obj/proc/can_climb_over(datum/source, atom/mover)
 	SIGNAL_HANDLER
-	if(!(flags_atom & ON_BORDER) && density)
+	if(!(atom_flags & ON_BORDER) && density)
 		return TRUE
 
 /obj/proc/updateUsrDialog()
@@ -237,6 +256,62 @@
 			return TRUE
 	return ..()
 
+/obj/vv_get_dropdown()
+	. = ..()
+	VV_DROPDOWN_OPTION("", "---------")
+	VV_DROPDOWN_OPTION(VV_HK_MASS_DEL_TYPE, "Delete all of type")
+	VV_DROPDOWN_OPTION(VV_HK_OSAY, "Object Say")
+
+/obj/vv_do_topic(list/href_list)
+	. = ..()
+
+	if(!.)
+		return
+
+	if(href_list[VV_HK_OSAY])
+		if(check_rights(R_FUN, FALSE))
+			SSadmin_verbs.dynamic_invoke_verb(usr, /datum/admin_verb/display_tags, src)
+
+	if(href_list[VV_HK_MASS_DEL_TYPE]) // todo why isnt this just invoking the delete all verb? or why have that one exist?
+		if(!check_rights(R_DEBUG|R_SERVER))
+			return
+		var/action_type = tgui_alert(usr, "Strict type ([type]) or type and all subtypes?",,list("Strict type","Type and subtypes","Cancel"))
+		if(action_type == "Cancel" || !action_type)
+			return
+
+		if(tgui_alert(usr, "Are you really sure you want to delete all objects of type [type]?",,list("Yes","No")) != "Yes")
+			return
+
+		if(tgui_alert(usr, "Second confirmation required. Delete?",,list("Yes","No")) != "Yes")
+			return
+
+		var/O_type = type
+		switch(action_type)
+			if("Strict type")
+				var/i = 0
+				for(var/obj/Obj in world)
+					if(Obj.type == O_type)
+						i++
+						qdel(Obj)
+					CHECK_TICK
+				if(!i)
+					to_chat(usr, "No objects of this type exist")
+					return
+				log_admin("[key_name(usr)] deleted all objects of type [O_type] ([i] objects deleted) ")
+				message_admins(span_notice("[key_name(usr)] deleted all objects of type [O_type] ([i] objects deleted) "))
+			if("Type and subtypes")
+				var/i = 0
+				for(var/obj/Obj in world)
+					if(istype(Obj,O_type))
+						i++
+						qdel(Obj)
+					CHECK_TICK
+				if(!i)
+					to_chat(usr, "No objects of this type exist")
+					return
+				log_admin("[key_name(usr)] deleted all objects of type or subtype of [O_type] ([i] objects deleted) ")
+				message_admins(span_notice("[key_name(usr)] deleted all objects of type or subtype of [O_type] ([i] objects deleted) "))
+
 ///Called to return an internally stored item, currently for the deployable element
 /obj/proc/get_internal_item()
 	return
@@ -276,6 +351,9 @@
 		if(!do_after(user, (fumble_time ? fumble_time : repair_time) * (skill_required - user.skills.getRating(SKILL_ENGINEER)), NONE, src, BUSY_ICON_BUILD))
 			return TRUE
 
+	if(user.skills.getRating(SKILL_ENGINEER) > skill_required)
+		repair_amount *= (1+(0.1*(user.skills.getRating(SKILL_ENGINEER) - (skill_required + 1))))
+
 	repair_time *= welder.toolspeed
 	balloon_alert_to_viewers("starting repair...")
 	handle_weldingtool_overlay()
@@ -304,12 +382,36 @@
 	handle_weldingtool_overlay(TRUE)
 	return TRUE
 
+/obj/grab_interact(obj/item/grab/grab, mob/user, base_damage = BASE_OBJ_SLAM_DAMAGE, is_sharp = FALSE)
+	if(isxeno(user))
+		return
+	if(user.a_intent != INTENT_HARM)
+		return
+	if(!isliving(grab.grabbed_thing))
+		return
+	if(user.grab_state <= GRAB_AGGRESSIVE)
+		to_chat(user, span_warning("You need a better grip to do that!"))
+		return
+
+	var/mob/living/grabbed_mob = grab.grabbed_thing
+	if(prob(15))
+		grabbed_mob.Paralyze(2 SECONDS)
+		user.drop_held_item()
+	step_towards(grabbed_mob, src)
+	var/damage = base_damage + (user.skills.getRating(SKILL_CQC) * CQC_SKILL_DAMAGE_MOD)
+	grabbed_mob.apply_damage(damage, BRUTE, "head", MELEE, is_sharp, updating_health = TRUE)
+	user.visible_message(span_danger("[user] slams [grabbed_mob]'s face against [src]!"),
+	span_danger("You slam [grabbed_mob]'s face against [src]!"))
+	log_combat(user, grabbed_mob, "slammed", "", "against \the [src]")
+	take_damage(damage, BRUTE, MELEE)
+	return TRUE
+
 /obj/plasmacutter_act(mob/living/user, obj/item/tool/pickaxe/plasmacutter/I)
 	if(user.do_actions)
 		return FALSE
 	if(!(obj_flags & CAN_BE_HIT) || CHECK_BITFIELD(resistance_flags, PLASMACUTTER_IMMUNE) || CHECK_BITFIELD(resistance_flags, INDESTRUCTIBLE))
 		return FALSE
-	if(!I.powered || (I.flags_item & NOBLUDGEON))
+	if(!I.powered || (I.item_flags & NOBLUDGEON))
 		return FALSE
 	if(user.a_intent == INTENT_HARM) // Attack normally.
 		return FALSE
@@ -320,4 +422,27 @@
 
 	I.cut_apart(user, name, src)
 	deconstruct(FALSE)
+	return TRUE
+
+/obj/footstep_override(atom/movable/source, list/footstep_overrides)
+	footstep_overrides[FOOTSTEP_PLATING] = layer
+
+/obj/get_dumping_location()
+	return get_turf(src)
+
+/obj/proc/do_deploy(mob/user, turf/location)
+	if(!istype(location))
+		location = get_turf(src)
+	SEND_SIGNAL(src, COMSIG_ITEM_DEPLOY, user, location)
+
+///Dissassembles the device
+/obj/proc/disassemble(mob/user)
+	var/obj/item/internal_item = get_internal_item()
+	if(!internal_item)
+		return FALSE
+	if(internal_item.item_flags & DEPLOYED_NO_PICKUP)
+		if(user)
+			balloon_alert(user, "Cannot disassemble")
+		return FALSE
+	SEND_SIGNAL(src, COMSIG_ITEM_UNDEPLOY, user)
 	return TRUE

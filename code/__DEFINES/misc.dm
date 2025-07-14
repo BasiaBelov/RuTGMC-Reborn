@@ -13,11 +13,6 @@
 //Force the config directory to be something other than "config"
 #define OVERRIDE_CONFIG_DIRECTORY_PARAMETER "config-directory"
 
-// Consider these images/atoms as part of the UI/HUD
-#define APPEARANCE_UI_IGNORE_ALPHA (RESET_COLOR|RESET_TRANSFORM|NO_CLIENT_COLOR|RESET_ALPHA|PIXEL_SCALE)
-#define APPEARANCE_UI (RESET_COLOR|RESET_TRANSFORM|NO_CLIENT_COLOR|PIXEL_SCALE)
-#define APPEARANCE_UI_TRANSFORM (RESET_COLOR|NO_CLIENT_COLOR|RESET_ALPHA|PIXEL_SCALE)
-
 //dirt type for each turf types.
 #define NO_DIRT 0
 #define DIRT_TYPE_GROUND 1
@@ -40,16 +35,6 @@
 #define SHOES_TIED 1
 #define SHOES_KNOTTED 2
 
-//subtypesof(), typesof() without the parent path
-#define subtypesof(typepath) ( typesof(typepath) - typepath )
-
-/// Takes a datum as input, returns its ref string
-#define text_ref(datum) ref(datum)
-
-/// A null statement to guard against EmptyBlock lint without necessitating the use of pass()
-/// Used to avoid proc-call overhead. But use sparingly. Probably pointless in most places.
-#define EMPTY_BLOCK_GUARD ;
-
 #define RESIZE_DEFAULT_SIZE 1
 
 GLOBAL_VAR_INIT(global_unique_id, 1)
@@ -70,13 +55,6 @@ GLOBAL_VAR_INIT(global_unique_id, 1)
 #define SHELLEO_ERRORLEVEL 1
 #define SHELLEO_STDOUT 2
 #define SHELLEO_STDERR 3
-
-//different types of atom colorations
-#define ADMIN_COLOUR_PRIORITY 1 //only used by rare effects like greentext coloring mobs and when admins varedit color
-#define TEMPORARY_COLOUR_PRIORITY 2 //e.g. purple effect of the revenant on a mob, black effect when mob electrocuted
-#define WASHABLE_COLOUR_PRIORITY 3 //color splashed onto an atom (e.g. paint on turf)
-#define FIXED_COLOUR_PRIORITY 4 //color inherent to the atom (e.g. blob color)
-#define COLOUR_PRIORITY_AMOUNT 4 //how many priority levels there are.
 
 //Dummy mob reserve slots
 #define DUMMY_HUMAN_SLOT_PREFERENCES "dummy_preference_preview"
@@ -153,10 +131,3 @@ GLOBAL_VAR_INIT(global_unique_id, 1)
 
 // shorter way to write as anything
 #define AS as anything
-
-// What kind of function to use for Explosions falling off.
-#define EXPLOSION_FALLOFF_SHAPE_LINEAR 1
-#define EXPLOSION_FALLOFF_SHAPE_EXPONENTIAL 2
-#define EXPLOSION_FALLOFF_SHAPE_EXPONENTIAL_HALF 3
-
-#define EXPLOSION_MAX_POWER 5000
