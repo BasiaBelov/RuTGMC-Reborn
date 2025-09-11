@@ -164,7 +164,7 @@
 	integrity_failure = 50
 	soft_armor = list(MELEE = 35, BULLET = 30, LASER = 20, ENERGY = 40, BOMB = 25, BIO = 50, FIRE = 0, ACID = 30)
 	slowdown = 0.3
-	item_flags = IS_DEPLOYABLE
+	deploy_flags = IS_DEPLOYABLE
 	strappable = FALSE
 	///The item this deploys into
 	var/deployable_item = /obj/structure/barricade/solid/deployable
@@ -233,6 +233,11 @@
 /datum/action/ability/activable/weapon_skill/shield_bash/remove_action(mob/living/carbon/carbon_owner)
 	. = ..()
 	UnregisterSignal(carbon_owner, COMSIG_MOB_MOUSEDOWN)
+
+/datum/action/ability/activable/weapon_skill/shield_bash/ai_should_use(atom/target)
+	if(get_dist(owner, target) > 1)
+		return FALSE
+	return ..()
 
 /datum/action/ability/activable/weapon_skill/shield_bash/use_ability(atom/A)
 	succeed_activate()

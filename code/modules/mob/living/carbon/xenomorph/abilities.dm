@@ -252,15 +252,15 @@
 /// Extra handling for adding the action for draggin functionality (for instant building)
 /datum/action/ability/activable/xeno/secrete_resin/give_action(mob/living/L)
 	. = ..()
-	if(!(CHECK_BITFIELD(SSticker?.mode?.round_type_flags, MODE_ALLOW_XENO_QUICKBUILD) || !SSresinshaping.active))
+	if(!CHECK_BITFIELD(SSticker?.mode?.round_type_flags, MODE_ALLOW_XENO_QUICKBUILD))
 		return
-
+	if(!SSresinshaping.active)
+		return
 	var/mutable_appearance/build_maptext = mutable_appearance(icon = null,icon_state = null, layer = ACTION_LAYER_MAPTEXT)
 	build_maptext.pixel_x = 12
 	build_maptext.pixel_y = -5
 	build_maptext.maptext = MAPTEXT(SSresinshaping.get_building_points(owner))
 	visual_references[VREF_MUTABLE_BUILDING_COUNTER] = build_maptext
-
 	RegisterSignal(owner, COMSIG_MOB_MOUSEDOWN, PROC_REF(start_resin_drag))
 	RegisterSignal(owner, COMSIG_MOB_MOUSEDRAG, PROC_REF(preshutter_resin_drag))
 	RegisterSignal(owner, COMSIG_MOB_MOUSEUP, PROC_REF(stop_resin_drag))
@@ -276,9 +276,10 @@
 	return ..()
 
 /datum/action/ability/activable/xeno/secrete_resin/update_button_icon()
-	var/atom/A = xeno_owner.selected_resin
-	action_icon_state = initial(A.name)
-	if(!is_gameplay_level(xeno_owner.loc.z))
+	if(xeno_owner)
+		var/atom/A = xeno_owner.selected_resin
+		action_icon_state = initial(A.name)
+	if(!is_gameplay_level(xeno_owner?.loc?.z))
 		return ..() // prevents runtimes
 	if(SSmonitor.gamestate == SHUTTERS_CLOSED && CHECK_BITFIELD(SSticker.mode?.round_type_flags, MODE_ALLOW_XENO_QUICKBUILD) && SSresinshaping.active)
 		button.cut_overlay(visual_references[VREF_MUTABLE_BUILDING_COUNTER])
@@ -765,11 +766,13 @@
 	owner.AddComponent(/datum/component/automatedfire/autofire, get_cooldown(), _fire_mode = GUN_FIREMODE_AUTOMATIC,  _callback_reset_fire = CALLBACK(src, PROC_REF(reset_fire)), _callback_fire = CALLBACK(src, PROC_REF(fire)))
 
 /datum/action/ability/activable/xeno/xeno_spit/remove_action(mob/living/L)
+	clean_target()
 	qdel(owner.GetComponent(/datum/component/automatedfire/autofire))
 	return ..()
 
 /datum/action/ability/activable/xeno/xeno_spit/update_button_icon()
-	action_icon_state = "[initial(xeno_owner.ammo.icon_state)]"
+	if(xeno_owner)
+		action_icon_state = "[initial(xeno_owner.ammo.icon_state)]"
 	return ..()
 
 /datum/action/ability/activable/xeno/xeno_spit/action_activate()
@@ -812,7 +815,7 @@
 	return ..()
 
 /datum/action/ability/activable/xeno/xeno_spit/use_ability(atom/A)
-	if(!owner.GetComponent(/datum/component/ai_controller)) //If its not an ai it will register to listen for clicks instead of use this proc. We want to call start_fire from here only if the owner is an ai.
+	if(owner.client) //If its not an ai it will register to listen for clicks instead of use this proc. We want to call start_fire from here only if the owner is an ai.
 		return
 	start_fire(object = A, can_use_ability_flags = ABILITY_IGNORE_SELECTED_ABILITY)
 
@@ -877,7 +880,7 @@
 ///Cleans the current target in case of Hardel
 /datum/action/ability/activable/xeno/xeno_spit/proc/clean_target()
 	SIGNAL_HANDLER
-	current_target = get_turf(current_target)
+	current_target = null
 
 ///Stops the Autofire component and resets the current cursor.
 /datum/action/ability/activable/xeno/xeno_spit/proc/stop_fire()
@@ -1250,7 +1253,7 @@
 	playsound(xeno_owner, 'sound/magic/end_of_psy_drain.ogg', 40)
 
 	xeno_owner.visible_message(span_xenodanger("\The [victim]'s life force is drained by \the [xeno_owner]!"), \
-	span_xenodanger("We suddenly feel \the [victim]'s life force streaming into us!"))
+	span_xenodanger("We feel \the [victim]'s life force streaming into us!"))
 
 	victim.do_jitter_animation(2)
 	victim.adjust_clone_loss(20)
@@ -1265,6 +1268,9 @@
 		psy_points_reward = psy_points_reward * 3
 	SSpoints.add_psy_points(xeno_owner.hivenumber, psy_points_reward)
 	GLOB.round_statistics.psypoints_from_psydrain += psy_points_reward
+
+	if(xeno_owner.hivenumber != XENO_HIVE_NORMAL)
+		return
 
 	if(SSticker.mode && !CHECK_BITFIELD(SSticker.mode.xeno_abilities_flags, ABILITY_CRASH))
 		var/datum/job/xeno_job = SSjob.GetJobType(/datum/job/xenomorph)

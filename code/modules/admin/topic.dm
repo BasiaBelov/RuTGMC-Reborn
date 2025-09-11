@@ -271,8 +271,8 @@ Status: [status ? status : "Unknown"] | Damage: [health ? health : "None"]
 			if("getxenos")
 				log_admin("[key_name(usr)] mass-teleported all Xenos.")
 				message_admins("[ADMIN_TPMONTY(usr)] mass-teleported all Xenos.")
-				to_chat(GLOB.alive_xeno_list_hive[XENO_HIVE_NORMAL], span_userdanger("[key_name_admin(usr, FALSE)] mass-teleported all xenos."))
-				for(var/i in GLOB.alive_xeno_list_hive[XENO_HIVE_NORMAL])
+				to_chat(GLOB.xeno_mob_list, span_userdanger("[key_name_admin(usr, FALSE)] mass-teleported all xenos."))
+				for(var/i in GLOB.xeno_mob_list)
 					var/mob/M = i
 					M.forceMove(T)
 			if("getall")
@@ -449,7 +449,7 @@ Status: [status ? status : "Unknown"] | Damage: [health ? health : "None"]
 			if("synthetic")
 				newmob = M.change_mob_type(/mob/living/carbon/human/species/synthetic, location, null, delmob)
 			if("early_synth")
-				newmob = M.change_mob_type(/mob/living/carbon/human/species/early_synthetic, location, null, delmob)
+				newmob = M.change_mob_type(/mob/living/carbon/human/species/synthetic/early, location, null, delmob)
 			if("sectoid")
 				newmob = M.change_mob_type(/mob/living/carbon/human/species/sectoid, location, null, delmob)
 			if("vatborn")
@@ -1392,6 +1392,8 @@ Status: [status ? status : "Unknown"] | Damage: [health ? health : "None"]
 		browse_messages(target_ckey = target, agegate = agegate)
 
 	else if(href_list["showmessageckeylinkless"])
+		if(!check_rights(R_BAN))
+			return
 		var/target = href_list["showmessageckeylinkless"]
 		browse_messages(target_ckey = target, linkless = TRUE)
 
