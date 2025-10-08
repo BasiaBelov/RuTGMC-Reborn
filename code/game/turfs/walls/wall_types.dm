@@ -218,9 +218,6 @@
 	resistance_flags = RESIST_ALL
 	icon_state = "wall-invincible"
 
-/turf/closed/wall/sulaco/unmeltable/ex_act(severity) //Should make it indestructable
-	return
-
 /turf/closed/wall/sulaco/unmeltable/attackby(obj/item/I, mob/user, params) //This should fix everything else. No cables, etc
 	return
 
@@ -231,9 +228,6 @@
 	opacity = TRUE
 	resistance_flags = RESIST_ALL
 	smoothing_flags = NONE
-
-/turf/closed/wall/indestructible/ex_act(severity)
-	return
 
 /turf/closed/wall/indestructible/attackby(obj/item/I, mob/user, params)
 	if(istype(I, /obj/item/tool/pickaxe/plasmacutter)) //needed for user feedback, if not included the user will not receive a message when trying plasma cutter wall/indestructible turfs
@@ -263,7 +257,8 @@
 
 //todo this should be using immediate instead of New()
 INITIALIZE_IMMEDIATE(/turf/closed/wall/indestructible/splashscreen)
-/turf/closed/wall/indestructible/splashscreen/New()
+/turf/closed/wall/indestructible/splashscreen/Initialize(mapload, ...)
+	. = ..()
 	var/prefix = "icons/misc/lobby_art/"
 	var/list/lobby_art = flist(prefix)
 	if(!length(lobby_art))
@@ -354,8 +349,8 @@ INITIALIZE_IMMEDIATE(/turf/closed/wall/indestructible/splashscreen)
 /turf/closed/wall/vault
 	icon_state = "rockvault"
 
-/turf/closed/wall/vault/New(location,type)
-	..()
+/turf/closed/wall/vault/Initialize(mapload, type)
+	. = ..()
 	icon_state = "[type]vault"
 
 /turf/closed/wall/desertcavewall

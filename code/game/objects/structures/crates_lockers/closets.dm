@@ -64,7 +64,9 @@
 
 /obj/structure/closet/ex_act(severity)
 	take_damage(severity, BRUTE, BOMB)
-	if(!locked || prob(severity * 0.3))
+	if(locked)
+		return
+	if(prob(severity * 0.3))
 		break_open()
 		contents_explosion(severity)
 
@@ -448,7 +450,7 @@
 	icon_opened = "marine_open"
 	var/squad // to which squad this closet belongs to
 
-/obj/structure/closet/marine/Initialize()
+/obj/structure/closet/marine/Initialize(mapload)
 	. = ..()
 	if(squad)
 		icon_state = "[squad]_closed"

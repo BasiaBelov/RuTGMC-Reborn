@@ -66,7 +66,7 @@
 			return
 	return ..(user)
 
-/obj/machinery/door/airlock/Initialize()
+/obj/machinery/door/airlock/Initialize(mapload)
 	. = ..()
 	return INITIALIZE_HINT_LATELOAD
 
@@ -340,7 +340,7 @@
 	if(!issilicon(user) && isElectrified())
 		shock(user, 100)
 
-/obj/machinery/door/airlock/projectile_hit(obj/projectile/proj, cardinal_move, uncrossing)
+/obj/machinery/door/airlock/projectile_hit(atom/movable/projectile/proj, cardinal_move, uncrossing)
 	. = ..()
 	if(. && is_mainship_level(z) && proj.firer)
 		log_attack("[key_name(proj.firer)] shot [src] with [proj] at [AREACOORD(src)]")
@@ -354,13 +354,11 @@
 	create_shrapnel(get_turf(src), rand(2, 5), direction, shrapnel_type = /datum/ammo/bullet/shrapnel/light)
 
 /obj/machinery/door/airlock/get_explosion_resistance()
-	if(density)
-		if(CHECK_BITFIELD(resistance_flags, INDESTRUCTIBLE))
-			return EXPLOSION_MAX_POWER
-		else
-			return (max_integrity - (max_integrity - obj_integrity)) / EXPLOSION_DAMAGE_MULTIPLIER_DOOR
-	else
-		return FALSE
+	if(!density)
+		return 0
+	if(CHECK_BITFIELD(resistance_flags, INDESTRUCTIBLE))
+		return EXPLOSION_MAX_POWER
+	return (max_integrity - (max_integrity - obj_integrity)) / EXPLOSION_DAMAGE_MULTIPLIER_DOOR
 
 /obj/machinery/door/airlock/attack_facehugger(mob/living/carbon/xenomorph/facehugger/M, isrightclick = FALSE)
 	for(var/atom/movable/AM in get_turf(src))

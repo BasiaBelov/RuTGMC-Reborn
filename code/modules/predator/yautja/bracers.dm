@@ -521,7 +521,7 @@
 		anim(M.loc,M,'icons/mob/mob.dmi',,"cloak",,M.dir)
 
 //Any projectile can decloak a predator. It does defeat one free bullet though.
-/obj/item/clothing/gloves/yautja/proc/bullet_act_sim(mob/living/carbon/human/H, obj/projectile/proj)
+/obj/item/clothing/gloves/yautja/proc/bullet_act_sim(mob/living/carbon/human/H, atom/movable/projectile/proj)
 	var/ammo_flags = proj.ammo.ammo_behavior_flags
 	if(ammo_flags & (AMMO_SNIPER|AMMO_ENERGY|AMMO_XENO)) //<--- These will auto uncloak.
 		decloak(H) //Continue on to damage.
@@ -623,7 +623,7 @@
 
 	exploding = TRUE
 	var/turf/T = get_turf(src)
-	if(explosion_type == SD_TYPE_BIG && victim.stat == CONSCIOUS && (is_ground_level(T.z) || SSticker.mode.round_type_flags & MODE_SHIPSIDE_SD))
+	if(explosion_type == SD_TYPE_BIG && victim.stat == CONSCIOUS && is_ground_level(T.z))
 		playsound(src, 'sound/voice/predator/deathlaugh.ogg', 100, 0, 17)
 
 	playsound(src, 'sound/effects/pred_countdown.ogg', 100, 0, 17)
@@ -637,7 +637,7 @@
 		if(victim)
 			victim.gib() // kills the pred
 			qdel(victim)
-		if(explosion_type == SD_TYPE_BIG && (is_ground_level(T.z) || SSticker.mode.round_type_flags & MODE_SHIPSIDE_SD))
+		if(explosion_type == SD_TYPE_BIG && is_ground_level(T.z))
 			cell_explosion(T, 700, 100)
 		else
 			cell_explosion(T, 300, 100)

@@ -247,8 +247,9 @@
 	desc = "Some thick jungle trees."
 
 /turf/closed/gm/ex_act(severity)
-	if(severity >= EXPLODE_DEVASTATE)
-		change_turf(/turf/open/ground/grass/weedable)
+	if(severity < EXPLODE_DEVASTATE)
+		return
+	change_turf(/turf/open/ground/grass/weedable)
 
 /turf/closed/gm/dense
 	name = "dense jungle wall"
@@ -407,28 +408,28 @@
 /turf/closed/ice_rock/northWall
 	icon_state = "north_wall"
 
-/turf/closed/ice_rock/northWall/New()
+/turf/closed/ice_rock/northWall/Initialize(mapload)
 	. = ..()
 	setDir(pick(NORTH,SOUTH,EAST,WEST))
 
 /turf/closed/ice_rock/southWall
 	icon_state = "south_wall"
 
-/turf/closed/ice_rock/southWall/New()
+/turf/closed/ice_rock/southWall/Initialize(mapload)
 	. = ..()
 	setDir(pick(NORTH,SOUTH,EAST,WEST))
 
 /turf/closed/ice_rock/westWall
 	icon_state = "west_wall"
 
-/turf/closed/ice_rock/westWall/New()
+/turf/closed/ice_rock/westWall/Initialize(mapload)
 	. = ..()
 	setDir(pick(NORTH,SOUTH,EAST,WEST))
 
 /turf/closed/ice_rock/eastWall
 	icon_state = "east_wall"
 
-/turf/closed/ice_rock/eastWall/New()
+/turf/closed/ice_rock/eastWall/Initialize(mapload)
 	. = ..()
 	setDir(pick(NORTH,SOUTH,EAST,WEST))
 
