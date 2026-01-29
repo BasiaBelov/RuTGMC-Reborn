@@ -206,6 +206,7 @@
 		wearer.adjust_stamina_loss(-7 * stamina_regen_amp * ((20 - (vali_necro_timer) * 0.1) * 0.05)) //stamina gain scales inversely with passed time, up to 20 seconds
 	if(vali_necro_timer > 10 SECONDS)
 		to_chat(wearer, span_bold("WARNING: You have [(200 - (vali_necro_timer)) * 0.1] seconds before necrotic tissue forms on your limbs."))
+		playsound(get_turf(wearer), 'sound/effects/vali_alarm.ogg', 60, 0)
 	if(vali_necro_timer > 15 SECONDS)
 		wearer.overlay_fullscreen("degeneration", /atom/movable/screen/fullscreen/animated/infection, 1)
 		to_chat(wearer, span_userdanger("The process of necrosis begins to set in. Turn it off before it's too late!"))
@@ -275,6 +276,7 @@
 					break
 		UnregisterSignal(wearer, COMSIG_MOB_DEATH, PROC_REF(on_off))
 		wearer.balloon_alert(wearer, "Halting green blood injection")
+		playsound(get_turf(wearer), 'sound/effects/vali_off.ogg', 60, 0)
 		COOLDOWN_START(src, chemboost_activation_cooldown, 10 SECONDS)
 		setup_bonus_effects()
 		return
@@ -282,7 +284,7 @@
 	processing_start = world.time
 	START_PROCESSING(SSobj, src)
 	RegisterSignal(wearer, COMSIG_MOB_DEATH, PROC_REF(on_off))
-	playsound(get_turf(wearer), 'sound/effects/bubbles.ogg', 30, 1)
+	playsound(get_turf(wearer), 'sound/effects/vali_charge.ogg', 60, 0)
 	to_chat(wearer, span_notice("Commensing green blood injection.<b>[(automatic_meds_use && meds_beaker.reagents.total_volume) ? " Adding additional reagents." : ""]</b>"))
 	if(automatic_meds_use)
 		to_chat(wearer, get_meds_beaker_contents())

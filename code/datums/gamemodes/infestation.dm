@@ -236,54 +236,24 @@
 		style = OOC_ALERT_GAME
 	)
 
-	var/sound/xeno_track
-	var/sound/human_track
-	var/sound/ghost_track
+	var/sound/victory_track
 	switch(round_finished)
 		if(MODE_INFESTATION_X_MAJOR)
-			xeno_track = pick('sound/theme/winning_triumph1.ogg', 'sound/theme/winning_triumph2.ogg')
-			human_track = pick('sound/theme/sad_loss1.ogg', 'sound/theme/sad_loss2.ogg')
-			ghost_track = xeno_track
+			victory_track = pick('sound/theme/xeno_major1.ogg', 'sound/theme/xeno_major2.ogg')
 		if(MODE_INFESTATION_M_MAJOR)
-			xeno_track = pick('sound/theme/sad_loss1.ogg', 'sound/theme/sad_loss2.ogg')
-			human_track = pick('sound/theme/winning_triumph1.ogg', 'sound/theme/winning_triumph2.ogg')
-			ghost_track = human_track
+			victory_track = pick('sound/theme/maro_major1.ogg', 'sound/theme/maro_major2.ogg')
 		if(MODE_INFESTATION_X_MINOR)
-			xeno_track = pick('sound/theme/neutral_hopeful1.ogg', 'sound/theme/neutral_hopeful2.ogg')
-			human_track = pick('sound/theme/neutral_melancholy1.ogg', 'sound/theme/neutral_melancholy2.ogg')
-			ghost_track = xeno_track
+			victory_track = pick('sound/theme/xeno_minor.ogg')
 		if(MODE_INFESTATION_M_MINOR)
-			xeno_track = pick('sound/theme/neutral_melancholy1.ogg', 'sound/theme/neutral_melancholy2.ogg')
-			human_track = pick('sound/theme/neutral_hopeful1.ogg', 'sound/theme/neutral_hopeful2.ogg')
-			ghost_track = human_track
+			victory_track = pick('sound/theme/maro_minor.ogg')
 		if(MODE_INFESTATION_DRAW_DEATH)
-			ghost_track = pick('sound/theme/nuclear_detonation1.ogg', 'sound/theme/nuclear_detonation2.ogg')
-			xeno_track = ghost_track
-			human_track = ghost_track
+			victory_track = pick('sound/theme/draw1.ogg', 'sound/theme/draw2.ogg')
 
-	xeno_track = sound(xeno_track)
-	xeno_track.channel = CHANNEL_CINEMATIC
-	human_track = sound(human_track)
-	human_track.channel = CHANNEL_CINEMATIC
-	ghost_track = sound(ghost_track)
-	ghost_track.channel = CHANNEL_CINEMATIC
+	victory_track = sound(victory_track)
+	victory_track.channel = CHANNEL_CINEMATIC
 
-	for(var/mob/M as anything in GLOB.xeno_mob_list)
-		SEND_SOUND(M, xeno_track)
-
-	for(var/mob/M as anything in GLOB.human_mob_list)
-		SEND_SOUND(M, human_track)
-
-	for(var/mob/M as anything in GLOB.observer_list)
-		if(ishuman(M.mind.current))
-			SEND_SOUND(M, human_track)
-			continue
-
-		if(isxeno(M.mind.current))
-			SEND_SOUND(M, xeno_track)
-			continue
-
-		SEND_SOUND(M, ghost_track)
+	for(var/mob/M as anything)
+		SEND_SOUND(M, victory_track)
 
 /datum/game_mode/infestation/can_start(bypass_checks = FALSE)
 	. = ..()

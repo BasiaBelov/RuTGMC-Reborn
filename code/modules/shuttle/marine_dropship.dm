@@ -26,6 +26,9 @@
 			A.set_broken()
 		for(var/obj/effect/soundplayer/deltaplayer/alarmplayer AS in GLOB.ship_alarms)
 			alarmplayer.loop_sound.stop(alarmplayer)	//quiet the delta klaxon alarms
+		for(var/mob/living/current_mob AS in GLOB.mob_living_list)
+			if(current_mob.z == z)
+				current_mob.playsound_local(current_mob, 'sound/effects/shuttle_crushed_far.ogg', 100)
 		CHECK_TICK
 
 	for(var/i in GLOB.alive_living_list) //knock down mobs
